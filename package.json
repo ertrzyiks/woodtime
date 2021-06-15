@@ -1,0 +1,10 @@
+{
+  "name": "woodtime",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "client": "yarn workspace client"
+  }
+}
