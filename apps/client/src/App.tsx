@@ -12,6 +12,7 @@ import EventList from './components/EventList/EventList'
 import Storage from './components/Storage/Storage'
 import AddEvent from "./components/AddEvent/AddEvent";
 import EventPage from "./components/EventPage/EventPage";
+import AddCheckpointPage from "./components/AddCheckpointPage/AddCheckpointPage";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,6 +54,9 @@ function App() {
           </Route>
           <Route path="/events/:id" exact>
             <EventPage />
+          </Route>
+          <Route path="/events/:id/add-checkpoint" exact>
+            <AddCheckpointPage />
           </Route>
         </Switch>
       </Router>

@@ -1,24 +1,17 @@
 import React, {ReactNode, useContext, useEffect, useState} from 'react'
-
-interface Checkpoint {
-  id: string
-  visited: boolean
-  code?: string
-}
-
-interface Event {
-  id: string
-  name: string
-  numberOfCheckpoints: number
-  checkpoints: Checkpoint[]
-  createdAt: string
-}
+import {OrienteeringEvent} from "../../types/OrienteeringEvent"
+import {Checkpoint} from "../../types/Checkpoint";
 
 interface Actions {
-  addEvent: (name: string) => Event
+  addEvent: (name: string) => OrienteeringEvent
+  addCheckpoint: (params: { eventId: string, id: string, code?: string }) => Checkpoint
 }
 
-export const StorageContext = React.createContext({ events: []  as Event[] })
+interface State {
+  events: OrienteeringEvent[]
+}
+
+export const StorageContext = React.createContext<State>({ events: [] })
 export const ActionsContext = React.createContext<Actions|null>(null)
 
 const PersistInLocalstorage = () => {
@@ -32,12 +25,12 @@ const PersistInLocalstorage = () => {
 }
 
 const Storage = ({ children }: { children?: ReactNode }) => {
-  const [value, setValue] = useState(() => {
+  const [value, setValue] = useState<State>(() => {
     const storedValueRaw =  localStorage.getItem('woodtime-storage') ?? ''
     return storedValueRaw ? JSON.parse(storedValueRaw) : { events: [] as Event[] }
   })
 
-  const actions = {
+  const actions: Actions = {
     addEvent: (name: string) => {
       const event = {
         id: new Date().getTime().toString(),
@@ -48,6 +41,30 @@ const Storage = ({ children }: { children?: ReactNode }) => {
       const newValue = { events: [...value.events, event] }
       setValue(newValue)
       return event
+    },
+    addCheckpoint({ eventId, id, code }) {
+      const event = value.events.find(e => e.id === eventId)
+      const checkpoint = {
+        id,
+        visited: true,
+        code
+      }
+
+      if (!event) {
+        throw new Error(`Event ${eventId} not found`)
+      }
+
+      const newEvents = value.events.map(e => {
+        if (e.id === eventId) {
+          return { ...e, checkpoints: [...e.checkpoints, checkpoint]}
+        } else {
+          return e
+        }
+      })
+
+      setValue({ ...value, events: newEvents})
+
+      return checkpoint
     }
   }
 
