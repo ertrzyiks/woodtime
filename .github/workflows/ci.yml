@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [
+        synchronize
+        opened
+        reopened
+        ready_for_review
+    ]
+
+jobs:
+  unit_test:
+    name: 'Unit tests'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run unit tests
+        run: yarn client test
+
+  build:
+    name: 'Build'
+    needs: unit_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run unit tests
+        run: yarn client build
+
+      - name: Save build folder
+        uses: actions/upload-artifact@v1
+        with:
+          name: client-dist
+          path: apps/client/build
