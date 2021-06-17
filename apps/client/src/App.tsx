@@ -33,7 +33,7 @@ function App() {
 
   return (
     <Storage>
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
