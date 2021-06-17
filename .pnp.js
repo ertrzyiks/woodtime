@@ -8675,7 +8675,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-router-dom", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:5.2.0"],
             ["react-scripts", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:4.0.3"],
             ["typescript", "patch:typescript@npm%3A4.3.2#builtin<compat/typescript>::version=4.3.2&hash=ddfc1b"],
-            ["web-vitals", "npm:1.1.2"]
+            ["web-vitals", "npm:1.1.2"],
+            ["workbox-background-sync", "npm:5.1.4"],
+            ["workbox-broadcast-update", "npm:5.1.4"],
+            ["workbox-cacheable-response", "npm:5.1.4"],
+            ["workbox-core", "npm:5.1.4"],
+            ["workbox-expiration", "npm:5.1.4"],
+            ["workbox-google-analytics", "npm:5.1.4"],
+            ["workbox-navigation-preload", "npm:5.1.4"],
+            ["workbox-precaching", "npm:5.1.4"],
+            ["workbox-range-requests", "npm:5.1.4"],
+            ["workbox-routing", "npm:5.1.4"],
+            ["workbox-strategies", "npm:5.1.4"],
+            ["workbox-streams", "npm:5.1.4"]
           ],
           "linkType": "SOFT",
         }]
