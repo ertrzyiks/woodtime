@@ -46,3 +46,21 @@ jobs:
         with:
           name: client-dist
           path: apps/client/build
+
+  deploy:
+    name: 'Deployment'
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build folder
+        uses: actions/download-artifact@v1
+        with:
+          name: client-dist
+          path: build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: build
