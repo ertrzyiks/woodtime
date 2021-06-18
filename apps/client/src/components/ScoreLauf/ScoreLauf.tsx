@@ -5,6 +5,7 @@ import {OrienteeringEvent} from "../../types/OrienteeringEvent";
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import AddIcon from '@material-ui/icons/Add';
 import { Link } from 'react-router-dom';
+import MissingCheckpointsArea from "../MissingCheckpointsArea/MissingCheckpointsArea";
 
 function LinearProgressWithLabel({ current, max, ...props}: LinearProgressProps & { current: number, max: number }) {
   const value = 100 * current / max
@@ -46,6 +47,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       <Fab color="primary" aria-label="add" component={Link} to={newCheckpointPath}>
         <AddIcon />
       </Fab>
+        <MissingCheckpointsArea scoredIds={checkpoints.map(ch => parseInt(ch.id, 10))} max={event.numberOfCheckpoints} />
     </div>
   )
 }
