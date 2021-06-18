@@ -1,7 +1,9 @@
 import React, {useContext} from 'react'
 import { Form, Field } from 'react-final-form'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
-import { Button, TextField } from '@material-ui/core'
+import { Box, Button, TextField } from '@material-ui/core'
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import {ActionsContext} from "../Storage/Storage";
 import {useHistory, useParams } from 'react-router-dom';
 
@@ -29,6 +31,14 @@ const AddCheckpointPage = () => {
     history.push(`/events/${eventId}`)
   }
 
+    const [state, setState] = React.useState({
+        skipChecked: false,
+    });
+
+    const handleSkipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState({ ...state, [event.target.name]: event.target.checked });
+    };
+
   const classes = useStyles()
 
   return (
@@ -48,11 +58,25 @@ const AddCheckpointPage = () => {
           name="code"
           render={({ input, meta }) => (
             <div className={classes.margin}>
-              <TextField {...input} label='Code' required />
+              <TextField {...input} label='Code' required={!state.skipChecked} disabled={state.skipChecked} />
               {meta.touched && meta.error && <span>{meta.error}</span>}
             </div>
           )}
         />
+
+        <Box display="flex" alignItems="center" ml={1}>
+          <FormControlLabel
+              control={
+                  <Checkbox
+                      checked={state.skipChecked}
+                      onChange={handleSkipChange}
+                      name="skipChecked"
+                      color="primary"
+                  />
+              }
+              label="Skip"
+          />
+        </Box>
 
         <Button variant="contained" color="primary" type='submit'>
           Submit
