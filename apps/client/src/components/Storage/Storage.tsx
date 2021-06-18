@@ -4,7 +4,7 @@ import {Checkpoint} from "../../types/Checkpoint";
 
 interface Actions {
   addEvent: (name: string) => OrienteeringEvent
-  addCheckpoint: (params: { eventId: string, id: string, code?: string }) => Checkpoint
+  addCheckpoint: (params: { eventId: string, id: string, code?: string, skipped: boolean }) => Checkpoint
 }
 
 interface State {
@@ -42,11 +42,12 @@ const Storage = ({ children }: { children?: ReactNode }) => {
       setValue(newValue)
       return event
     },
-    addCheckpoint({ eventId, id, code }) {
+
+    addCheckpoint({ eventId, id, code, skipped }) {
       const event = value.events.find(e => e.id === eventId)
       const checkpoint = {
         id,
-        visited: true,
+        skipped,
         code
       }
 

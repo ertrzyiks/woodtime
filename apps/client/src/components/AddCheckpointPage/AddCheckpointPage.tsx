@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme: Theme) =>
 interface Values {
   id: string
   code?: string
+  skipped: boolean
 }
 
 const AddCheckpointPage = () => {
@@ -31,58 +32,64 @@ const AddCheckpointPage = () => {
     history.push(`/events/${eventId}`)
   }
 
-    const [state, setState] = React.useState({
-        skipChecked: false,
-    });
-
-    const handleSkipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState({ ...state, [event.target.name]: event.target.checked });
-    };
-
   const classes = useStyles()
 
   return (
-    <Form<Values> onSubmit={handleCheckpointSubmit} render={({ handleSubmit }) => (
-      <form onSubmit={handleSubmit}>
-        <Field
-          name="id"
-          render={({ input, meta }) => (
-            <div className={classes.margin}>
-              <TextField {...input} label='Id' required />
-              {meta.touched && meta.error && <span>{meta.error}</span>}
-            </div>
-          )}
-        />
+    <Form<Values>
+        onSubmit={handleCheckpointSubmit}
+        initialValues={{ skipped: false }}
+        render={({ values, handleSubmit }) => {
+            if (values.skipped) {
+                delete values.code
+            }
 
-        <Field
-          name="code"
-          render={({ input, meta }) => (
-            <div className={classes.margin}>
-              <TextField {...input} label='Code' required={!state.skipChecked} disabled={state.skipChecked} />
-              {meta.touched && meta.error && <span>{meta.error}</span>}
-            </div>
-          )}
-        />
+           return (<form onSubmit={handleSubmit}>
+                <Field
+                    name="id"
+                    render={({input, meta}) => (
+                        <div className={classes.margin}>
+                            <TextField {...input} label='Id' required/>
+                            {meta.touched && meta.error && <span>{meta.error}</span>}
+                        </div>
+                    )}
+                />
 
-        <Box display="flex" alignItems="center" ml={1}>
-          <FormControlLabel
-              control={
-                  <Checkbox
-                      checked={state.skipChecked}
-                      onChange={handleSkipChange}
-                      name="skipChecked"
-                      color="primary"
-                  />
-              }
-              label="Skip"
-          />
-        </Box>
+                <Field
+                    name="code"
+                    render={({input, meta}) => (
+                        <div className={classes.margin}>
+                            <TextField {...input} label='Code' required={!values.skipped} disabled={values.skipped}/>
+                            {meta.touched && meta.error && <span>{meta.error}</span>}
+                        </div>
+                    )}
+                />
 
-        <Button variant="contained" color="primary" type='submit'>
-          Submit
-        </Button>
-      </form>
-    )}/>
+                <Field
+                    name="skipped"
+                    type="checkbox"
+                    render={({input, meta}) => (
+                        <Box display="flex" alignItems="center" ml={1}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        {...input}
+                                        checked={input.value}
+                                        name="skipped"
+                                        color="primary"
+                                    />
+                                }
+                                label="Skip"
+                            />
+                        </Box>
+                    )}
+                />
+
+                <Button variant="contained" color="primary" type='submit'>
+                    Submit
+                </Button>
+            </form>)
+        }
+    }/>
   )
 }
 

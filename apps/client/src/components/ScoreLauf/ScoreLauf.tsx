@@ -38,7 +38,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
         <List>
           {checkpoints.map(checkpoint => (
             <ListItem key={checkpoint.id}>
-              <ListItemText primary={checkpoint.id} secondary={checkpoint.code} />
+              <ListItemText primary={checkpoint.id} secondary={checkpoint.skipped ? 'skipped' : checkpoint.code} />
             </ListItem>
           ))}
         </List>
