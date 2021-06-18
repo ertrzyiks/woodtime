@@ -1,5 +1,5 @@
 export interface Checkpoint {
   id: string
-  visited: boolean
+  skipped: boolean
   code?: string
 }
