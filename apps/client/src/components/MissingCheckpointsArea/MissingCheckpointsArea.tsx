@@ -10,7 +10,7 @@ const MissingCheckpointsArea = ({ scoredIds, max }: Props) => {
     const allPoints = Array(max).fill(max).map((_, idx) => 1 + idx)
     const missingPoints = allPoints.filter(p => !scoredIds.includes(p));
 
-   if (scoredIds.length === 0) {
+   if (scoredIds.length === 0 || scoredIds.length === max) {
        return null
    }
 

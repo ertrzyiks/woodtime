@@ -5,6 +5,7 @@ import {Checkpoint} from "../../types/Checkpoint";
 interface Actions {
   addEvent: (name: string) => OrienteeringEvent
   addCheckpoint: (params: { eventId: string, id: string, code?: string, skipped: boolean }) => Checkpoint
+  deleteCheckpoint: (params: { eventId: string, id: string }) => void
 }
 
 interface State {
@@ -45,14 +46,14 @@ const Storage = ({ children }: { children?: ReactNode }) => {
 
     addCheckpoint({ eventId, id, code, skipped }) {
       const event = value.events.find(e => e.id === eventId)
+      if (!event) {
+        throw new Error(`Event ${eventId} not found`)
+      }
+
       const checkpoint = {
         id,
         skipped,
         code
-      }
-
-      if (!event) {
-        throw new Error(`Event ${eventId} not found`)
       }
 
       const newEvents = value.events.map(e => {
@@ -66,6 +67,24 @@ const Storage = ({ children }: { children?: ReactNode }) => {
       setValue({ ...value, events: newEvents})
 
       return checkpoint
+    },
+
+    deleteCheckpoint: ({ eventId, id }) => {
+      const event = value.events.find(e => e.id === eventId)
+      if (!event) {
+        throw new Error(`Event ${eventId} not found`)
+      }
+
+      const updatedEvents = value.events.map(e => {
+        if (e.id !== eventId) {
+          return e
+        }
+
+        const updatedCheckpoints = e.checkpoints.filter(ch => ch.id !== id)
+        return { ...e, checkpoints: updatedCheckpoints}
+      })
+
+      setValue({ ...value, events: updatedEvents})
     }
   }
 
