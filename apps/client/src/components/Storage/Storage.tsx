@@ -35,7 +35,7 @@ const Storage = ({ children }: { children?: ReactNode }) => {
       const event = {
         id: new Date().getTime().toString(),
         name, createdAt: new Date().toISOString(),
-        numberOfCheckpoints: 17,
+        numberOfCheckpoints: 10,
         checkpoints: []
       }
       const newValue = { events: [...value.events, event] }
