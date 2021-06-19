@@ -48,7 +48,11 @@ const AddCheckpointPage = () => {
                     name="id"
                     render={({input, meta}) => (
                         <div className={classes.margin}>
-                            <TextField {...input} label='Id' required/>
+                            <TextField {...input}
+                                       label='Id'
+                                       required
+                                       autoComplete="off"
+                            />
                             {meta.touched && meta.error && <span>{meta.error}</span>}
                         </div>
                     )}
@@ -58,7 +62,12 @@ const AddCheckpointPage = () => {
                     name="code"
                     render={({input, meta}) => (
                         <div className={classes.margin}>
-                            <TextField {...input} label='Code' required={!values.skipped} disabled={values.skipped}/>
+                            <TextField {...input}
+                                       label='Code'
+                                       required={!values.skipped}
+                                       disabled={values.skipped}
+                                       autoComplete="off"
+                            />
                             {meta.touched && meta.error && <span>{meta.error}</span>}
                         </div>
                     )}
