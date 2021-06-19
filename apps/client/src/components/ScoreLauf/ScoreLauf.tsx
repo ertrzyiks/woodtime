@@ -1,11 +1,14 @@
 import {Box, Fab, List, ListItem, ListItemText, Typography} from '@material-ui/core';
-import React from 'react'
+import React, {useContext} from 'react'
 import {OrienteeringEvent} from "../../types/OrienteeringEvent";
 
 import LinearProgress, { LinearProgressProps } from '@material-ui/core/LinearProgress';
 import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from "../MissingCheckpointsArea/MissingCheckpointsArea";
+import IconButton from "@material-ui/core/IconButton";
+import {ActionsContext} from "../Storage/Storage";
 
 function LinearProgressWithLabel({ current, max, ...props}: LinearProgressProps & { current: number, max: number }) {
   const value = 100 * current / max
@@ -28,7 +31,13 @@ interface Props {
 }
 
 const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
-  const checkpoints = event.checkpoints
+    const actions = useContext(ActionsContext)
+    const checkpoints = event.checkpoints
+
+    const handleDeleteClick = (checkpointId: string) => {
+        actions?.deleteCheckpoint({ eventId: event.id, id: checkpointId })
+    }
+
   return (
     <div>
       <Typography>{event.name}</Typography>
@@ -39,6 +48,9 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
           {checkpoints.map(checkpoint => (
             <ListItem key={checkpoint.id}>
               <ListItemText primary={checkpoint.id} secondary={checkpoint.skipped ? 'skipped' : checkpoint.code} />
+                <IconButton aria-label="delete" onClick={() => handleDeleteClick(checkpoint.id)}>
+                    <DeleteIcon />
+                </IconButton>
             </ListItem>
           ))}
         </List>
