@@ -1,5 +1,7 @@
 {
   "name": "@woodtime/scanner",
+  "main": "build/index.js",
+  "module": "build/esm/index.js",
   "dependencies": {
     "@types/react": "17.0.11",
     "@types/react-dom": "17.0.8",
@@ -29,6 +31,7 @@
   "scripts": {
     "start": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
+    "build": "tsc --build tsconfig.build.json && tsc --build tsconfig.build.esm.json",
     "test": "jest"
   },
   "jest": {

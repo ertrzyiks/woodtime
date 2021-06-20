@@ -20,7 +20,7 @@ const Scanner = ({ onRead }: Props) => {
 
     const video = videoRef.current
 
-    function handleSuccess(stream) {
+    function handleSuccess(stream: MediaStream) {
       if (ignored) {
         return
       }
@@ -29,7 +29,7 @@ const Scanner = ({ onRead }: Props) => {
       video.srcObject = stream
     }
 
-    function handleError(error) {
+    function handleError(error: Error) {
       if (ignored) {
         return
       }
