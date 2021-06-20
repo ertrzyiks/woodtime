@@ -6,7 +6,8 @@
     "libs/*"
   ],
   "scripts": {
-    "client": "yarn workspace client"
+    "client": "yarn workspace client",
+    "scanner": "yarn workspace @woodtime/scanner"
   },
   "dependencies": {
     "global": "^4.4.0",
