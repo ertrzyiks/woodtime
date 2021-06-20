@@ -5449,6 +5449,7 @@ __metadata:
     apollo-server-express: ^2.25.1
     express: ^4.17.1
     graphql: ^15.5.0
+    prettier: 2.3.1
   languageName: unknown
   linkType: soft
 
@@ -7203,6 +7204,7 @@ __metadata:
     "@types/react-router-dom": ^5.1.7
     eslint-config-react-app: ^6.0.0
     final-form: ^4.20.2
+    prettier: 2.3.1
     react: ^17.0.2
     react-dom: ^17.0.2
     react-final-form: ^6.5.3
@@ -16116,6 +16118,15 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"prettier@npm:2.3.1, prettier@npm:^2.3.1":
+  version: 2.3.1
+  resolution: "prettier@npm:2.3.1"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 9b4a695b87ce5f510fc20feec01cce7371f0fa0b92ffe79d543f6be52e2004c532861629de4d7ab1c577e1f649dce3cfccd62cb2ca6526b1da8d9c63eb84bf36
+  languageName: node
+  linkType: hard
+
 "prettier@npm:~2.2.1":
   version: 2.2.1
   resolution: "prettier@npm:2.2.1"
@@ -20501,6 +20512,9 @@ typescript@^4.3.4:
 "woodtime@workspace:.":
   version: 0.0.0-use.local
   resolution: "woodtime@workspace:."
+  dependencies:
+    global: ^4.4.0
+    prettier: ^2.3.1
   languageName: unknown
   linkType: soft
 

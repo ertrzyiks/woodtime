@@ -1,18 +1,18 @@
-import React from 'react'
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
-import { AppBar, Toolbar, Typography, Link } from "@material-ui/core"
+import React from 'react';
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { AppBar, Toolbar, Typography, Link } from '@material-ui/core';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link as RouterLink
-} from "react-router-dom"
+  Link as RouterLink,
+} from 'react-router-dom';
 
-import EventList from './components/EventList/EventList'
-import Storage from './components/Storage/Storage'
-import AddEvent from "./components/AddEvent/AddEvent";
-import EventPage from "./components/EventPage/EventPage";
-import AddCheckpointPage from "./components/AddCheckpointPage/AddCheckpointPage";
+import EventList from './components/EventList/EventList';
+import Storage from './components/Storage/Storage';
+import AddEvent from './components/AddEvent/AddEvent';
+import EventPage from './components/EventPage/EventPage';
+import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -25,11 +25,11 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flexGrow: 1,
     },
-  }),
+  })
 );
 
 function App() {
-  const classes = useStyles()
+  const classes = useStyles();
 
   return (
     <Storage>
@@ -37,7 +37,7 @@ function App() {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              <Link component={RouterLink} to='/' color='inherit'>
+              <Link component={RouterLink} to="/" color="inherit">
                 Woodtime
               </Link>
             </Typography>

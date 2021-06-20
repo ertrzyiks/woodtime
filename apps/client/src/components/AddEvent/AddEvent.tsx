@@ -1,31 +1,30 @@
-import React, {useContext, useState} from 'react'
+import React, { useContext, useState } from 'react';
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField
-} from "@material-ui/core";
-import { useHistory } from "react-router-dom"
-import {ActionsContext} from "../Storage/Storage";
+  TextField,
+} from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import { ActionsContext } from '../Storage/Storage';
 
 const AddEvent = () => {
-  const [name, setName] = useState('')
+  const [name, setName] = useState('');
 
-  const actions = useContext(ActionsContext)
-  const history = useHistory()
+  const actions = useContext(ActionsContext);
+  const history = useHistory();
   const handleClose = () => {
-    history.push('/')
-  }
-
+    history.push('/');
+  };
 
   const handleSubmit = () => {
-    const event = actions?.addEvent(name)
+    const event = actions?.addEvent(name);
     if (event) {
-      history.push(`/events/${event.id}`)
+      history.push(`/events/${event.id}`);
     }
-  }
+  };
   return (
     <Dialog
       open
@@ -34,9 +33,15 @@ const AddEvent = () => {
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
     >
-      <DialogTitle id="alert-dialog-slide-title">Create a new event</DialogTitle>
+      <DialogTitle id="alert-dialog-slide-title">
+        Create a new event
+      </DialogTitle>
       <DialogContent>
-        <TextField id="standard-basic" label="Name" onChange={e => setName(e.target.value)} />
+        <TextField
+          id="standard-basic"
+          label="Name"
+          onChange={(e) => setName(e.target.value)}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleSubmit} color="primary">
@@ -47,7 +52,7 @@ const AddEvent = () => {
         </Button>
       </DialogActions>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AddEvent
+export default AddEvent;
