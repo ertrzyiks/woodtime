@@ -1,7 +1,7 @@
 import { Checkpoint } from './Checkpoint';
 
 export interface OrienteeringEvent {
-  id: string;
+  id: number;
   name: string;
   numberOfCheckpoints: number;
   checkpoints: Checkpoint[];
