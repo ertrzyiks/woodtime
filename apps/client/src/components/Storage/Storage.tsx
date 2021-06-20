@@ -3,7 +3,7 @@ import { OrienteeringEvent } from '../../types/OrienteeringEvent';
 import { Checkpoint } from '../../types/Checkpoint';
 
 interface Actions {
-  addEvent: (name: string) => OrienteeringEvent;
+  addEvent: (name: string, numCheckpoints: string) => OrienteeringEvent;
   addCheckpoint: (params: {
     eventId: string;
     id: string;
@@ -39,12 +39,12 @@ const Storage = ({ children }: { children?: ReactNode }) => {
   });
 
   const actions: Actions = {
-    addEvent: (name: string) => {
+    addEvent: (name: string, numCheckpoints: string) => {
       const event = {
         id: new Date().getTime().toString(),
         name,
         createdAt: new Date().toISOString(),
-        numberOfCheckpoints: 10,
+        numberOfCheckpoints: parseInt(numCheckpoints, 10),
         checkpoints: [],
       };
       const newValue = { events: [...value.events, event] };

@@ -9,9 +9,16 @@ import {
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { ActionsContext } from '../Storage/Storage';
+import { Field, Form } from 'react-final-form';
+
+interface Values {
+  name: string;
+  numCheckpoints: string;
+}
 
 const AddEvent = () => {
   const [name, setName] = useState('');
+  const [numCheckpoints, setNumCheckpoints] = useState('');
 
   const actions = useContext(ActionsContext);
   const history = useHistory();
@@ -20,7 +27,7 @@ const AddEvent = () => {
   };
 
   const handleSubmit = () => {
-    const event = actions?.addEvent(name);
+    const event = actions?.addEvent(name, numCheckpoints);
     if (event) {
       history.push(`/events/${event.id}`);
     }
@@ -36,21 +43,56 @@ const AddEvent = () => {
       <DialogTitle id="alert-dialog-slide-title">
         Create a new event
       </DialogTitle>
-      <DialogContent>
-        <TextField
-          id="standard-basic"
-          label="Name"
-          onChange={(e) => setName(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleSubmit} color="primary">
-          Create
-        </Button>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-      </DialogActions>
+      <Form<Values>
+        onSubmit={handleSubmit}
+        render={({ handleSubmit }) => {
+          return (
+            <form onSubmit={handleSubmit}>
+              <DialogContent>
+                <Field
+                  name="id"
+                  render={({ input, meta }) => (
+                    <div>
+                      <TextField
+                        id="standard-basic"
+                        label="Name"
+                        required
+                        autoComplete="off"
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+
+                <Field
+                  name="code"
+                  render={({ input, meta }) => (
+                    <div>
+                      <TextField
+                        id="standard-basic"
+                        label="Points"
+                        required
+                        autoComplete="off"
+                        onChange={(e) => setNumCheckpoints(e.target.value)}
+                      />
+                      {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button variant="contained" color="primary" type="submit">
+                  Create
+                </Button>
+                <Button onClick={handleClose} color="primary">
+                  Cancel
+                </Button>
+              </DialogActions>
+            </form>
+          );
+        }}
+      />
     </Dialog>
   );
 };
