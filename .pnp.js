@@ -52,6 +52,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
+            ["global", "npm:4.4.0"],
+            ["prettier", "npm:2.3.1"]
           ],
           "linkType": "SOFT",
         }]
@@ -9568,7 +9570,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["apollo-server", "virtual:62573a3b61ec6fe643a41d93ffa4ebd18a388dcd65c8cb24d9c86e851eb981c2764668b271ce43155e158809ba35a2a6f515276032c105924e6c314ac6de1cd6#npm:2.25.1"],
             ["apollo-server-express", "virtual:62573a3b61ec6fe643a41d93ffa4ebd18a388dcd65c8cb24d9c86e851eb981c2764668b271ce43155e158809ba35a2a6f515276032c105924e6c314ac6de1cd6#npm:2.25.1"],
             ["express", "npm:4.17.1"],
-            ["graphql", "npm:15.5.0"]
+            ["graphql", "npm:15.5.0"],
+            ["prettier", "npm:2.3.1"]
           ],
           "linkType": "SOFT",
         }]
@@ -11884,6 +11887,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-router-dom", "npm:5.1.7"],
             ["eslint-config-react-app", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.0"],
             ["final-form", "npm:4.20.2"],
+            ["prettier", "npm:2.3.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:17.0.2"],
             ["react-final-form", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.5.3"],
@@ -22332,6 +22336,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.2.1"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:2.3.1", {
+          "packageLocation": "./.yarn/cache/prettier-npm-2.3.1-f8593fac45-9b4a695b87.zip/node_modules/prettier/",
+          "packageDependencies": [
+            ["prettier", "npm:2.3.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["pretty-bytes", [
@@ -27700,7 +27711,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         ["workspace:.", {
           "packageLocation": "./",
           "packageDependencies": [
-            ["woodtime", "workspace:."]
+            ["woodtime", "workspace:."],
+            ["global", "npm:4.4.0"],
+            ["prettier", "npm:2.3.1"]
           ],
           "linkType": "SOFT",
         }]
