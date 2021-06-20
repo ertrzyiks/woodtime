@@ -5299,7 +5299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@woodtime/scanner@workspace:libs/scanner":
+"@woodtime/scanner@workspace:*, @woodtime/scanner@workspace:libs/scanner":
   version: 0.0.0-use.local
   resolution: "@woodtime/scanner@workspace:libs/scanner"
   dependencies:
@@ -7491,6 +7491,7 @@ __metadata:
     "@types/react": ^17.0.0
     "@types/react-dom": ^17.0.0
     "@types/react-router-dom": ^5.1.7
+    "@woodtime/scanner": "workspace:*"
     eslint-config-react-app: ^6.0.0
     final-form: ^4.20.2
     prettier: 2.3.1

@@ -6,6 +6,7 @@
     "libs/*"
   ],
   "scripts": {
+    "build": "yarn workspaces foreach run build",
     "client": "yarn workspace client",
     "scanner": "yarn workspace @woodtime/scanner"
   },
