@@ -28,7 +28,7 @@ const AddCheckpointPage = () => {
   const history = useHistory();
 
   const handleCheckpointSubmit = (checkpoint: Values) => {
-    actions?.addCheckpoint({ eventId, ...checkpoint });
+    actions?.addCheckpoint({ eventId: parseInt(eventId, 10), ...checkpoint });
     history.push(`/events/${eventId}`);
   };
 

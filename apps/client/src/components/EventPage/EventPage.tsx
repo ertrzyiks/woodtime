@@ -7,7 +7,7 @@ const EventPage = () => {
   const { id } = useParams<{ id: string }>();
   const { events } = useContext(StorageContext);
 
-  const event = events.find((e) => e.id === id);
+  const event = events.find((e) => e.id === parseInt(id, 10));
 
   if (!event) {
     return null;

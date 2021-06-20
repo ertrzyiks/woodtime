@@ -5,12 +5,12 @@ import { Checkpoint } from '../../types/Checkpoint';
 interface Actions {
   addEvent: (name: string, numCheckpoints: string) => OrienteeringEvent;
   addCheckpoint: (params: {
-    eventId: string;
+    eventId: number;
     id: string;
     code?: string;
     skipped: boolean;
   }) => Checkpoint;
-  deleteCheckpoint: (params: { eventId: string; id: string }) => void;
+  deleteCheckpoint: (params: { eventId: number; id: string }) => void;
 }
 
 interface State {
@@ -41,7 +41,7 @@ const Storage = ({ children }: { children?: ReactNode }) => {
   const actions: Actions = {
     addEvent: (name: string, numCheckpoints: string) => {
       const event = {
-        id: new Date().getTime().toString(),
+        id: new Date().getTime(),
         name,
         createdAt: new Date().toISOString(),
         numberOfCheckpoints: parseInt(numCheckpoints, 10),

@@ -12248,6 +12248,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", "npm:17.0.7"],
             ["@types/react-router-dom", "npm:5.1.7"],
             ["@woodtime/scanner", "workspace:libs/scanner"],
+            ["date-fns", "npm:2.22.1"],
             ["eslint-config-react-app", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.0"],
             ["final-form", "npm:4.20.2"],
             ["prettier", "npm:2.3.1"],
@@ -13429,6 +13430,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["abab", "npm:2.0.5"],
             ["whatwg-mimetype", "npm:2.3.0"],
             ["whatwg-url", "npm:8.6.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["date-fns", [
+        ["npm:2.22.1", {
+          "packageLocation": "./.yarn/cache/date-fns-npm-2.22.1-cc0cbadceb-a89dc6cdf3.zip/node_modules/date-fns/",
+          "packageDependencies": [
+            ["date-fns", "npm:2.22.1"]
           ],
           "linkType": "HARD",
         }]
