@@ -6,6 +6,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { ActionsContext } from '../Storage/Storage';
 import { useHistory, useParams } from 'react-router-dom';
+import { FORM_ERROR } from 'final-form';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,8 +29,26 @@ const AddCheckpointPage = () => {
   const history = useHistory();
 
   const handleCheckpointSubmit = (checkpoint: Values) => {
-    actions?.addCheckpoint({ eventId: parseInt(eventId, 10), ...checkpoint });
-    history.push(`/events/${eventId}`);
+    try {
+      actions?.addCheckpoint({ eventId: parseInt(eventId, 10), ...checkpoint });
+      history.push(`/events/${eventId}`);
+    } catch (err) {
+      if (!err) {
+        return {
+          [FORM_ERROR]: 'Something went wrong',
+        };
+      }
+
+      if (err.message && err.message.startsWith('Checkpoint')) {
+        return {
+          id: 'Id already taken',
+        };
+      }
+
+      return {
+        [FORM_ERROR]: err.message || err,
+      };
+    }
   };
 
   const classes = useStyles();
@@ -38,13 +57,16 @@ const AddCheckpointPage = () => {
     <Form<Values>
       onSubmit={handleCheckpointSubmit}
       initialValues={{ skipped: false }}
-      render={({ values, handleSubmit }) => {
+      render={({ values, submitError, handleSubmit }) => {
         if (values.skipped) {
           delete values.code;
         }
 
         return (
           <form onSubmit={handleSubmit}>
+            {submitError && (
+              <div className="error">{submitError}</div> // not showing
+            )}
             <Field
               name="id"
               render={({ input, meta }) => (
@@ -55,7 +77,9 @@ const AddCheckpointPage = () => {
                     required
                     autoComplete="off"
                   />
-                  {meta.touched && meta.error && <span>{meta.error}</span>}
+                  {meta.touched && (meta.error || meta.submitError) && (
+                    <span>{meta.error || meta.submitError}</span>
+                  )}
                 </div>
               )}
             />
@@ -71,7 +95,9 @@ const AddCheckpointPage = () => {
                     disabled={values.skipped}
                     autoComplete="off"
                   />
-                  {meta.touched && meta.error && <span>{meta.error}</span>}
+                  {meta.touched && (meta.error || meta.submitError) && (
+                    <span>{meta.error || meta.submitError}</span>
+                  )}
                 </div>
               )}
             />
