@@ -1,9 +1,12 @@
 import {
   Box,
+  createStyles,
   Fab,
-  List,
-  ListItem,
-  ListItemText,
+  Grid,
+  GridSpacing,
+  makeStyles,
+  Paper,
+  Theme,
   Typography,
 } from '@material-ui/core';
 import React, { useContext } from 'react';
@@ -53,6 +56,29 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
     actions?.deleteCheckpoint({ eventId: event.id, id: checkpointId });
   };
 
+  const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+      root: {
+        flexGrow: 1,
+        padding: 20,
+      },
+      paper: {
+        height: 100,
+        width: 100,
+      },
+      item: {
+        padding: 5,
+      },
+      control: {
+        padding: theme.spacing(2),
+      },
+    })
+  );
+
+  const [spacing, setSpacing] = React.useState<GridSpacing>(2);
+
+  const classes = useStyles();
+
   return (
     <div>
       <Typography>{event.name}</Typography>
@@ -62,22 +88,47 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       />
 
       {checkpoints.length > 0 && (
-        <List>
-          {checkpoints.map((checkpoint) => (
-            <ListItem key={checkpoint.id}>
-              <ListItemText
-                primary={checkpoint.id}
-                secondary={checkpoint.skipped ? 'skipped' : checkpoint.code}
-              />
-              <IconButton
-                aria-label="delete"
-                onClick={() => handleDeleteClick(checkpoint.id)}
-              >
-                <DeleteIcon />
-              </IconButton>
-            </ListItem>
-          ))}
-        </List>
+        <Grid container className={classes.root} spacing={2}>
+          <Grid item xs={12}>
+            <Grid container justify="flex-start" spacing={spacing}>
+              {checkpoints.map((checkpoint) => (
+                <Grid key={checkpoint.id} item className={classes.item}>
+                  <Paper className={classes.paper}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: 10,
+                      }}
+                    >
+                      <div>
+                        <span style={{ display: 'block' }}>
+                          #{checkpoint.id}
+                        </span>
+                        <span style={{ display: 'block' }}>
+                          {checkpoint.skipped ? 'skipped' : checkpoint.code}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                        }}
+                      >
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => handleDeleteClick(checkpoint.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </div>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+        </Grid>
       )}
 
       <Fab
