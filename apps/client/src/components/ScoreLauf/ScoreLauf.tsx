@@ -75,7 +75,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
     })
   );
 
-  const [spacing, setSpacing] = React.useState<GridSpacing>(2);
+  const [spacing] = React.useState<GridSpacing>(2);
 
   const classes = useStyles();
 
