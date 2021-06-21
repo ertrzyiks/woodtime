@@ -58,6 +58,11 @@ const Storage = ({ children }: { children?: ReactNode }) => {
         throw new Error(`Event ${eventId} not found`);
       }
 
+      const hasCheckpoint = event.checkpoints.some((ch) => ch.id === id);
+      if (hasCheckpoint) {
+        throw new Error(`Checkpoint ${id} already added`);
+      }
+
       const checkpoint = {
         id,
         skipped,
