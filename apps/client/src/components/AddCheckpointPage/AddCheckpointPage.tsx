@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, {useContext, useState} from 'react';
 import { Form, Field } from 'react-final-form';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Box, Button, TextField } from '@material-ui/core';
@@ -7,6 +7,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { ActionsContext } from '../Storage/Storage';
 import { useHistory, useParams } from 'react-router-dom';
 import { FORM_ERROR } from 'final-form';
+import { Scanner } from "@woodtime/scanner"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,7 +23,14 @@ interface Values {
   skipped: boolean;
 }
 
+interface ScannerRead {
+  id: number
+  code: string
+}
+
 const AddCheckpointPage = () => {
+  const [scanning, setScanning] = useState(false)
+  const [scannerRead, setScannerRead] = useState<ScannerRead|null>(null)
   const actions = useContext(ActionsContext);
   const { id: eventId } = useParams<{ id: string }>();
 
@@ -121,6 +129,28 @@ const AddCheckpointPage = () => {
                 </Box>
               )}
             />
+
+            <div style={{ marginTop: 16, marginBottom: 16, width: 300, height: 225 }}>
+              {scanning ? (
+                <div style={{ position: 'relative' }}>
+                  <Scanner onRead={point => { setScannerRead(point) }}/>
+
+                  <Button variant="contained" color="secondary" onClick={() => setScanning(false)} style={{ position: 'absolute', bottom: 0, right: 0 }}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <div style={{ width: 300, height: 225, background: 'grey', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Button variant="contained" color="secondary" onClick={() => setScanning(true)}>
+                    Scan
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {scannerRead && (
+              <div>{scannerRead.id} - {scannerRead.code}</div>
+            )}
 
             <Button variant="contained" color="primary" type="submit">
               Submit
