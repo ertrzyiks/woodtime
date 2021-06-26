@@ -1,9 +1,12 @@
 import {createWorker, Worker} from 'tesseract.js'
 
 export async function buildWorker() {
-  const worker = createWorker({
-    corePath: require('file-loader!tesseract.js-core/tesseract-core.asm.js').default
-  })
+  const worker = createWorker(typeof process === 'object'
+    ? {}
+    : {
+      corePath: require('file-loader!tesseract.js-core/tesseract-core.asm.js').default
+    }
+  )
 
   await worker.load();
   await worker.loadLanguage('pol');
