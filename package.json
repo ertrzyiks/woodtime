@@ -7,6 +7,9 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach run build",
+    "build:watch": "yarn workspaces foreach run build:watch",
+    "test": "yarn workspaces foreach run test",
+    "start": "yarn build && yarn client start",
     "client": "yarn workspace client",
     "scanner": "yarn workspace @woodtime/scanner"
   },

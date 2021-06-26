@@ -9413,6 +9413,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:0c45d909f1bedf0abdacdb5d1505e51999aa20c9eb06c7211740a42c3de5b877eceea493d137f4af27bb05463d68601eb5c558703a6cf22583e9b98616b1637c#npm:17.0.2"],
             ["tesseract.js", "npm:2.1.4"],
+            ["tesseract.js-core", "npm:2.2.0"],
             ["typescript", "patch:typescript@npm%3A4.3.4#builtin<compat/typescript>::version=4.3.4&hash=ddfc1b"]
           ],
           "linkType": "SOFT",

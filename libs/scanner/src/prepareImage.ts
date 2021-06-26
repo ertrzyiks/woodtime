@@ -11,7 +11,6 @@ const posToIndex = (x: number, y: number, width: number) => {
 
 export function prepareImage(ctx: CanvasRenderingContext2D) {
   const { width, height } = ctx.canvas
-  console.log({ width, height })
   const imageData = ctx.getImageData(0, 0, width, height)
   const { data } = imageData
 
