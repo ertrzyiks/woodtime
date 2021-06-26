@@ -111,7 +111,9 @@ const Scanner = ({ onRead }: Props) => {
   }, [canvasRef, videoRef])
 
   return (
-    <video playsInline autoPlay ref={videoRef} style={{ width: '100%', height: 'calc(var(--width) * 0.75)' }}></video>
+    <div style={{ width: 300, height: 225, overflow: 'hidden'}}>
+      <video playsInline autoPlay ref={videoRef} style={{ width: '100%', height: 'calc(var(--width) * 0.75)' }}></video>
+    </div>
   )
 }
 
