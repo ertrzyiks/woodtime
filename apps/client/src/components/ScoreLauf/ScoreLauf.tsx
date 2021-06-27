@@ -19,6 +19,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../CheckpointCard/CheckpointCard';
+import Solution from '../Solution/Solution';
 
 function LinearProgressWithLabel({
   current,
@@ -110,6 +111,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
         scoredIds={checkpoints.map((ch) => parseInt(ch.id, 10))}
         max={event.numberOfCheckpoints}
       />
+      <Solution checkpoints={checkpoints} max={event.numberOfCheckpoints} />
     </Box>
   );
 };
