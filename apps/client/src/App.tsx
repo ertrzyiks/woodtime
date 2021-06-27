@@ -13,6 +13,7 @@ import Storage from './components/Storage/Storage';
 import AddEvent from './components/AddEvent/AddEvent';
 import EventPage from './components/EventPage/EventPage';
 import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
+import PwaUpdateNotification from "./components/PwaUpdateNofication/PwaUpdateNotification";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +34,8 @@ function App() {
 
   return (
     <Storage>
+      <PwaUpdateNotification />
+
       <Router basename={process.env.PUBLIC_URL}>
         <AppBar position="static">
           <Toolbar>
