@@ -9,7 +9,7 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import React, { useContext } from 'react';
+import React from 'react';
 import { OrienteeringEvent } from '../../types/OrienteeringEvent';
 
 import LinearProgress, {
@@ -18,7 +18,6 @@ import LinearProgress, {
 import AddIcon from '@material-ui/icons/Add';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
-import { ActionsContext } from '../Storage/Storage';
 import CheckpointCard from '../CheckpointCard/CheckpointCard';
 
 function LinearProgressWithLabel({
