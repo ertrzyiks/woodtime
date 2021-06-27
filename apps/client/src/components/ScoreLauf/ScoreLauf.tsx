@@ -16,11 +16,10 @@ import LinearProgress, {
   LinearProgressProps,
 } from '@material-ui/core/LinearProgress';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
-import IconButton from '@material-ui/core/IconButton';
 import { ActionsContext } from '../Storage/Storage';
+import CheckpointCard from '../CheckpointCard/CheckpointCard';
 
 function LinearProgressWithLabel({
   current,
@@ -48,40 +47,34 @@ interface Props {
   newCheckpointPath: string;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1,
+      padding: 20,
+    },
+    paper: {
+      width: 80,
+    },
+    item: {
+      padding: 5,
+    },
+    control: {
+      padding: theme.spacing(2),
+    },
+  })
+);
+
 const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
-  const actions = useContext(ActionsContext);
   const checkpoints = event.checkpoints;
-
-  const handleDeleteClick = (checkpointId: string) => {
-    actions?.deleteCheckpoint({ eventId: event.id, id: checkpointId });
-  };
-
-  const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-      root: {
-        flexGrow: 1,
-        padding: 20,
-      },
-      paper: {
-        height: 100,
-        width: 100,
-      },
-      item: {
-        padding: 5,
-      },
-      control: {
-        padding: theme.spacing(2),
-      },
-    })
-  );
 
   const [spacing] = React.useState<GridSpacing>(2);
 
   const classes = useStyles();
 
   return (
-    <div>
-      <Typography>{event.name}</Typography>
+    <Box m={1}>
+      <Typography variant="h6">{event.name}</Typography>
       <LinearProgressWithLabel
         current={checkpoints.length}
         max={event.numberOfCheckpoints}
@@ -94,35 +87,10 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
               {checkpoints.map((checkpoint) => (
                 <Grid key={checkpoint.id} item className={classes.item}>
                   <Paper className={classes.paper}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: 10,
-                      }}
-                    >
-                      <div>
-                        <span style={{ display: 'block' }}>
-                          #{checkpoint.id}
-                        </span>
-                        <span style={{ display: 'block' }}>
-                          {checkpoint.skipped ? 'skipped' : checkpoint.code}
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'flex-start',
-                        }}
-                      >
-                        <IconButton
-                          aria-label="delete"
-                          onClick={() => handleDeleteClick(checkpoint.id)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </div>
-                    </div>
+                    <CheckpointCard
+                      checkpoint={checkpoint}
+                      eventId={event.id}
+                    />
                   </Paper>
                 </Grid>
               ))}
@@ -143,7 +111,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
         scoredIds={checkpoints.map((ch) => parseInt(ch.id, 10))}
         max={event.numberOfCheckpoints}
       />
-    </div>
+    </Box>
   );
 };
 
