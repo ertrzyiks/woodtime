@@ -28,6 +28,7 @@ module.exports = gql`
   type Query {
     me: User
     events: [Event!]!
+    event(id: Int!): Event
   }
 
   type CreateUserPayload {

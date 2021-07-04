@@ -6,6 +6,7 @@ const typeDefs = require("./schema");
 
 const {
   events,
+  event,
   checkpoints,
   createEvent,
   deleteEvent,
@@ -37,6 +38,7 @@ const resolvers = {
       return context.user;
     },
     events,
+    event,
   },
   Event: {
     checkpoints,
