@@ -1,6 +1,6 @@
 const knex = require("../../knex");
 
-module.exports = async (_, { eventId }) => {
+module.exports = async ({ id }) => {
   return knex
     .select(
       "id",
@@ -14,6 +14,6 @@ module.exports = async (_, { eventId }) => {
     )
     .from("checkpoints")
     .where({
-      event_id: eventId,
+      event_id: id,
     });
 };

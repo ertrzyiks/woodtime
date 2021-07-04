@@ -7,16 +7,17 @@ module.exports = gql`
     cp_code: String
     skipped: Boolean
     skip_reason: String
-    createdAt: String!
-    updatedAt: String!
+    created_at: String!
+    updated_at: String!
   }
 
   type Event {
     id: Int!
     name: String!
-    checkpoint_count: [Checkpoint!]!
-    createdAt: String!
-    updatedAt: String!
+    checkpoint_count: Int!
+    checkpoints: [Checkpoint!]!
+    created_at: String!
+    updated_at: String!
   }
 
   type User {
@@ -72,7 +73,7 @@ module.exports = gql`
     login(token: String!): LoginPayload
     joinEvent(id: String!): JoinEventPayload
 
-    createEvent(name: String!, checkpoint_count: Int!): CreateEventResult
+    createEvent(name: String!, checkpointCount: Int!): CreateEventResult
 
     deleteEvent(id: Int!): DeleteEventResult
 

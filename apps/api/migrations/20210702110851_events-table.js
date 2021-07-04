@@ -1,10 +1,12 @@
-exports.up = function (knex) {
+exports.up = async function (knex) {
+  await knex.raw("PRAGMA foreign_keys = ON");
+
   return knex.schema.createTable("events", function (table) {
-    table.integer("id").primary().notNullable();
+    table.increments("id").primary();
     table.string("name").notNullable();
     table.integer("checkpoint_count").notNullable();
-    table.timestamp("created_at").notNullable();
-    table.timestamp("updated_at").notNullable();
+    table.string("created_at").notNullable();
+    table.string("updated_at").notNullable();
   });
 };
 

@@ -37,6 +37,8 @@ const resolvers = {
       return context.user;
     },
     events,
+  },
+  Event: {
     checkpoints,
   },
   Mutation: {
@@ -50,11 +52,11 @@ const resolvers = {
 
       return user;
     },
+    createEvent,
+    deleteEvent,
+    createCheckpoint,
+    deleteCheckpoint,
   },
-  createEvent,
-  deleteEvent,
-  createCheckpoint,
-  deleteCheckpoint,
 };
 
 const context = async ({ req }) => {

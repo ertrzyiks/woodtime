@@ -4,14 +4,18 @@ module.exports = async (_, { name, checkpointCount }) => {
   const event = {
     name,
     checkpoint_count: checkpointCount,
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
 
-  const createdEvent = await knex.insert(event).into("events");
+  console.log("create event", name, checkpointCount);
+
+  const createdEvent = await knex("events").insert(event);
+
+  console.log("created", createdEvent);
 
   return {
     success: true,
-    event: createdEvent,
+    event: { id: createdEvent[0], ...event },
   };
 };

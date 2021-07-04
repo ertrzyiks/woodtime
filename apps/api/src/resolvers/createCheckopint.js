@@ -6,8 +6,8 @@ module.exports = async (_, { cpId, cpCode, skipped, skipReason }) => {
     cp_code: cpCode,
     skipped,
     skip_reason: skipReason,
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   };
 
   const createdCheckpoint = await knex.insert(checkpoint).into("checkpoints");

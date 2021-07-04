@@ -10,6 +10,9 @@ import {
 import { useHistory } from 'react-router-dom';
 import { ActionsContext } from '../Storage/Storage';
 import { Field, Form } from 'react-final-form';
+import { useMutation } from '@apollo/client';
+
+import { CREATE_EVENT } from '../../queries';
 
 interface Values {
   name: string;
@@ -20,17 +23,23 @@ const AddEvent = () => {
   const [name, setName] = useState('');
   const [numCheckpoints, setNumCheckpoints] = useState('');
 
-  const actions = useContext(ActionsContext);
+  const [createEvent, { loading: creationLoading, error: creationError }] =
+    useMutation(CREATE_EVENT, {
+      refetchQueries: ['getEvents'],
+      onCompleted: (data) => {
+        history.push(`/events/${data.createEvent.event.id}`);
+      },
+    });
+
   const history = useHistory();
   const handleClose = () => {
     history.push('/');
   };
 
   const handleSubmit = () => {
-    const event = actions?.addEvent(name, numCheckpoints);
-    if (event) {
-      history.push(`/events/${event.id}`);
-    }
+    return createEvent({
+      variables: { name, checkpointCount: parseInt(numCheckpoints, 10) },
+    });
   };
   return (
     <Dialog
