@@ -77,7 +77,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       <Typography variant="h6">{event.name}</Typography>
       <LinearProgressWithLabel
         current={checkpoints.length}
-        max={event.numberOfCheckpoints}
+        max={event.checkpoint_count}
       />
 
       {checkpoints.length > 0 && (
@@ -85,7 +85,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
           <Grid item xs={12}>
             <Grid container justify="flex-start" spacing={spacing}>
               {checkpoints.map((checkpoint) => (
-                <Grid key={checkpoint.id} item className={classes.item}>
+                <Grid key={checkpoint.cp_id} item className={classes.item}>
                   <Paper className={classes.paper}>
                     <CheckpointCard
                       checkpoint={checkpoint}
@@ -108,10 +108,10 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
         <AddIcon />
       </Fab>
       <MissingCheckpointsArea
-        scoredIds={checkpoints.map((ch) => parseInt(ch.id, 10))}
-        max={event.numberOfCheckpoints}
+        scoredIds={checkpoints.map((ch) => ch.cp_id)}
+        max={event.checkpoint_count}
       />
-      <Solution checkpoints={checkpoints} max={event.numberOfCheckpoints} />
+      <Solution checkpoints={checkpoints} max={event.checkpoint_count} />
     </Box>
   );
 };

@@ -63,13 +63,15 @@ const CheckpointCard = ({ checkpoint, eventId }: Props) => {
       <div className={classes.wrapper}>
         <div className={classes.header}>
           <Typography variant="button" color="textSecondary">
-            {checkpoint.id}
+            {checkpoint.cp_id}
           </Typography>
         </div>
         <div className={classes.content}>
           <Typography variant="subtitle1">
             <span>
-              {checkpoint.skipped ? 'skipped' : checkpoint.code?.toUpperCase()}
+              {checkpoint.skipped
+                ? 'skipped'
+                : checkpoint.cp_code?.toUpperCase()}
             </span>
           </Typography>
         </div>
@@ -77,7 +79,7 @@ const CheckpointCard = ({ checkpoint, eventId }: Props) => {
       <div className={classes.deleteIcon}>
         <IconButton
           aria-label="delete"
-          onClick={() => handleDeleteClick(checkpoint.id)}
+          onClick={() => handleDeleteClick(checkpoint.cp_id.toString())}
         >
           <ClearIcon />
         </IconButton>

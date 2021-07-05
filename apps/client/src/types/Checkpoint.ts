@@ -1,5 +1,7 @@
 export interface Checkpoint {
-  id: string;
+  id: number;
   skipped: boolean;
-  code?: string;
+  skip_reason?: string;
+  cp_id: number;
+  cp_code?: string;
 }

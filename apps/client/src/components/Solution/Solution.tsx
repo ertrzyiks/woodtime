@@ -13,7 +13,7 @@ const Solution = ({ checkpoints, max }: Props) => {
   }
 
   checkpoints.sort((ch1, ch2) => {
-    return parseInt(ch1.id, 10) > parseInt(ch2.id, 10) ? 1 : -1;
+    return ch1.cp_id > ch2.cp_id ? 1 : -1;
   });
 
   const parsedCodes = checkpoints.map((ch) => {
@@ -21,7 +21,7 @@ const Solution = ({ checkpoints, max }: Props) => {
       return '...';
     }
 
-    return ch.code;
+    return ch.cp_code;
   });
 
   return (

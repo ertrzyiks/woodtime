@@ -5,6 +5,7 @@ export const GET_EVENT = gql`
     event(id: $id) {
       id
       name
+      checkpoint_count
       checkpoints {
         cp_id
         cp_code

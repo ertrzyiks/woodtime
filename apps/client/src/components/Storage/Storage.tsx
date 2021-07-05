@@ -3,15 +3,10 @@ import { OrienteeringEvent } from '../../types/OrienteeringEvent';
 import { Checkpoint } from '../../types/Checkpoint';
 
 interface Actions {
-  addEvent: (name: string, numCheckpoints: string) => OrienteeringEvent;
+  addEvent: () => void;
   deleteEvent: (id: number) => void;
-  addCheckpoint: (params: {
-    eventId: number;
-    id: string;
-    code?: string;
-    skipped: boolean;
-  }) => Checkpoint;
-  deleteCheckpoint: (params: { eventId: number; id: string }) => void;
+  addCheckpoint: (params: any) => void;
+  deleteCheckpoint: (params: any) => void;
 }
 
 interface State {
@@ -40,53 +35,14 @@ const Storage = ({ children }: { children?: ReactNode }) => {
   });
 
   const actions: Actions = {
-    addEvent: (name: string, numCheckpoints: string) => {
-      const event = {
-        id: new Date().getTime(),
-        name,
-        createdAt: new Date().toISOString(),
-        numberOfCheckpoints: parseInt(numCheckpoints, 10),
-        checkpoints: [],
-      };
-      const newValue = { events: [...value.events, event] };
-      setValue(newValue);
-      return event;
-    },
+    addEvent: () => {},
 
     deleteEvent: (id: number) => {
       const remainingEvents = value.events.filter((e) => e.id !== id);
       setValue({ ...value, events: remainingEvents });
     },
 
-    addCheckpoint({ eventId, id, code, skipped }) {
-      const event = value.events.find((e) => e.id === eventId);
-      if (!event) {
-        throw new Error(`Event ${eventId} not found`);
-      }
-
-      const hasCheckpoint = event.checkpoints.some((ch) => ch.id === id);
-      if (hasCheckpoint) {
-        throw new Error(`Checkpoint ${id} already added`);
-      }
-
-      const checkpoint = {
-        id,
-        skipped,
-        code,
-      };
-
-      const newEvents = value.events.map((e) => {
-        if (e.id === eventId) {
-          return { ...e, checkpoints: [...e.checkpoints, checkpoint] };
-        } else {
-          return e;
-        }
-      });
-
-      setValue({ ...value, events: newEvents });
-
-      return checkpoint;
-    },
+    addCheckpoint() {},
 
     deleteCheckpoint: ({ eventId, id }) => {
       const event = value.events.find((e) => e.id === eventId);
