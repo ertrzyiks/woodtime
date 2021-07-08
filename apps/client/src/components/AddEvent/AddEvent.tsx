@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -25,6 +25,7 @@ const AddEvent = () => {
   const [createEvent, { loading: creationLoading, error: creationError }] =
     useMutation(CREATE_EVENT, {
       refetchQueries: ['getEvents'],
+      awaitRefetchQueries: true,
       onCompleted: (data) => {
         history.push(`/events/${data.createEvent.event.id}`);
       },

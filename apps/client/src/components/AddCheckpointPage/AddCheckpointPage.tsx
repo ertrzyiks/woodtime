@@ -4,11 +4,10 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Box, Button, TextField } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import { ActionsContext } from '../Storage/Storage';
 import { useHistory, useParams } from 'react-router-dom';
 import { FORM_ERROR } from 'final-form';
 import { Scanner } from '@woodtime/scanner';
-import { CREATE_CHECKPOINT, CREATE_EVENT } from '../../queries';
+import { CREATE_CHECKPOINT } from '../../queries';
 import { useMutation } from '@apollo/client';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -35,14 +34,14 @@ interface ScannerRead {
 const AddCheckpointPage = () => {
   const [scanning, setScanning] = useState(false);
   const [scannerRead, setScannerRead] = useState<ScannerRead | null>(null);
-  const actions = useContext(ActionsContext);
   const { id: eventId } = useParams<{ id: string }>();
 
   const history = useHistory();
 
   const [createCheckpoint, { loading: creationLoading, error: creationError }] =
     useMutation<any, Values>(CREATE_CHECKPOINT, {
-      refetchQueries: ['event'],
+      refetchQueries: ['getEvent'],
+      awaitRefetchQueries: true,
       onCompleted: (data) => {
         history.push(`/events/${data.createCheckpoint.checkpoint.event_id}`);
       },
@@ -50,13 +49,6 @@ const AddCheckpointPage = () => {
 
   const handleCheckpointSubmit = (checkpoint: any) => {
     try {
-      console.log('params', {
-        eventId: parseInt(eventId, 10),
-        cpId: parseInt(checkpoint.cpId, 10),
-        cpCode: checkpoint.cpCode,
-        skipped: checkpoint.skipped,
-        skipReason: checkpoint.skipReason,
-      });
       return createCheckpoint({
         variables: {
           eventId: parseInt(eventId, 10),
@@ -86,6 +78,14 @@ const AddCheckpointPage = () => {
   };
 
   const classes = useStyles();
+
+  if (creationLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (creationError) {
+    return <p>Error :(</p>;
+  }
 
   return (
     <Form<Values>

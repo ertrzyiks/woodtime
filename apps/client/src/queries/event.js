@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const GET_EVENT = gql`
-  query ($id: Int!) {
+  query getEvent($id: Int!) {
     event(id: $id) {
       id
       name
@@ -9,7 +9,9 @@ export const GET_EVENT = gql`
       checkpoints {
         cp_id
         cp_code
+        event_id
         skipped
+        skip_reason
       }
     }
   }

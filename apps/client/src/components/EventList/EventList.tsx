@@ -12,10 +12,9 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import { Link } from 'react-router-dom';
-import { ActionsContext, StorageContext } from '../Storage/Storage';
 import format from 'date-fns/format';
 import { useQuery } from '@apollo/client';
-import { GET_EVENTS } from '../../queries/getEvents';
+import { GET_EVENTS } from '../../queries';
 
 const Event = ({
   id,
@@ -52,12 +51,9 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const EventList = () => {
-  const actions = useContext(ActionsContext);
   const { loading, error, data } = useQuery(GET_EVENTS);
 
-  const handleDeleteClick = (eventId: number) => {
-    // actions?.deleteEvent(eventId);
-  };
+  const handleDeleteClick = (eventId: number) => {};
 
   const classes = useStyles();
 
@@ -68,8 +64,6 @@ const EventList = () => {
   if (error) {
     return <p>Error :(</p>;
   }
-
-  console.log('DATA.events', data.events);
 
   return (
     <div className={classes.listWrapper}>
