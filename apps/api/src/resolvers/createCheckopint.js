@@ -1,19 +1,24 @@
 const knex = require("../../knex");
 
-module.exports = async (_, { cpId, cpCode, skipped, skipReason }) => {
+module.exports = async (
+  _,
+  { event_id, cp_id, cp_code, skipped, skip_reason }
+) => {
   const checkpoint = {
-    cp_id: cpId,
-    cp_code: cpCode,
+    event_id,
+    cp_id,
+    cp_code,
     skipped,
-    skip_reason: skipReason,
+    skip_reason: skip_reason || null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
 
-  const createdCheckpoint = await knex.insert(checkpoint).into("checkpoints");
+  console.log("checkpoint to store", checkpoint);
+  const createdCheckpointIds = await knex("checkpoints").insert(checkpoint);
 
   return {
     success: true,
-    checkpoint: createdCheckpoint,
+    checkpoint: { id: createdCheckpointIds[0], ...checkpoint },
   };
 };

@@ -4,7 +4,7 @@ import { Checkpoint } from '../../types/Checkpoint';
 
 interface Actions {
   addEvent: () => void;
-  deleteEvent: (id: number) => void;
+  deleteEvent: () => void;
   addCheckpoint: (params: any) => void;
   deleteCheckpoint: (params: any) => void;
 }
@@ -37,30 +37,11 @@ const Storage = ({ children }: { children?: ReactNode }) => {
   const actions: Actions = {
     addEvent: () => {},
 
-    deleteEvent: (id: number) => {
-      const remainingEvents = value.events.filter((e) => e.id !== id);
-      setValue({ ...value, events: remainingEvents });
-    },
+    deleteEvent: () => {},
 
     addCheckpoint() {},
 
-    deleteCheckpoint: ({ eventId, id }) => {
-      const event = value.events.find((e) => e.id === eventId);
-      if (!event) {
-        throw new Error(`Event ${eventId} not found`);
-      }
-
-      const updatedEvents = value.events.map((e) => {
-        if (e.id !== eventId) {
-          return e;
-        }
-
-        const updatedCheckpoints = e.checkpoints.filter((ch) => ch.id !== id);
-        return { ...e, checkpoints: updatedCheckpoints };
-      });
-
-      setValue({ ...value, events: updatedEvents });
-    },
+    deleteCheckpoint: () => {},
   };
 
   return (

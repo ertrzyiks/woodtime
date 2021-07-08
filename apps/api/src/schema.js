@@ -2,7 +2,8 @@ const { gql } = require("apollo-server-express");
 
 module.exports = gql`
   type Checkpoint {
-    id: Int!
+    id: Int
+    event_id: Int!
     cp_id: Int!
     cp_code: String
     skipped: Boolean
@@ -82,6 +83,8 @@ module.exports = gql`
       event_id: Int!
       cp_id: Int!
       cp_code: String
+      skipped: Boolean
+      skip_reason: String
     ): CreateCheckpointResult
 
     deleteCheckpoint(id: Int!): DeleteCheckpointResult

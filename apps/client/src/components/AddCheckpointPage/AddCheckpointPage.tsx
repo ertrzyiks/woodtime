@@ -8,6 +8,8 @@ import { ActionsContext } from '../Storage/Storage';
 import { useHistory, useParams } from 'react-router-dom';
 import { FORM_ERROR } from 'final-form';
 import { Scanner } from '@woodtime/scanner';
+import { CREATE_CHECKPOINT, CREATE_EVENT } from '../../queries';
+import { useMutation } from '@apollo/client';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -18,9 +20,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 interface Values {
-  id: string;
-  code?: string;
-  skipped: boolean;
+  eventId: number;
+  cpId: number;
+  cpCode?: string;
+  skipped?: boolean;
+  skipReason?: string;
 }
 
 interface ScannerRead {
@@ -36,10 +40,32 @@ const AddCheckpointPage = () => {
 
   const history = useHistory();
 
-  const handleCheckpointSubmit = (checkpoint: Values) => {
+  const [createCheckpoint, { loading: creationLoading, error: creationError }] =
+    useMutation<any, Values>(CREATE_CHECKPOINT, {
+      refetchQueries: ['event'],
+      onCompleted: (data) => {
+        history.push(`/events/${data.createCheckpoint.checkpoint.event_id}`);
+      },
+    });
+
+  const handleCheckpointSubmit = (checkpoint: any) => {
     try {
-      actions?.addCheckpoint({ eventId: eventId, ...checkpoint });
-      history.push(`/events/${eventId}`);
+      console.log('params', {
+        eventId: parseInt(eventId, 10),
+        cpId: parseInt(checkpoint.cpId, 10),
+        cpCode: checkpoint.cpCode,
+        skipped: checkpoint.skipped,
+        skipReason: checkpoint.skipReason,
+      });
+      return createCheckpoint({
+        variables: {
+          eventId: parseInt(eventId, 10),
+          cpId: parseInt(checkpoint.cpId, 10),
+          cpCode: checkpoint.cpCode,
+          skipped: checkpoint.skipped,
+          skipReason: checkpoint.skipReason,
+        },
+      });
     } catch (err) {
       if (!err) {
         return {
@@ -67,7 +93,7 @@ const AddCheckpointPage = () => {
       initialValues={{ skipped: false }}
       render={({ values, submitError, handleSubmit }) => {
         if (values.skipped) {
-          delete values.code;
+          delete values.cpCode;
         }
 
         return (
@@ -76,7 +102,7 @@ const AddCheckpointPage = () => {
               <div className="error">{submitError}</div> // not showing
             )}
             <Field
-              name="id"
+              name="cpId"
               render={({ input, meta }) => (
                 <div className={classes.margin}>
                   <TextField
@@ -93,7 +119,7 @@ const AddCheckpointPage = () => {
             />
 
             <Field
-              name="code"
+              name="cpCode"
               render={({ input, meta }) => (
                 <div className={classes.margin}>
                   <TextField

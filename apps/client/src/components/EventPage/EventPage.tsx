@@ -11,10 +11,6 @@ const EventPage = () => {
     variables: { id: parseInt(id, 10) },
   });
   const event = data?.event;
-  //
-  // if (!event) {
-  //   return null;
-  // }
 
   if (loading) {
     return <p>Loading...</p>;

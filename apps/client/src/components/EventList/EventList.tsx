@@ -56,7 +56,7 @@ const EventList = () => {
   const { loading, error, data } = useQuery(GET_EVENTS);
 
   const handleDeleteClick = (eventId: number) => {
-    actions?.deleteEvent(eventId);
+    // actions?.deleteEvent(eventId);
   };
 
   const classes = useStyles();
