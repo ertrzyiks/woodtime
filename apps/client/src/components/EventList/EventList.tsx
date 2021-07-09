@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import {
   createStyles,
   Fab,
@@ -12,8 +11,9 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import { Link } from 'react-router-dom';
-import { ActionsContext, StorageContext } from '../Storage/Storage';
 import format from 'date-fns/format';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_EVENTS, DELETE_EVENT } from '../../queries';
 
 const Event = ({
   id,
@@ -25,7 +25,10 @@ const Event = ({
   createdAt: string;
 }) => (
   <ListItem button component={Link} to={`/events/${id}`}>
-    <ListItemText primary={name} secondary={createdAt} />
+    <ListItemText
+      primary={name}
+      secondary={format(new Date(createdAt), 'dd/MM/yyyy')}
+    />
   </ListItem>
 );
 
@@ -35,50 +38,77 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       width: '100%',
     },
-    deleteIcon: {
-      // position: 'absolute',
-      // top: -3,
-      // right: -5,
+    deleteIcon: {},
+    listWrapper: {
+      position: 'relative',
+    },
+    addEventButton: {
+      position: 'absolute',
+      right: '15%',
     },
   })
 );
 
 const EventList = () => {
-  const actions = useContext(ActionsContext);
+  const { loading, error, data } = useQuery(GET_EVENTS);
+
+  const [deleteEvent] = useMutation(DELETE_EVENT, {
+    refetchQueries: ['getEvents'],
+    awaitRefetchQueries: true,
+  });
 
   const handleDeleteClick = (eventId: number) => {
-    actions?.deleteEvent(eventId);
+    return deleteEvent({ variables: { id: eventId } });
   };
 
   const classes = useStyles();
 
-  const { events } = useContext(StorageContext);
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>Error :(</p>;
+  }
+
   return (
-    <div>
+    <div className={classes.listWrapper}>
       <List>
-        {events
+        {[...data.events]
           .sort((a: { id: number }, b: { id: number }) => b.id - a.id)
-          .map(({ id, name, createdAt }) => (
-            <div className={classes.wrapper}>
-              <Event
-                key={id}
-                id={id}
-                name={name}
-                createdAt={format(new Date(createdAt), 'dd/MM/yyyy')}
-              />
-              <div className={classes.deleteIcon}>
-                <IconButton
-                  aria-label="delete"
-                  onClick={() => handleDeleteClick(id)}
-                >
-                  <ClearIcon />
-                </IconButton>
+          // TODO: generate types
+          .map(
+            ({
+              id,
+              name,
+              created_at,
+            }: {
+              id: number;
+              name: string;
+              created_at: string;
+            }) => (
+              <div className={classes.wrapper}>
+                <Event key={id} id={id} name={name} createdAt={created_at} />
+                <div className={classes.deleteIcon}>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => handleDeleteClick(id)}
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
       </List>
 
-      <Fab color="primary" aria-label="add" component={Link} to="/events/new">
+      <Fab
+        className={classes.addEventButton}
+        color="primary"
+        aria-label="add"
+        component={Link}
+        to="/events/new"
+      >
         <AddIcon />
       </Fab>
     </div>

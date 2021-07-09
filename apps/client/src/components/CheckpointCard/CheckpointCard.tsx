@@ -6,9 +6,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
-import { ActionsContext } from '../Storage/Storage';
+import { useMutation } from '@apollo/client';
+import { DELETE_CHECKPOINT } from '../../queries/deleteCheckpoint';
 
 interface Props {
   checkpoint: Checkpoint;
@@ -43,11 +44,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const CheckpointCard = ({ checkpoint, eventId }: Props) => {
-  const actions = useContext(ActionsContext);
+const CheckpointCard = ({ checkpoint }: Props) => {
+  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
+    refetchQueries: ['getEvent'],
+    awaitRefetchQueries: true,
+  });
 
-  const handleDeleteClick = (checkpointId: string) => {
-    actions?.deleteCheckpoint({ eventId, id: checkpointId });
+  const handleDeleteClick = (checkpointId: number) => {
+    return deleteCheckpoint({ variables: { id: checkpointId } });
   };
 
   const classes = useStyles();
@@ -63,13 +67,15 @@ const CheckpointCard = ({ checkpoint, eventId }: Props) => {
       <div className={classes.wrapper}>
         <div className={classes.header}>
           <Typography variant="button" color="textSecondary">
-            {checkpoint.id}
+            {checkpoint.cp_id}
           </Typography>
         </div>
         <div className={classes.content}>
           <Typography variant="subtitle1">
             <span>
-              {checkpoint.skipped ? 'skipped' : checkpoint.code?.toUpperCase()}
+              {checkpoint.skipped
+                ? 'skipped'
+                : checkpoint.cp_code?.toUpperCase()}
             </span>
           </Typography>
         </div>
