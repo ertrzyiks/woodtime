@@ -22,14 +22,13 @@ const AddEvent = () => {
   const [name, setName] = useState('');
   const [numCheckpoints, setNumCheckpoints] = useState('');
 
-  const [createEvent, { loading: creationLoading, error: creationError }] =
-    useMutation(CREATE_EVENT, {
-      refetchQueries: ['getEvents'],
-      awaitRefetchQueries: true,
-      onCompleted: (data) => {
-        history.push(`/events/${data.createEvent.event.id}`);
-      },
-    });
+  const [createEvent] = useMutation(CREATE_EVENT, {
+    refetchQueries: ['getEvents'],
+    awaitRefetchQueries: true,
+    onCompleted: (data) => {
+      history.push(`/events/${data.createEvent.event.id}`);
+    },
+  });
 
   const history = useHistory();
   const handleClose = () => {

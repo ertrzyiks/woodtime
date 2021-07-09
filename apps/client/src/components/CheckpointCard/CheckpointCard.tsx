@@ -45,11 +45,10 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const CheckpointCard = ({ checkpoint }: Props) => {
-  const [deleteCheckpoint, { loading: deletionLoading, error: deletionError }] =
-    useMutation(DELETE_CHECKPOINT, {
-      refetchQueries: ['getEvent'],
-      awaitRefetchQueries: true,
-    });
+  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
+    refetchQueries: ['getEvent'],
+    awaitRefetchQueries: true,
+  });
 
   const handleDeleteClick = (checkpointId: number) => {
     return deleteCheckpoint({ variables: { id: checkpointId } });

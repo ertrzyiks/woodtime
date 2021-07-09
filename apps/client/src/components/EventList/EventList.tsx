@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import {
   createStyles,
   Fab,
@@ -53,11 +52,10 @@ const useStyles = makeStyles((theme: Theme) =>
 const EventList = () => {
   const { loading, error, data } = useQuery(GET_EVENTS);
 
-  const [deleteEvent, { loading: deletionLoading, error: deletionError }] =
-    useMutation(DELETE_EVENT, {
-      refetchQueries: ['getEvents'],
-      awaitRefetchQueries: true,
-    });
+  const [deleteEvent] = useMutation(DELETE_EVENT, {
+    refetchQueries: ['getEvents'],
+    awaitRefetchQueries: true,
+  });
 
   const handleDeleteClick = (eventId: number) => {
     return deleteEvent({ variables: { id: eventId } });
