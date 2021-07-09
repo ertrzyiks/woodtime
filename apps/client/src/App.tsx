@@ -15,7 +15,6 @@ import {
 } from '@apollo/client';
 
 import EventList from './components/EventList/EventList';
-import Storage from './components/Storage/Storage';
 import AddEvent from './components/AddEvent/AddEvent';
 import EventPage from './components/EventPage/EventPage';
 import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
@@ -52,39 +51,36 @@ function App() {
   const classes = useStyles();
 
   return (
-    <Storage>
+    <Router basename={process.env.PUBLIC_URL}>
       <PwaUpdateNotification />
+      <ApolloProvider client={getClient()}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" className={classes.title}>
+              <Link component={RouterLink} to="/" color="inherit">
+                Woodtime
+              </Link>
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-      <Router basename={process.env.PUBLIC_URL}>
-        <ApolloProvider client={getClient()}>
-          <AppBar position="static">
-            <Toolbar>
-              <Typography variant="h6" className={classes.title}>
-                <Link component={RouterLink} to="/" color="inherit">
-                  Woodtime
-                </Link>
-              </Typography>
-            </Toolbar>
-          </AppBar>
-
-          <Switch>
-            <Route path="/" exact>
-              <EventList />
-            </Route>
-            <Route path="/events/new" exact>
-              <EventList />
-              <AddEvent />
-            </Route>
-            <Route path="/events/:id" exact>
-              <EventPage />
-            </Route>
-            <Route path="/events/:id/add-checkpoint" exact>
-              <AddCheckpointPage />
-            </Route>
-          </Switch>
-        </ApolloProvider>
-      </Router>
-    </Storage>
+        <Switch>
+          <Route path="/" exact>
+            <EventList />
+          </Route>
+          <Route path="/events/new" exact>
+            <EventList />
+            <AddEvent />
+          </Route>
+          <Route path="/events/:id" exact>
+            <EventPage />
+          </Route>
+          <Route path="/events/:id/add-checkpoint" exact>
+            <AddCheckpointPage />
+          </Route>
+        </Switch>
+      </ApolloProvider>
+    </Router>
   );
 }
 

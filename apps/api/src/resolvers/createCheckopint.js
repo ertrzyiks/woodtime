@@ -14,7 +14,6 @@ module.exports = async (
     updated_at: new Date().toISOString(),
   };
 
-  console.log("checkpoint to store", checkpoint);
   const createdCheckpointIds = await knex("checkpoints").insert(checkpoint);
 
   return {
