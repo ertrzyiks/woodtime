@@ -2,6 +2,7 @@
   "name": "api",
   "version": "1.0.0",
   "scripts": {
+    "start:prod": "knex migrate:latest && node src/index.js",
     "start": "node src/index.js"
   },
   "dependencies": {

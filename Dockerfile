@@ -7,4 +7,4 @@ WORKDIR /app
 RUN yarn install --immutable-cache --immutable
 
 ENTRYPOINT ["yarn"]
-CMD ["workspace", "api", "start"]
+CMD ["workspace", "api", "start:prod"]
