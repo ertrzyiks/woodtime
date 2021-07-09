@@ -13,8 +13,8 @@ import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
-import { useQuery } from '@apollo/client';
-import { GET_EVENTS } from '../../queries';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_EVENTS, DELETE_EVENT } from '../../queries';
 
 const Event = ({
   id,
@@ -53,7 +53,15 @@ const useStyles = makeStyles((theme: Theme) =>
 const EventList = () => {
   const { loading, error, data } = useQuery(GET_EVENTS);
 
-  const handleDeleteClick = (eventId: number) => {};
+  const [deleteEvent, { loading: deletionLoading, error: deletionError }] =
+    useMutation(DELETE_EVENT, {
+      refetchQueries: ['getEvents'],
+      awaitRefetchQueries: true,
+    });
+
+  const handleDeleteClick = (eventId: number) => {
+    return deleteEvent({ variables: { id: eventId } });
+  };
 
   const classes = useStyles();
 

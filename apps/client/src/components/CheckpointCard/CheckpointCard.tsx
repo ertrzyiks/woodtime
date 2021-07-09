@@ -6,9 +6,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import ClearIcon from '@material-ui/icons/Clear';
-import React, { useContext } from 'react';
+import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
-import { ActionsContext } from '../Storage/Storage';
+import { useMutation } from '@apollo/client';
+import { DELETE_CHECKPOINT } from '../../queries/deleteCheckpoint';
 
 interface Props {
   checkpoint: Checkpoint;
@@ -43,11 +44,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const CheckpointCard = ({ checkpoint, eventId }: Props) => {
-  const actions = useContext(ActionsContext);
+const CheckpointCard = ({ checkpoint }: Props) => {
+  const [deleteCheckpoint, { loading: deletionLoading, error: deletionError }] =
+    useMutation(DELETE_CHECKPOINT, {
+      refetchQueries: ['getEvent'],
+      awaitRefetchQueries: true,
+    });
 
-  const handleDeleteClick = (checkpointId: string) => {
-    actions?.deleteCheckpoint({ eventId, id: checkpointId });
+  const handleDeleteClick = (checkpointId: number) => {
+    return deleteCheckpoint({ variables: { id: checkpointId } });
   };
 
   const classes = useStyles();
@@ -79,7 +84,7 @@ const CheckpointCard = ({ checkpoint, eventId }: Props) => {
       <div className={classes.deleteIcon}>
         <IconButton
           aria-label="delete"
-          onClick={() => handleDeleteClick(checkpoint.cp_id.toString())}
+          onClick={() => handleDeleteClick(checkpoint.id)}
         >
           <ClearIcon />
         </IconButton>

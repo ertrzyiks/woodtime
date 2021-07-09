@@ -7,6 +7,7 @@ export const GET_EVENT = gql`
       name
       checkpoint_count
       checkpoints {
+        id
         cp_id
         cp_code
         event_id
