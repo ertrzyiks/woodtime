@@ -62,6 +62,11 @@ const useStyles = makeStyles((theme: Theme) =>
     control: {
       padding: theme.spacing(2),
     },
+    addCheckpointButton: {
+      position: 'absolute',
+      right: '1em',
+      bottom: '1em'
+    },
   })
 );
 
@@ -100,6 +105,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       )}
 
       <Fab
+        className={classes.addCheckpointButton}
         color="primary"
         aria-label="add"
         component={Link}
