@@ -39,12 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
     },
     deleteIcon: {},
-    listWrapper: {
-      position: 'relative',
-    },
+    listWrapper: {},
     addEventButton: {
       position: 'absolute',
-      right: '15%',
+      right: '1em',
+      bottom: '1em'
     },
   })
 );
