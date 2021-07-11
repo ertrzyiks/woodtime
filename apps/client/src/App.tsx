@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { AppBar, Toolbar, Typography, Link } from '@material-ui/core';
+import {AppBar, Toolbar, Typography, Link, CircularProgress} from '@material-ui/core';
 import {
   BrowserRouter as Router,
   Switch,
@@ -42,6 +42,13 @@ const useStyles = makeStyles((theme: Theme) =>
     title: {
       flexGrow: 1,
     },
+    loaderWrapper: {
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      justifyContent: 'center',
+      display: 'flex'
+    }
   })
 );
 
@@ -102,7 +109,9 @@ function App() {
             </Switch>
           </ApolloProvider>
         ) : (
-          <div>Loading...</div>
+          <div className={classes.loaderWrapper}>
+            <CircularProgress />
+          </div>
         )}
       </InitialNavigationDetector>
     </Router>
