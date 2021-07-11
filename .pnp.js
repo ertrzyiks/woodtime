@@ -10296,6 +10296,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["apollo3-cache-persist", [
+        ["npm:0.9.1", {
+          "packageLocation": "./.yarn/cache/apollo3-cache-persist-npm-0.9.1-e0fd0ca53a-776818a7bb.zip/node_modules/apollo3-cache-persist/",
+          "packageDependencies": [
+            ["apollo3-cache-persist", "npm:0.9.1"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:0.9.1", {
+          "packageLocation": "./.yarn/$$virtual/apollo3-cache-persist-virtual-77cfb1edd5/0/cache/apollo3-cache-persist-npm-0.9.1-e0fd0ca53a-776818a7bb.zip/node_modules/apollo3-cache-persist/",
+          "packageDependencies": [
+            ["apollo3-cache-persist", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:0.9.1"],
+            ["@apollo/client", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:3.3.20"],
+            ["@types/apollo__client", null]
+          ],
+          "packagePeers": [
+            "@apollo/client",
+            "@types/apollo__client"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["app-root-dir", [
         ["npm:1.0.2", {
           "packageLocation": "./.yarn/cache/app-root-dir-npm-1.0.2-efb56c3049-223fed876c.zip/node_modules/app-root-dir/",
@@ -12420,6 +12442,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", "npm:17.0.7"],
             ["@types/react-router-dom", "npm:5.1.7"],
             ["@woodtime/scanner", "workspace:libs/scanner"],
+            ["apollo3-cache-persist", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:0.9.1"],
             ["date-fns", "npm:2.22.1"],
             ["eslint-config-react-app", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.0"],
             ["final-form", "npm:4.20.2"],
