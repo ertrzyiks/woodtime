@@ -5976,6 +5976,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"apollo3-cache-persist@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "apollo3-cache-persist@npm:0.9.1"
+  peerDependencies:
+    "@apollo/client": ^3.2.5
+  checksum: 776818a7bb736ab8ead122e0fa31dbe4e94ade87b2482440f5f5e7d79a2b9d2f1583b9c7708fa4cb734bfaa76f12b741239df37d06b7c945dc881ed3f7979da2
+  languageName: node
+  linkType: hard
+
 "app-root-dir@npm:^1.0.2":
   version: 1.0.2
   resolution: "app-root-dir@npm:1.0.2"
@@ -7624,6 +7633,7 @@ __metadata:
     "@types/react-dom": ^17.0.0
     "@types/react-router-dom": ^5.1.7
     "@woodtime/scanner": "workspace:*"
+    apollo3-cache-persist: ^0.9.1
     date-fns: ^2.22.1
     eslint-config-react-app: ^6.0.0
     final-form: ^4.20.2

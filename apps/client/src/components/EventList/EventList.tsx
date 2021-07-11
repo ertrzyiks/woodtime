@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_EVENTS, DELETE_EVENT } from '../../queries';
+import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 
 const Event = ({
   id,
@@ -49,7 +50,11 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const EventList = () => {
-  const { loading, error, data } = useQuery(GET_EVENTS);
+  const isInitialNavigation = useInitialNavigation()
+  const { loading, error, data } = useQuery(GET_EVENTS, {
+    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
+    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
+  });
 
   const [deleteEvent] = useMutation(DELETE_EVENT, {
     refetchQueries: ['getEvents'],
@@ -62,7 +67,7 @@ const EventList = () => {
 
   const classes = useStyles();
 
-  if (loading) {
+  if (loading && !data) {
     return <p>Loading...</p>;
   }
 
