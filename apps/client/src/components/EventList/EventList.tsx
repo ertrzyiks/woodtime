@@ -13,10 +13,13 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
 import EventIcon from '@material-ui/icons/Event'
+import ListIcon from '@material-ui/icons/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_EVENTS, DELETE_EVENT } from '../../queries';
+import SimpleChecklist from '../SimpleChecklist/SimpleChecklist';
+import React, { useState } from 'react';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
@@ -45,7 +48,13 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
     },
     deleteIcon: {},
-    listWrapper: {},
+    icons: {
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
+    listWrapper: {
+      position: 'relative',
+    },
     addEventButton: {
       position: 'absolute',
       right: '1em',
@@ -60,11 +69,20 @@ const EventList = () => {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
   });
+  const [showChecklist, setShowChecklist] = useState(false);
 
   const [deleteEvent] = useMutation(DELETE_EVENT, {
     refetchQueries: ['getEvents'],
     awaitRefetchQueries: true,
   });
+
+  const handleChecklistClick = () => {
+    setShowChecklist(true);
+  };
+
+  const handleChecklistClose = () => {
+    setShowChecklist(false);
+  };
 
   const handleDeleteClick = (eventId: number) => {
     return deleteEvent({ variables: { id: eventId } });
@@ -76,6 +94,12 @@ const EventList = () => {
   if (loading && !data) {
     return <p>Loading...</p>;
   }
+
+  if (error) {
+    return <p>Error :(</p>;
+  }
+
+  console.log('show', showChecklist);
 
   return (
     <div className={classes.listWrapper}>
@@ -106,9 +130,15 @@ const EventList = () => {
               name: string;
               created_at: string;
             }) => (
-              <div className={classes.wrapper}>
-                <Event key={id} id={id} name={name} createdAt={created_at} />
-                <div className={classes.deleteIcon}>
+              <div className={classes.wrapper} key={id}>
+                <Event id={id} name={name} createdAt={created_at} />
+                <div className={classes.icons}>
+                  <IconButton
+                    aria-label="checklist"
+                    onClick={() => handleChecklistClick()}
+                  >
+                    <ListIcon />
+                  </IconButton>
                   <IconButton
                     aria-label="delete"
                     onClick={() => handleDeleteClick(id)}
@@ -121,6 +151,7 @@ const EventList = () => {
           )}
       </List>
 
+      {showChecklist && <SimpleChecklist handleClose={handleChecklistClose} />}
       <Fab
         className={classes.addEventButton}
         color="primary"
