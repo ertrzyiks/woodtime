@@ -1,4 +1,6 @@
 import {
+  Box,
+  Breadcrumbs,
   createStyles,
   Fab,
   IconButton,
@@ -6,15 +8,18 @@ import {
   ListItem,
   ListItemText,
   makeStyles,
-  Theme,
+  Theme, Typography,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
+import EventIcon from '@material-ui/icons/Event'
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_EVENTS, DELETE_EVENT } from '../../queries';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
+import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
+import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 
 const Event = ({
   id,
@@ -66,17 +71,27 @@ const EventList = () => {
   };
 
   const classes = useStyles();
+  const breadcrumbClasses = useBreadcrumbStyles()
 
   if (loading && !data) {
     return <p>Loading...</p>;
   }
 
-  if (error) {
-    return <p>Error :(</p>;
-  }
-
   return (
     <div className={classes.listWrapper}>
+      <Box px={1} py={2}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Typography color="textPrimary" className={breadcrumbClasses.link}>
+            <EventIcon className={breadcrumbClasses.icon} />
+            Events
+          </Typography>
+        </Breadcrumbs>
+      </Box>
+
+      <LoadingIndicator active={loading} />
+
+      {error && <p>Error :(</p>}
+
       <List>
         {[...data.events]
           .sort((a: { id: number }, b: { id: number }) => b.id - a.id)
