@@ -99,8 +99,6 @@ const EventList = () => {
     return <p>Error :(</p>;
   }
 
-  console.log('show', showChecklist);
-
   return (
     <div className={classes.listWrapper}>
       <Box px={1} py={2}>
