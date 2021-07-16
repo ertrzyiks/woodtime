@@ -15,6 +15,7 @@ module.exports = gql`
   type Event {
     id: Int!
     name: String!
+    type: Int!
     checkpoint_count: Int!
     checkpoints: [Checkpoint!]!
     created_at: String!
@@ -75,7 +76,11 @@ module.exports = gql`
     login(token: String!): LoginPayload
     joinEvent(id: String!): JoinEventPayload
 
-    createEvent(name: String!, checkpointCount: Int!): CreateEventResult
+    createEvent(
+      name: String!
+      checkpointCount: Int!
+      type: Int!
+    ): CreateEventResult
 
     deleteEvent(id: Int!): DeleteEventResult
 

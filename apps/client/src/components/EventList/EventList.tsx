@@ -8,11 +8,12 @@ import {
   ListItem,
   ListItemText,
   makeStyles,
-  Theme, Typography,
+  Theme,
+  Typography,
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import ClearIcon from '@material-ui/icons/Clear';
-import EventIcon from '@material-ui/icons/Event'
+import EventIcon from '@material-ui/icons/Event';
 import ListIcon from '@material-ui/icons/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
@@ -20,9 +21,9 @@ import { useMutation, useQuery } from '@apollo/client';
 import { GET_EVENTS, DELETE_EVENT } from '../../queries';
 import SimpleChecklist from '../SimpleChecklist/SimpleChecklist';
 import React, { useState } from 'react';
-import {useInitialNavigation} from "../../hooks/useInitialNavigation";
-import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
-import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
+import { useInitialNavigation } from '../../hooks/useInitialNavigation';
+import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
+import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 
 const Event = ({
   id,
@@ -52,22 +53,20 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'space-between',
     },
-    listWrapper: {
-      position: 'relative',
-    },
+    listWrapper: {},
     addEventButton: {
       position: 'absolute',
       right: '1em',
-      bottom: '1em'
+      bottom: '1em',
     },
   })
 );
 
 const EventList = () => {
-  const isInitialNavigation = useInitialNavigation()
+  const isInitialNavigation = useInitialNavigation();
   const { loading, error, data } = useQuery(GET_EVENTS, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
+    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
   });
   const [showChecklist, setShowChecklist] = useState(false);
 
@@ -89,7 +88,7 @@ const EventList = () => {
   };
 
   const classes = useStyles();
-  const breadcrumbClasses = useBreadcrumbStyles()
+  const breadcrumbClasses = useBreadcrumbStyles();
 
   if (loading && !data) {
     return <p>Loading...</p>;

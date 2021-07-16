@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import {
   Button,
+  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  makeStyles,
+  Radio,
+  RadioGroup,
   TextField,
+  Theme,
+  Typography,
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { Field, Form } from 'react-final-form';
@@ -18,9 +27,25 @@ interface Values {
   numCheckpoints: string;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    radioGroupWrapper: {
+      paddingTop: 25,
+      paddingBottom: 10,
+    },
+    title: {
+      paddingBottom: 0,
+    },
+    radioLabel: {
+      fontSize: '0.6rem',
+    },
+  })
+);
+
 const AddEvent = () => {
   const [name, setName] = useState('');
   const [numCheckpoints, setNumCheckpoints] = useState('');
+  const [type, setType] = useState('score');
 
   const [createEvent] = useMutation(CREATE_EVENT, {
     refetchQueries: ['getEvents'],
@@ -30,16 +55,24 @@ const AddEvent = () => {
     },
   });
 
+  const classes = useStyles();
+
   const history = useHistory();
   const handleClose = () => {
     history.push('/');
   };
 
   const handleSubmit = () => {
+    const eventTypeId = type === 'score' ? 1 : 2;
     return createEvent({
-      variables: { name, checkpointCount: parseInt(numCheckpoints, 10) },
+      variables: {
+        name,
+        checkpointCount: parseInt(numCheckpoints, 10),
+        type: eventTypeId,
+      },
     });
   };
+
   return (
     <Dialog
       open
@@ -48,7 +81,7 @@ const AddEvent = () => {
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
     >
-      <DialogTitle id="alert-dialog-slide-title">
+      <DialogTitle id="alert-dialog-slide-title" className={classes.title}>
         Create a new event
       </DialogTitle>
       <Form<Values>
@@ -58,7 +91,7 @@ const AddEvent = () => {
             <form onSubmit={handleSubmit}>
               <DialogContent>
                 <Field
-                  name="id"
+                  name="name"
                   render={({ input, meta }) => (
                     <div>
                       <TextField
@@ -74,7 +107,7 @@ const AddEvent = () => {
                 />
 
                 <Field
-                  name="code"
+                  name="points"
                   render={({ input, meta }) => (
                     <div>
                       <TextField
@@ -85,6 +118,38 @@ const AddEvent = () => {
                         onChange={(e) => setNumCheckpoints(e.target.value)}
                       />
                       {meta.touched && meta.error && <span>{meta.error}</span>}
+                    </div>
+                  )}
+                />
+
+                <Field
+                  name="type"
+                  render={() => (
+                    <div className={classes.radioGroupWrapper}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Type</FormLabel>
+                        <RadioGroup
+                          aria-label="type"
+                          name="type"
+                          value={type}
+                          onChange={(e) => setType(e.target.value)}
+                        >
+                          <FormControlLabel
+                            value="score"
+                            control={<Radio size="small" />}
+                            label={
+                              <Typography variant="body2">Scorelauf</Typography>
+                            }
+                          />
+                          <FormControlLabel
+                            value="classic"
+                            control={<Radio size="small" />}
+                            label={
+                              <Typography variant="body2">Classic</Typography>
+                            }
+                          />
+                        </RadioGroup>
+                      </FormControl>
                     </div>
                   )}
                 />
