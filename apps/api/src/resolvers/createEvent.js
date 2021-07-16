@@ -1,8 +1,9 @@
 const knex = require("../../knex");
 
-module.exports = async (_, { name, checkpointCount }) => {
+module.exports = async (_, { name, checkpointCount, type }) => {
   const event = {
     name,
+    type,
     checkpoint_count: checkpointCount,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
