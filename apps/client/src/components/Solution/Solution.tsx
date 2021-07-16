@@ -8,20 +8,17 @@ interface Props {
 }
 
 const Solution = ({ checkpoints, max }: Props) => {
-  if (checkpoints.length !== max) {
-    return null;
-  }
+  const seqCheckpointIds = Array(max)
+    .fill(max)
+    .map((_, idx) => 1 + idx);
 
-  checkpoints.sort((ch1, ch2) => {
-    return ch1.cp_id > ch2.cp_id ? 1 : -1;
-  });
-
-  const parsedCodes = checkpoints.map((ch) => {
-    if (ch.skipped) {
+  const parsedCodes = seqCheckpointIds.map((id: number) => {
+    const matchingCheckpoint = checkpoints.find((ch) => ch.cp_id === id);
+    if (!matchingCheckpoint || matchingCheckpoint.skipped) {
       return '...';
     }
 
-    return ch.cp_code;
+    return matchingCheckpoint.cp_code;
   });
 
   return (
