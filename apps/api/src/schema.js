@@ -26,11 +26,32 @@ module.exports = gql`
     id: String!
     name: String!
   }
+  
+  type Coordinates {
+    lat: String
+    lng: String
+  }
+
+  type CoordinatesConnection {
+    points: [Coordinates]!
+  }
+
+  input CoordinatesInput {
+    lat: String
+    lng: String
+  }
+  
+  input VirtualCheckpontsInput {
+    start: CoordinatesInput!
+    radius: Int!
+    count: Int!
+  }
 
   type Query {
     me: User
     events: [Event!]!
     event(id: Int!): Event
+    virtualCheckpoints(input: VirtualCheckpontsInput!): CoordinatesConnection!
   }
 
   type CreateUserPayload {

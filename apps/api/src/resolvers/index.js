@@ -6,4 +6,5 @@ module.exports = {
   deleteEvent: require("./deleteEvent"),
   createCheckpoint: require("./createCheckopint"),
   deleteCheckpoint: require("./deleteCheckpoint"),
+  virtualCheckpoints: require("./virtualCheckpoints"),
 };

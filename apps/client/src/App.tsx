@@ -19,6 +19,7 @@ import EventList from './components/EventList/EventList';
 import AddEvent from './components/AddEvent/AddEvent';
 import EventPage from './components/EventPage/EventPage';
 import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
+import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
@@ -99,6 +100,9 @@ function App() {
               <Route path="/events/new" exact>
                 <EventList />
                 <AddEvent />
+              </Route>
+              <Route path="/admin" exact>
+                <VirtualChallenge />
               </Route>
               <Route path="/events/:id" exact>
                 <EventPage />

@@ -8395,6 +8395,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/geojson", [
+        ["npm:7946.0.8", {
+          "packageLocation": "./.yarn/cache/@types-geojson-npm-7946.0.8-df9187edab-2d9628afd0.zip/node_modules/@types/geojson/",
+          "packageDependencies": [
+            ["@types/geojson", "npm:7946.0.8"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/glob", [
         ["npm:7.1.3", {
           "packageLocation": "./.yarn/cache/@types-glob-npm-7.1.3-44516e2aab-633bf1dda9.zip/node_modules/@types/glob/",
@@ -8570,6 +8579,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@types/koa-compose", "npm:3.2.5"],
             ["@types/koa", "npm:2.13.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/leaflet", [
+        ["npm:1.7.4", {
+          "packageLocation": "./.yarn/cache/@types-leaflet-npm-1.7.4-f4f25e4374-bce121f399.zip/node_modules/@types/leaflet/",
+          "packageDependencies": [
+            ["@types/leaflet", "npm:1.7.4"],
+            ["@types/geojson", "npm:7946.0.8"]
           ],
           "linkType": "HARD",
         }]
@@ -9937,6 +9956,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["apollo-server", "virtual:62573a3b61ec6fe643a41d93ffa4ebd18a388dcd65c8cb24d9c86e851eb981c2764668b271ce43155e158809ba35a2a6f515276032c105924e6c314ac6de1cd6#npm:2.25.1"],
             ["apollo-server-express", "virtual:62573a3b61ec6fe643a41d93ffa4ebd18a388dcd65c8cb24d9c86e851eb981c2764668b271ce43155e158809ba35a2a6f515276032c105924e6c314ac6de1cd6#npm:2.25.1"],
             ["express", "npm:4.17.1"],
+            ["geolib", "npm:3.3.1"],
             ["graphql", "npm:15.5.0"],
             ["knex", "virtual:62573a3b61ec6fe643a41d93ffa4ebd18a388dcd65c8cb24d9c86e851eb981c2764668b271ce43155e158809ba35a2a6f515276032c105924e6c314ac6de1cd6#npm:0.95.6"],
             ["prettier", "npm:2.3.1"],
@@ -12437,6 +12457,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@testing-library/react", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:11.2.7"],
             ["@testing-library/user-event", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:12.8.3"],
             ["@types/jest", "npm:26.0.23"],
+            ["@types/leaflet", "npm:1.7.4"],
             ["@types/node", "npm:12.20.15"],
             ["@types/react", "npm:17.0.11"],
             ["@types/react-dom", "npm:17.0.7"],
@@ -12448,6 +12469,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["final-form", "npm:4.20.2"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:2.12.5"],
+            ["leaflet", "npm:1.7.1"],
             ["prettier", "npm:2.3.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:0c45d909f1bedf0abdacdb5d1505e51999aa20c9eb06c7211740a42c3de5b877eceea493d137f4af27bb05463d68601eb5c558703a6cf22583e9b98616b1637c#npm:17.0.2"],
@@ -16571,6 +16593,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["geolib", [
+        ["npm:3.3.1", {
+          "packageLocation": "./.yarn/cache/geolib-npm-3.3.1-bd5af57644-94d90ee381.zip/node_modules/geolib/",
+          "packageDependencies": [
+            ["geolib", "npm:3.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["get-caller-file", [
         ["npm:2.0.5", {
           "packageLocation": "./.yarn/cache/get-caller-file-npm-2.0.5-80e8a86305-9dd9e1e259.zip/node_modules/get-caller-file/",
@@ -20504,6 +20535,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["core-js", "npm:3.14.0"],
             ["dotenv", "npm:8.6.0"],
             ["dotenv-expand", "npm:5.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["leaflet", [
+        ["npm:1.7.1", {
+          "packageLocation": "./.yarn/cache/leaflet-npm-1.7.1-dc40ced5a1-7a841174dc.zip/node_modules/leaflet/",
+          "packageDependencies": [
+            ["leaflet", "npm:1.7.1"]
           ],
           "linkType": "HARD",
         }]

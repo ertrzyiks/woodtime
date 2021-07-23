@@ -4478,6 +4478,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/geojson@npm:*":
+  version: 7946.0.8
+  resolution: "@types/geojson@npm:7946.0.8"
+  checksum: 2d9628afd0caac21dd927c90a5be0a361634a2d3b55c78752a9f1754874cf3802aa5cf2248489ace40e97b29a25d718b0d10689ca8e1b42df350222c282a8ef0
+  languageName: node
+  linkType: hard
+
 "@types/glob-base@npm:^0.3.0":
   version: 0.3.0
   resolution: "@types/glob-base@npm:0.3.0"
@@ -4626,6 +4633,15 @@ __metadata:
     "@types/koa-compose": "*"
     "@types/node": "*"
   checksum: 0ad6026adefd1dbdec014d1618c153722b5d585ef346ec09cb54f745c38ad6cb9a49b5a4f2d850d549d7c28f2122a05d0ab4d6eb58781d03903cd46a24f21b31
+  languageName: node
+  linkType: hard
+
+"@types/leaflet@npm:^1.7.4":
+  version: 1.7.4
+  resolution: "@types/leaflet@npm:1.7.4"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: bce121f399f321acc29462fc4d01643d14cd58e6e306ef137d7d34124ba9b77a792d868885f113f6c55127f014148583932c2d35b73173183b102ab0e058bcad
   languageName: node
   linkType: hard
 
@@ -5755,6 +5771,7 @@ __metadata:
     apollo-server: ^2.25.1
     apollo-server-express: ^2.25.1
     express: ^4.17.1
+    geolib: ^3.3.1
     graphql: ^15.5.0
     knex: ^0.95.6
     prettier: 2.3.1
@@ -7628,6 +7645,7 @@ __metadata:
     "@testing-library/react": ^11.1.0
     "@testing-library/user-event": ^12.1.10
     "@types/jest": ^26.0.15
+    "@types/leaflet": ^1.7.4
     "@types/node": ^12.0.0
     "@types/react": ^17.0.0
     "@types/react-dom": ^17.0.0
@@ -7639,6 +7657,7 @@ __metadata:
     final-form: ^4.20.2
     graphql: ^15.5.1
     graphql-tag: ^2.12.5
+    leaflet: ^1.7.1
     prettier: 2.3.1
     react: ^17.0.2
     react-dom: ^17.0.2
@@ -10979,6 +10998,13 @@ fsevents@^1.2.7:
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
   checksum: d523437689c97b3aba9c5cdeca4677d5fff9a29d620db693fea40d852bad63563110f16979d0170248439dbcd2ecee0780fb2533d3f0519f019081aa10767c60
+  languageName: node
+  linkType: hard
+
+"geolib@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "geolib@npm:3.3.1"
+  checksum: 94d90ee381eb660b567aadb601f988d3747635108c1175a331ce675f857a9aa4cf75a9619bd34cc0cede8449f09f6335ea19f5f2af0a4f44b52642af42e340ea
   languageName: node
   linkType: hard
 
@@ -14485,6 +14511,13 @@ fsevents@^1.2.7:
     dotenv: ^8.0.0
     dotenv-expand: ^5.1.0
   checksum: 52a97e9c25d3e7f34cdca23b9d73fb9991a4d05d4fbc6b6c6c7dc875c6822a3694dfb604e7412d47dd416635643854bd852218fa8ae553850e007d57d0e01d01
+  languageName: node
+  linkType: hard
+
+"leaflet@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "leaflet@npm:1.7.1"
+  checksum: 7a841174dc3c8e135a2ba9a81cdd8145ef4c00e516eb558281ea47b20499f94ddab58a76a72ee15104e0dce88a07ae91fe933cfab75b569c5ed0770497aa7d99
   languageName: node
   linkType: hard
 

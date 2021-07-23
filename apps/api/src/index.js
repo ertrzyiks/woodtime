@@ -12,6 +12,7 @@ const {
   deleteEvent,
   createCheckpoint,
   deleteCheckpoint,
+  virtualCheckpoints,
 } = require("./resolvers");
 
 const app = express();
@@ -39,6 +40,7 @@ const resolvers = {
     },
     events,
     event,
+    virtualCheckpoints,
   },
   Event: {
     checkpoints,
