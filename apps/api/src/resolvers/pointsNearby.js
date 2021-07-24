@@ -39,6 +39,7 @@ module.exports = async (_, args) => {
   }
 
   return {
-    points
+    points,
+    totalCount: points.length
   }
 };

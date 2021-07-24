@@ -1,164 +1,24 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import L from 'leaflet'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import { Button, Slider } from '@material-ui/core'
-import { useLazyQuery } from '@apollo/client'
+import { useLazyQuery, useMutation } from '@apollo/client'
+
+import Map from './Map'
 import {GET_VIRTUAL_POINTS} from '../../queries/getVirtualPoints'
-
-import oval from '../../assets/oval.png'
-
-
-const checkpointIcon = L.icon({
-  iconUrl: oval,
-  shadowUrl: oval,
-
-  iconSize:     [24, 24], // size of the icon
-  shadowSize:   [24, 24], // size of the shadow
-  iconAnchor:   [12, 12], // point of the icon which will correspond to marker's location
-  shadowAnchor: [12, 12],  // the same for the shadow
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-})
+import {CREATE_VIRTUAL_CHALLENGE} from "../../queries/createVirtualChallenge";
 
 interface Coords {
   lat: number
   lng: number
 }
 
-interface Props {
-  startPoint: [number, number] | null
-  initialPoint: [number, number]
-  range: number
-  checkpoints?: Coords[]
-  onDrag: (coords: Coords) => void
-  onClick: (coords: Coords) => void
-}
-
-const Map = ({ initialPoint, startPoint, range, checkpoints, onDrag, onClick }: Props) => {
-  const mapRef = useRef<L.Map | null>(null)
-  const circleRef = useRef<L.Circle | null>(null)
-  const [dragging, setDragging] = useState(false)
-
-  useEffect(() => {
-    const map = L.map('mapid').setView(initialPoint, 13)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors,',
-      maxZoom: 18,
-      id: 'osm/streets',
-      tileSize: 512,
-      zoomOffset: -1
-    }).addTo(map)
-
-    mapRef.current = map
-
-    return () => {
-      map.off()
-      map.remove()
-    }
-  }, [initialPoint])
-
-  useEffect(() => {
-    const map = mapRef.current
-
-    if (!map) {
-      return
-    }
-
-    const callback = (e: L.LeafletEvent) => {
-      // @ts-ignore
-      const position = e.latlng
-      onClick(position)
-    }
-
-    map.on('click', callback)
-
-    return () => {
-      map.off('click', callback)
-    }
-  }, [onClick, mapRef])
-
-  useEffect(() => {
-    const map = mapRef.current
-
-    if (!startPoint || !map) {
-      return
-    }
-
-    const circle = L.circle(startPoint, {
-      color: 'red',
-      opacity: 0.5,
-      fillColor: '#fff',
-      fillOpacity: 0.0,
-      radius: 500
-    }).addTo(map)
-
-    const marker = L.marker(startPoint, { draggable: true })
-
-    marker.on('dragstart', event => {
-      setDragging(true)
-    })
-
-    marker.on('dragend', event => {
-      setDragging(false)
-    })
-
-    marker.on('dragend', event => {
-      const m = event.target;
-      const position = m.getLatLng();
-
-      onDrag(position)
-    })
-
-    marker.on('drag', event => {
-      const m = event.target;
-      const position = m.getLatLng()
-
-      circle.setLatLng(position)
-    })
-
-    map.addLayer(marker)
-
-    circleRef.current = circle
-
-    return () => {
-      circleRef.current = null
-      map.removeLayer(marker)
-      map.removeLayer(circle)
-    }
-  }, [startPoint, mapRef, onDrag])
-
-  useEffect(() => {
-    if (!circleRef.current) {
-      return
-    }
-
-    circleRef.current.setRadius(range)
-  }, [range, circleRef])
-
-  useEffect(() => {
-    if (!mapRef.current || !circleRef.current || !checkpoints || dragging) {
-      return
-    }
-
-    const markers = checkpoints?.map(point => {
-      return L.marker([point.lat, point.lng], { draggable: true, icon: checkpointIcon })
-    }) ?? []
-
-    markers.forEach(marker => mapRef.current?.addLayer(marker))
-
-    return () => {
-      markers.forEach(marker => mapRef.current?.removeLayer(marker))
-    }
-  }, [checkpoints, circleRef, mapRef, dragging])
-
-  return (
-    <div id='mapid' style={{ height: '100%' }} />
-  )
-}
-
 const VirtualChallenge = () => {
+  const [points, setPoints] = useState<Coords[]>([])
   const [getPoints, { loading, data }] = useLazyQuery(GET_VIRTUAL_POINTS, {
     fetchPolicy: 'no-cache',
     notifyOnNetworkStatusChange: true
   })
+
+  const [create] = useMutation(CREATE_VIRTUAL_CHALLENGE)
 
   const [startPoint, setStartPoint] = useState<[number, number] | null>(null)
   const initialPoint: [number, number] = useMemo(() => [54.372158, 18.638306], [])
@@ -183,6 +43,21 @@ const VirtualChallenge = () => {
     setStartPoint([coords.lat, coords.lng])
   }, [hasPoint, setStartPoint])
 
+  const handlePointsChange = useCallback((points: Coords[]) => {
+    setPoints(points)
+  }, [setPoints])
+
+  const handleCreate = useCallback(() => {
+    create({
+      variables: {
+        input: {
+          name: 'Test',
+          checkpoints: points.map(point => ({ lat: point.lat.toString(), lng: point.lng.toString()}))
+        }
+      }
+    })
+  }, [points, create])
+
   useEffect(() => {
     if (!startPoint) {
       return
@@ -202,25 +77,34 @@ const VirtualChallenge = () => {
     })
   }, [getPoints, range, startPoint])
 
+  useEffect(() => {
+    if (!loading && data) {
+      setPoints(data.pointsNearby.points.map(({ lat, lng }: {lat: string, lng: string }) => ({
+        lat: parseFloat(lat),
+        lng: parseFloat(lng)
+      })))
+    } else {
+      setPoints([])
+    }
+  }, [loading, data])
+
   return (
-    <div style={{ height: '100%' }}>
+    <div>
       <div style={{ height: 200 }}>
         <Slider value={range} onChange={handleChange} min={100} max={2000} aria-labelledby="continuous-slider" />
 
         <br />
-        <Button>Find points</Button>
+        <Button onClick={handleCreate}>Create</Button>
       </div>
-      <div style={{ height: 'calc(100% - 400px)' }}>
+      <div style={{ position: 'fixed', bottom: 12, left: 12, right: 12, top: 300 }}>
         <Map
           initialPoint={initialPoint}
           startPoint={startPoint}
           range={range}
-          checkpoints={!loading && data && data.virtualCheckpoints.points.map(({ lat, lng }: {lat: string, lng: string }) => ({
-            lat: parseFloat(lat),
-            lng: parseFloat(lng)
-          }))}
+          checkpoints={points}
           onDrag={handlePositionDrag}
           onClick={handleMapClick}
+          onChange={handlePointsChange}
         />
       </div>
     </div>

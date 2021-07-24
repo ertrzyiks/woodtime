@@ -15,3 +15,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.checkpoint-label {
+  background: none;
+  box-shadow: none;
+  border: none;
+  font-size: 2em;
+  color: #E933B0;
+  padding-left: 12px;
+}
+
+.checkpoint-label:before {
+  display: none;
+}
