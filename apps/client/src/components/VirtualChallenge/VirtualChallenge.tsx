@@ -1,112 +1,50 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
-import { Button, Slider } from '@material-ui/core'
-import { useLazyQuery, useMutation } from '@apollo/client'
-
-import Map from './Map'
-import {GET_VIRTUAL_POINTS} from '../../queries/getVirtualPoints'
-import {CREATE_VIRTUAL_CHALLENGE} from "../../queries/createVirtualChallenge";
-
-interface Coords {
-  lat: number
-  lng: number
-}
+import { useQuery } from '@apollo/client';
+import React from 'react'
+import { useParams } from "react-router-dom"
+import {GET_VIRTUAL_CHALLENGE} from "../../queries/getVirtualChallenge";
+import {useInitialNavigation} from "../../hooks/useInitialNavigation";
+import { Link as RouterLink } from 'react-router-dom';
+import Box from '@material-ui/core/Box';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import EventIcon from '@material-ui/icons/Event';
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
+import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
+import Button from '@material-ui/core/Button';
 
 const VirtualChallenge = () => {
-  const [points, setPoints] = useState<Coords[]>([])
-  const [getPoints, { loading, data }] = useLazyQuery(GET_VIRTUAL_POINTS, {
-    fetchPolicy: 'no-cache',
-    notifyOnNetworkStatusChange: true
+  const isInitialNavigation = useInitialNavigation();
+
+  const breadcrumbClasses = useBreadcrumbStyles();
+
+  const { id } = useParams<{ id: string }>()
+  const { data } = useQuery(GET_VIRTUAL_CHALLENGE, {
+    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
+    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
+    variables: {
+      id: parseInt(id, 10)
+    }
   })
 
-  const [create] = useMutation(CREATE_VIRTUAL_CHALLENGE)
+  const virtualChallenge = data?.virtualChallenge
 
-  const [startPoint, setStartPoint] = useState<[number, number] | null>(null)
-  const initialPoint: [number, number] = useMemo(() => [54.372158, 18.638306], [])
-  const [range, setRange] = useState(500)
-
-
-  const handleChange = (event: unknown, newValue: number | number[]) => {
-    setRange(Array.isArray(newValue) ? newValue[0] : newValue)
+  if (!virtualChallenge) {
+    return <div>NOT FOUND</div>
   }
-
-  const handlePositionDrag = useCallback((coords) => {
-    setStartPoint([coords.lat, coords.lng])
-  }, [setStartPoint])
-
-  const hasPoint = startPoint !== null
-
-  const handleMapClick = useCallback((coords) => {
-    if (hasPoint) {
-      return
-    }
-
-    setStartPoint([coords.lat, coords.lng])
-  }, [hasPoint, setStartPoint])
-
-  const handlePointsChange = useCallback((points: Coords[]) => {
-    setPoints(points)
-  }, [setPoints])
-
-  const handleCreate = useCallback(() => {
-    create({
-      variables: {
-        input: {
-          name: 'Test',
-          checkpoints: points.map(point => ({ lat: point.lat.toString(), lng: point.lng.toString()}))
-        }
-      }
-    })
-  }, [points, create])
-
-  useEffect(() => {
-    if (!startPoint) {
-      return
-    }
-
-    getPoints({
-      variables: {
-        input: {
-          start: {
-            lat: startPoint[0].toString(),
-            lng: startPoint[1].toString()
-          },
-          radius: range,
-          count: 12
-        }
-      }
-    })
-  }, [getPoints, range, startPoint])
-
-  useEffect(() => {
-    if (!loading && data) {
-      setPoints(data.pointsNearby.points.map(({ lat, lng }: {lat: string, lng: string }) => ({
-        lat: parseFloat(lat),
-        lng: parseFloat(lng)
-      })))
-    } else {
-      setPoints([])
-    }
-  }, [loading, data])
 
   return (
     <div>
-      <div style={{ height: 200 }}>
-        <Slider value={range} onChange={handleChange} min={100} max={2000} aria-labelledby="continuous-slider" />
+      <Box px={1} py={2}>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link color="inherit" component={RouterLink} to='/virtual-challenges' className={breadcrumbClasses.link}>
+            <EventIcon className={breadcrumbClasses.icon} />
+            Virtual Challenges
+          </Link>
+          <Typography color="textPrimary">{virtualChallenge.name}</Typography>
+        </Breadcrumbs>
+      </Box>
 
-        <br />
-        <Button onClick={handleCreate}>Create</Button>
-      </div>
-      <div style={{ position: 'fixed', bottom: 12, left: 12, right: 12, top: 300 }}>
-        <Map
-          initialPoint={initialPoint}
-          startPoint={startPoint}
-          range={range}
-          checkpoints={points}
-          onDrag={handlePositionDrag}
-          onClick={handleMapClick}
-          onChange={handlePointsChange}
-        />
-      </div>
+      <Button>Join</Button>
     </div>
   )
 }

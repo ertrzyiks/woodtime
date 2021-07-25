@@ -8,4 +8,6 @@ module.exports = {
   createVirtualChallenge: require("./createVirtualChallenge"),
   deleteCheckpoint: require("./deleteCheckpoint"),
   pointsNearby: require("./pointsNearby"),
+  virtualChallenges: require("./virtualChallenges"),
+  virtualChallenge: require("./virtualChallenge"),
 };

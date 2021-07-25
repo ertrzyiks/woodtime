@@ -53,6 +53,8 @@ module.exports = gql`
     name: String!
     checkpoints: CoordinatesConnection!
     radius: Int!
+    created_at: String!
+    updated_at: String!
   }
   
   type VirtualChallengeConnection {
@@ -65,8 +67,8 @@ module.exports = gql`
     events: [Event!]!
     event(id: Int!): Event
     pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!
-    virtualCheckpoints: VirtualChallengeConnection!
-    virtualCheckpoint(id: Int!): VirtualChallenge
+    virtualChallenges: VirtualChallengeConnection!
+    virtualChallenge(id: Int!): VirtualChallenge
   }
 
   type CreateUserPayload {
