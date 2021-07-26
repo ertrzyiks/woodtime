@@ -62,6 +62,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.DOKKU_DEPLOY_KEY }}
+      - run: echo 'ertrzyiks.me,104.236.224.189 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNfW9tfAr21CQlapt944WeYOaSftTQB3Ly/Tm/1ZeXYEI08w9v9FEXRG2E+Sj/EDHimklHLlCwWCPMqMYFMQsMg=' >> ~/.ssh/known_hosts
+      - run: |
+          git config --global user.email "deploy-bot@ertrzyiks.me"
+          git config --global user.name "Deploy Bot"
+          git init
+          git remote add dokku dokku@ertrzyiks.me:woodtime-api
+          git add .
+          git commit -m 'Update'
+          git push dokku master --force
       - name: Download build folder
         uses: actions/download-artifact@v1
         with:
