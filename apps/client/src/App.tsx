@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import {AppBar, Toolbar, Typography, Link, CircularProgress} from '@material-ui/core';
+import {AppBar, Toolbar, Typography, Link, CircularProgress, IconButton} from '@material-ui/core';
+import PublicIcon from '@material-ui/icons/Public';
 import {
   BrowserRouter as Router,
   Switch,
@@ -90,6 +91,10 @@ function App() {
                 Woodtime
               </Link>
             </Typography>
+
+            <IconButton component={RouterLink} to="/virtual-challenges" color="inherit" aria-label='Browse virtual challenges'>
+              <PublicIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
