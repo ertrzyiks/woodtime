@@ -54,9 +54,9 @@ jobs:
           name: client-dist
           path: apps/client/build
 
-  deploy:
-    name: 'Deployment'
-    needs: [build, unit_tests]
+  deploy_api:
+    name: 'Deploy API'
+    needs: [ unit_tests ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
@@ -73,7 +73,16 @@ jobs:
           git remote add dokku dokku@ertrzyiks.me:woodtime-api
           git add .
           git commit -m 'Update'
-          git push dokku master --force
+          git push dokku main:master --force
+
+  deploy_web:
+    name: 'Deploy Web'
+    needs: [build, unit_tests, deploy_api]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
       - name: Download build folder
         uses: actions/download-artifact@v1
         with:
