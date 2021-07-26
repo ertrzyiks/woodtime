@@ -12,6 +12,7 @@ const {
   deleteEvent,
   createCheckpoint,
   createVirtualChallenge,
+  enrollVirtualChallenge,
   deleteCheckpoint,
   pointsNearby,
   virtualChallenges,
@@ -66,6 +67,7 @@ const resolvers = {
     createCheckpoint,
     deleteCheckpoint,
     createVirtualChallenge,
+    enrollVirtualChallenge
   },
 };
 

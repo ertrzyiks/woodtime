@@ -119,6 +119,11 @@ module.exports = gql`
     virtualChallenge: VirtualChallenge
   }
 
+  type EnrollVirtualChallengeResult {
+    success: Boolean!
+    event: Event
+  }
+
   type Mutation {
     createUser(name: String!): CreateUserPayload
     login(token: String!): LoginPayload
@@ -143,5 +148,6 @@ module.exports = gql`
     deleteCheckpoint(id: Int!): DeleteCheckpointResult
     
     createVirtualChallenge(input: CreateVirtualChallengeInput!): CreateVirtualChallengeResult!
+    enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!
   }
 `;

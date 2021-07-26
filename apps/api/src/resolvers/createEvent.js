@@ -5,6 +5,7 @@ module.exports = async (_, { name, checkpointCount, type }) => {
     name,
     type,
     checkpoint_count: checkpointCount,
+    virtual_challenge_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };

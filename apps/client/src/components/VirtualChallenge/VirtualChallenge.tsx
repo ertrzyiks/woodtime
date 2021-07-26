@@ -1,6 +1,6 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import React from 'react'
-import { useParams } from "react-router-dom"
+import {useHistory, useParams } from "react-router-dom"
 import {GET_VIRTUAL_CHALLENGE} from "../../queries/getVirtualChallenge";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import { Link as RouterLink } from 'react-router-dom';
@@ -11,16 +11,30 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import Button from '@material-ui/core/Button';
+import {ENROLL_VIRTUAL_CHALLENGE} from "../../queries/enrollVirtualChallenge";
+import {GET_EVENTS} from "../../queries";
 
 const VirtualChallenge = () => {
   const isInitialNavigation = useInitialNavigation();
 
-  const breadcrumbClasses = useBreadcrumbStyles();
+  const breadcrumbClasses = useBreadcrumbStyles()
+  const history = useHistory();
 
   const { id } = useParams<{ id: string }>()
   const { data } = useQuery(GET_VIRTUAL_CHALLENGE, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
+    variables: {
+      id: parseInt(id, 10)
+    }
+  })
+
+  const [enroll] = useMutation(ENROLL_VIRTUAL_CHALLENGE, {
+    refetchQueries: [{ query: GET_EVENTS }],
+    awaitRefetchQueries: true,
+    onCompleted: (data) => {
+      history.push(`/events/${data.enrollVirtualChallenge.event.id}`);
+    },
     variables: {
       id: parseInt(id, 10)
     }
@@ -44,7 +58,7 @@ const VirtualChallenge = () => {
         </Breadcrumbs>
       </Box>
 
-      <Button>Join</Button>
+      <Button onClick={() => enroll()}>Join</Button>
     </div>
   )
 }
