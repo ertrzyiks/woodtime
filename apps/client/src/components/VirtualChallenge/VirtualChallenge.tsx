@@ -6,7 +6,7 @@ import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import { Link as RouterLink } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import EventIcon from '@material-ui/icons/Event';
+import PublicIcon from '@material-ui/icons/Public';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
@@ -51,7 +51,7 @@ const VirtualChallenge = () => {
       <Box px={1} py={2}>
         <Breadcrumbs aria-label="breadcrumb">
           <Link color="inherit" component={RouterLink} to='/virtual-challenges' className={breadcrumbClasses.link}>
-            <EventIcon className={breadcrumbClasses.icon} />
+            <PublicIcon className={breadcrumbClasses.icon} />
             Virtual Challenges
           </Link>
           <Typography color="textPrimary">{virtualChallenge.name}</Typography>

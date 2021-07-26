@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Typography from '@material-ui/core/Typography';
-import EventIcon from '@material-ui/icons/Event';
+import PublicIcon from '@material-ui/icons/Public';
 
 import React from 'react'
 import {GET_VIRTUAL_CHALLENGES} from "../../queries/getVirtualChallenges";
@@ -34,7 +34,7 @@ const VirtualChallengeList = () => {
       <Box px={1} py={2}>
         <Breadcrumbs aria-label="breadcrumb">
           <Typography color="textPrimary" className={breadcrumbClasses.link}>
-            <EventIcon className={breadcrumbClasses.icon} />
+            <PublicIcon className={breadcrumbClasses.icon} />
             Virtual Challenges
           </Typography>
         </Breadcrumbs>
