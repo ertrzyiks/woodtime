@@ -71,7 +71,7 @@ jobs:
           git config --global user.name "Deploy Bot"
           git init
           git remote add dokku dokku@ertrzyiks.me:woodtime-api
-          git push dokku main:master --force
+          git push dokku HEAD:master --force
 
   deploy_web:
     name: 'Deploy Web'
