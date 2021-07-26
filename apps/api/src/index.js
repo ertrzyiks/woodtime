@@ -11,7 +11,12 @@ const {
   createEvent,
   deleteEvent,
   createCheckpoint,
+  createVirtualChallenge,
+  enrollVirtualChallenge,
   deleteCheckpoint,
+  pointsNearby,
+  virtualChallenges,
+  virtualChallenge
 } = require("./resolvers");
 
 const app = express();
@@ -39,6 +44,9 @@ const resolvers = {
     },
     events,
     event,
+    pointsNearby,
+    virtualChallenges,
+    virtualChallenge
   },
   Event: {
     checkpoints,
@@ -58,6 +66,8 @@ const resolvers = {
     deleteEvent,
     createCheckpoint,
     deleteCheckpoint,
+    createVirtualChallenge,
+    enrollVirtualChallenge
   },
 };
 

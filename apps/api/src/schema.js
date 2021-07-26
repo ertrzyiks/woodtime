@@ -26,11 +26,49 @@ module.exports = gql`
     id: String!
     name: String!
   }
+  
+  type Coordinates {
+    lat: String
+    lng: String
+  }
+
+  type CoordinatesConnection {
+    points: [Coordinates]!
+    totalCount: Int!
+  }
+
+  input CoordinatesInput {
+    lat: String
+    lng: String
+  }
+  
+  input PointsNearbyInput {
+    start: CoordinatesInput!
+    radius: Int!
+    count: Int!
+  }
+
+  type VirtualChallenge {
+    id: Int!
+    name: String!
+    checkpoints: CoordinatesConnection!
+    radius: Int!
+    created_at: String!
+    updated_at: String!
+  }
+  
+  type VirtualChallengeConnection {
+    totalCount: Int!
+    nodes: [VirtualChallenge]
+  }
 
   type Query {
     me: User
     events: [Event!]!
     event(id: Int!): Event
+    pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!
+    virtualChallenges: VirtualChallengeConnection!
+    virtualChallenge(id: Int!): VirtualChallenge
   }
 
   type CreateUserPayload {
@@ -70,6 +108,21 @@ module.exports = gql`
     success: Boolean!
     id: Int!
   }
+  
+  input CreateVirtualChallengeInput {
+    name: String!
+    checkpoints: [CoordinatesInput]
+  }
+  
+  type CreateVirtualChallengeResult {
+    success: Boolean!
+    virtualChallenge: VirtualChallenge
+  }
+
+  type EnrollVirtualChallengeResult {
+    success: Boolean!
+    event: Event
+  }
 
   type Mutation {
     createUser(name: String!): CreateUserPayload
@@ -93,5 +146,8 @@ module.exports = gql`
     ): CreateCheckpointResult
 
     deleteCheckpoint(id: Int!): DeleteCheckpointResult
+    
+    createVirtualChallenge(input: CreateVirtualChallengeInput!): CreateVirtualChallengeResult!
+    enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!
   }
 `;

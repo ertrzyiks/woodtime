@@ -19,6 +19,9 @@ import EventList from './components/EventList/EventList';
 import AddEvent from './components/AddEvent/AddEvent';
 import EventPage from './components/EventPage/EventPage';
 import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
+import AddVirtualChallenge from './components/AddVirtualChallenge/AddVirtualChallenge';
+import VirtualChallengeList from './components/VirtualChallengeList/VirtualChallengeList';
+import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
@@ -105,6 +108,15 @@ function App() {
               </Route>
               <Route path="/events/:id/add-checkpoint" exact>
                 <AddCheckpointPage />
+              </Route>
+              <Route path="/virtual-challenges" exact>
+                <VirtualChallengeList />
+              </Route>
+              <Route path="/virtual-challenges/new" exact>
+                <AddVirtualChallenge />
+              </Route>
+              <Route path="/virtual-challenges/:id" exact>
+                <VirtualChallenge />
               </Route>
             </Switch>
           </ApolloProvider>

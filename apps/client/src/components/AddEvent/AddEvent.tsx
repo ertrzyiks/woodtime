@@ -20,7 +20,7 @@ import { useHistory } from 'react-router-dom';
 import { Field, Form } from 'react-final-form';
 import { useMutation } from '@apollo/client';
 
-import { CREATE_EVENT } from '../../queries';
+import {CREATE_EVENT, GET_EVENTS} from '../../queries';
 
 interface Values {
   name: string;
@@ -47,8 +47,10 @@ const AddEvent = () => {
   const [numCheckpoints, setNumCheckpoints] = useState('');
   const [type, setType] = useState('score');
 
+  const history = useHistory();
+
   const [createEvent] = useMutation(CREATE_EVENT, {
-    refetchQueries: ['getEvents'],
+    refetchQueries: [{ query: GET_EVENTS }],
     awaitRefetchQueries: true,
     onCompleted: (data) => {
       history.push(`/events/${data.createEvent.event.id}`);
@@ -57,7 +59,6 @@ const AddEvent = () => {
 
   const classes = useStyles();
 
-  const history = useHistory();
   const handleClose = () => {
     history.push('/');
   };
