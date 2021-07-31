@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
     addEventButton: {
       position: 'absolute',
       right: '1em',
-      bottom: '1em',
+      bottom: '5em',
     },
   })
 );

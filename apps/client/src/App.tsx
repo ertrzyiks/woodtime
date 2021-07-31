@@ -1,12 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import {AppBar, Toolbar, Typography, Link, CircularProgress, IconButton} from '@material-ui/core';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Link,
+  CircularProgress,
+  BottomNavigation,
+  BottomNavigationAction
+} from '@material-ui/core';
 import PublicIcon from '@material-ui/icons/Public';
+import EventIcon from '@material-ui/icons/Event';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link as RouterLink,
+  useHistory,
+  useLocation,
 } from 'react-router-dom';
 import {
   ApolloClient,
@@ -52,9 +63,41 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%',
       justifyContent: 'center',
       display: 'flex'
+    },
+    bottomBar: {
+      position: 'fixed',
+      bottom: 0,
+      width: '100%'
     }
   })
 );
+
+function BottomBar({ className }: { className: string }) {
+  const history = useHistory()
+  const location = useLocation()
+
+  if (location.pathname !== '/' && location.pathname !== '/virtual-challenges') {
+    return null
+  }
+
+  return (
+    <BottomNavigation
+      value={location.pathname === '/' ? 0 : 1}
+      onChange={(event, newValue) => {
+        if (newValue === 0) {
+          history.push('/')
+        } else {
+          history.push('/virtual-challenges')
+        }
+      }}
+      showLabels
+      className={className}
+    >
+      <BottomNavigationAction label="Events" icon={<EventIcon />} />
+      <BottomNavigationAction label="Virtual Challenges" icon={<PublicIcon />} />
+    </BottomNavigation>
+  )
+}
 
 function App() {
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
@@ -91,10 +134,6 @@ function App() {
                 Woodtime
               </Link>
             </Typography>
-
-            <IconButton component={RouterLink} to="/virtual-challenges" color="inherit" aria-label='Browse virtual challenges'>
-              <PublicIcon />
-            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -124,6 +163,8 @@ function App() {
                 <VirtualChallenge />
               </Route>
             </Switch>
+
+            <BottomBar className={classes.bottomBar}/>
           </ApolloProvider>
         ) : (
           <div className={classes.loaderWrapper}>
