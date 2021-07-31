@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import ScoreLauf from '../ScoreLauf/ScoreLauf';
+import VirtualEvent from '../VirtualEvent/VirtualEvent';
 import { GET_EVENT } from '../../queries/event';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import {Box, Breadcrumbs, Link, Typography} from "@material-ui/core";
@@ -42,10 +43,18 @@ const EventPage = () => {
 
       {error && <p>Error :(</p>}
 
-      <ScoreLauf
-        event={event}
-        newCheckpointPath={`/events/${event.id}/add-checkpoint`}
-      />
+      {(event.type === 3 && event.virtual_challenge) ? (
+        <VirtualEvent
+          event={event}
+          virtualChallenge={event.virtual_challenge}
+          newCheckpointPath={`/events/${event.id}/add-checkpoint`}
+        />
+      ) : (
+        <ScoreLauf
+          event={event}
+          newCheckpointPath={`/events/${event.id}/add-checkpoint`}
+        />
+      )}
     </div>
   );
 };

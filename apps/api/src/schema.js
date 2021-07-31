@@ -20,6 +20,7 @@ module.exports = gql`
     checkpoints: [Checkpoint!]!
     created_at: String!
     updated_at: String!
+    virtual_challenge: EventVirtualChallenge
   }
 
   type User {
@@ -46,6 +47,10 @@ module.exports = gql`
     start: CoordinatesInput!
     radius: Int!
     count: Int!
+  }
+  
+  type EventVirtualChallenge {
+    id: Int!
   }
 
   type VirtualChallenge {
@@ -101,6 +106,7 @@ module.exports = gql`
   }
 
   type CreateCheckpointResult {
+    success: Boolean!
     checkpoint: Checkpoint
   }
 
@@ -123,6 +129,11 @@ module.exports = gql`
     success: Boolean!
     event: Event
   }
+  
+  type CheckInViertualCheckpointResult {
+    success: Boolean!
+    checkpoint: Checkpoint
+  }
 
   type Mutation {
     createUser(name: String!): CreateUserPayload
@@ -143,9 +154,14 @@ module.exports = gql`
       cp_code: String
       skipped: Boolean
       skip_reason: String
-    ): CreateCheckpointResult
+    ): CreateCheckpointResult!
+    
+    checkInVirtualCheckpoint(
+      event_id: Int!
+      position: CoordinatesInput!
+    ): CheckInViertualCheckpointResult!
 
-    deleteCheckpoint(id: Int!): DeleteCheckpointResult
+    deleteCheckpoint(id: Int!): DeleteCheckpointResult!
     
     createVirtualChallenge(input: CreateVirtualChallengeInput!): CreateVirtualChallengeResult!
     enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!

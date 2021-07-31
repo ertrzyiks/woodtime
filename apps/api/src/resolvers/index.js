@@ -11,4 +11,5 @@ module.exports = {
   pointsNearby: require("./pointsNearby"),
   virtualChallenges: require("./virtualChallenges"),
   virtualChallenge: require("./virtualChallenge"),
+  checkInVirtualCheckpoint: require("./checkInVirtualCheckpoint"),
 };

@@ -5,7 +5,11 @@ export const GET_EVENT = gql`
     event(id: $id) {
       id
       name
+      type
       checkpoint_count
+      virtual_challenge {
+        id
+      }
       checkpoints {
         id
         cp_id

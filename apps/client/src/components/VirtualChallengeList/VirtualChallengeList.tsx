@@ -14,9 +14,23 @@ import { Link } from 'react-router-dom';
 import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 import { format } from 'date-fns';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
+import Fab from "@material-ui/core/Fab";
+import AddIcon from '@material-ui/icons/Add';
+import {createStyles, makeStyles, Theme} from "@material-ui/core";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    addChallengeButton: {
+      position: 'absolute',
+      right: '1em',
+      bottom: '5em',
+    },
+  })
+);
 
 const VirtualChallengeList = () => {
   const isInitialNavigation = useInitialNavigation();
+  const classes = useStyles()
 
   const { data, loading } = useQuery(GET_VIRTUAL_CHALLENGES, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
@@ -44,7 +58,7 @@ const VirtualChallengeList = () => {
 
       <List>
         {data.virtualChallenges.nodes.map((challenge: any) => (
-          <ListItem button component={Link} to={`/virtual-challenges/${challenge.id}`}>
+          <ListItem key={challenge.id} button component={Link} to={`/virtual-challenges/${challenge.id}`}>
             <ListItemText
               primary={challenge.name}
               secondary={format(new Date(challenge.createdAt), 'dd/MM/yyyy')}
@@ -53,6 +67,15 @@ const VirtualChallengeList = () => {
         ))}
       </List>
 
+      <Fab
+        className={classes.addChallengeButton}
+        color="primary"
+        aria-label="add"
+        component={Link}
+        to="/virtual-challenges/new"
+      >
+        <AddIcon />
+      </Fab>
     </div>
   )
 }

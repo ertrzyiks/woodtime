@@ -16,7 +16,8 @@ const {
   deleteCheckpoint,
   pointsNearby,
   virtualChallenges,
-  virtualChallenge
+  virtualChallenge,
+  checkInVirtualCheckpoint
 } = require("./resolvers");
 
 const app = express();
@@ -67,7 +68,8 @@ const resolvers = {
     createCheckpoint,
     deleteCheckpoint,
     createVirtualChallenge,
-    enrollVirtualChallenge
+    enrollVirtualChallenge,
+    checkInVirtualCheckpoint
   },
 };
 
