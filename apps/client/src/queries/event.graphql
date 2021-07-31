@@ -5,6 +5,7 @@ query getEvent($id: Int!) {
     type
     invite_token
     checkpoint_count
+    created_at
     virtual_challenge {
       id
     }

@@ -4,7 +4,7 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';
 import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
-import { GetEventDocument } from '../../queries/event';
+import {GetEventDocument, GetEventQuery} from '../../queries/event';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { Box, Breadcrumbs, Link, Typography } from '@material-ui/core';
 import EventIcon from '@material-ui/icons/Event';
@@ -33,11 +33,11 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   </ContentLoader>
 )
 
-function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
+function mergeCheckpoints(event: GetEventQuery['event'] | undefined, items: QueueItem['checkpoint'][]) {
   if (!event) {
     return event
   }
-
+  
   return {
     ...event,
     checkpoints: [
@@ -45,9 +45,9 @@ function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
       ...items.map(item => ({
         id: 0,
         cp_id: item.cpId,
-        cp_code: item.cpCode,
+        cp_code: item.cpCode ?? null,
         skipped: item.skipped,
-        skip_reason: item.skipReason,
+        skip_reason: item.skipReason ?? null,
         pending: true,
         error: item.error
       }))
@@ -105,6 +105,10 @@ const EventPage = () => {
     )
   }
 
+  if (!event) {
+    return <div>Not found</div>
+  }
+
   const eventContent =
     event.type === EVENT_TYPES.SCORE ? (
       <ScoreLauf
@@ -140,7 +144,6 @@ const EventPage = () => {
         <VirtualEvent
           event={event}
           virtualChallenge={event.virtual_challenge}
-          newCheckpointPath={`/events/${event.id}/add-checkpoint`}
         />
       ) : eventContent}
     </div>

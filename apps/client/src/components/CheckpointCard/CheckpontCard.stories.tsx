@@ -12,7 +12,8 @@ const checkpoint = {
   id: 1,
   skipped: false,
   cp_id: 12,
-  cp_code: 'AUG'
+  cp_code: 'AUG',
+  skip_reason: null
 }
 
 export const Default = () => <CheckpointCard checkpoint={checkpoint} onDelete={noop} eventId={1} />;

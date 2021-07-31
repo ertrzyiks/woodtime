@@ -13,3 +13,5 @@ generates:
     plugins:
       - typescript-operations
       - typed-document-node
+    config:
+      avoidOptionals: true
