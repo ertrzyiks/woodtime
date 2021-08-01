@@ -6,7 +6,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { useHistory, useParams } from 'react-router-dom';
 import { FORM_ERROR } from 'final-form';
-import { CREATE_CHECKPOINT } from '../../queries';
+import {CREATE_CHECKPOINT, GET_EVENT} from '../../queries';
 import { useMutation } from '@apollo/client';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -32,7 +32,7 @@ const AddCheckpointPage = () => {
 
   const [createCheckpoint, { loading: creationLoading, error: creationError }] =
     useMutation<any, Values>(CREATE_CHECKPOINT, {
-      refetchQueries: ['getEvent'],
+      refetchQueries: [{ query: GET_EVENT, variables: { id: parseInt(eventId, 10) } }],
       awaitRefetchQueries: true,
       onCompleted: (data) => {
         history.push(`/events/${data.createCheckpoint.checkpoint.event_id}`);
