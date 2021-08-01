@@ -7,7 +7,7 @@ module.exports = async (
   const checkpoint = {
     event_id,
     cp_id,
-    cp_code,
+    cp_code: cp_code || null,
     skipped,
     skip_reason: skip_reason || null,
     created_at: new Date().toISOString(),
