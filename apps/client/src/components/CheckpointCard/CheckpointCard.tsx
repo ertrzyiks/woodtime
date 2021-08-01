@@ -9,7 +9,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
 import { useMutation } from '@apollo/client';
-import { DELETE_CHECKPOINT } from '../../queries/deleteCheckpoint';
+import { DELETE_CHECKPOINT } from '../../queries';
 
 interface Props {
   checkpoint: Checkpoint;
