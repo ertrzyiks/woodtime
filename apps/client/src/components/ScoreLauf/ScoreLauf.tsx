@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
     addCheckpointButton: {
       position: 'absolute',
       right: '1em',
-      bottom: '1em'
+      bottom: '1em',
     },
   })
 );
