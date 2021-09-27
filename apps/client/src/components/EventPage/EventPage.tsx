@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, Link as RouterLink } from 'react-router-dom';
+import ContentLoader from "react-content-loader"
 import ScoreLauf from '../ScoreLauf/ScoreLauf';
 import VirtualEvent from '../VirtualEvent/VirtualEvent';
 import { GET_EVENT } from '../../queries/event';
@@ -16,6 +17,19 @@ const EVENT_TYPES = {
   CLASSIC: 2,
 };
 
+const Loader = ({ children, width, height } : { width: number, height: number, children: ReactNode }) => (
+  <ContentLoader
+    speed={2}
+    width={width}
+    height={height}
+    viewBox={`0 0 ${width} ${height}`}
+    backgroundColor="#eeeeee"
+    foregroundColor="#cccccc"
+  >
+    {children}
+  </ContentLoader>
+)
+
 const EventPage = () => {
   const { id } = useParams<{ id: string }>();
 
@@ -30,7 +44,37 @@ const EventPage = () => {
   const event = data?.event;
 
   if (loading && !data) {
-    return <p>Loading...</p>;
+    return (
+      <div>
+        <Box px={1} py={2}>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link
+              color="inherit"
+              component={RouterLink}
+              to="/"
+              className={classes.link}
+            >
+              <EventIcon className={classes.icon} />
+              Events
+            </Link>
+          </Breadcrumbs>
+        </Box>
+
+        <Box px={1} py={2}>
+          <Loader width={300} height={500}>
+            <rect x="0" y="0" rx="3" ry="3" width="45" height="12" />
+            <rect x="0" y="20" rx="3" ry="3" width="250" height="3" />
+            <rect x="30" y="40" rx="3" ry="3" width="80" height="80" />
+            <rect x="130" y="40" rx="3" ry="3" width="80" height="80" />
+            <rect x="0" y="190" rx="3" ry="3" width="45" height="12" />
+            <rect x="0" y="220" rx="3" ry="3" width="100" height="10" />
+            <rect x="0" y="240" rx="3" ry="3" width="100" height="10" />
+            <rect x="0" y="260" rx="3" ry="3" width="100" height="10" />
+
+          </Loader>
+        </Box>
+      </div>
+    )
   }
 
   const eventContent =

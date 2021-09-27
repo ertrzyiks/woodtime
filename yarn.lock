@@ -7660,6 +7660,7 @@ __metadata:
     leaflet: ^1.7.1
     prettier: 2.3.1
     react: ^17.0.2
+    react-content-loader: ^6.0.3
     react-dom: ^17.0.2
     react-final-form: ^6.5.3
     react-router-dom: ^5.2.0
@@ -18054,6 +18055,15 @@ fsevents@^1.2.7:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: 5e02f92eda933f1945407a290cc83ef2b640b46c7b637ae25c34a56ccc9c8b59fff08484462db292a2beeebe5a612682fe1d79cf29b44a49a2524db43db31dfb
+  languageName: node
+  linkType: hard
+
+"react-content-loader@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "react-content-loader@npm:6.0.3"
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: 585d551222d48c77c33a4bafda9efcd0417c6ec5426f8b6fe33910bb94dd77a85158274eb4880426507fe71f85290084085a6121e060a7fd80da3a4f743b6c5e
   languageName: node
   linkType: hard
 

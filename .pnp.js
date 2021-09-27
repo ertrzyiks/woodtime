@@ -12472,6 +12472,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["leaflet", "npm:1.7.1"],
             ["prettier", "npm:2.3.1"],
             ["react", "npm:17.0.2"],
+            ["react-content-loader", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.3"],
             ["react-dom", "virtual:0c45d909f1bedf0abdacdb5d1505e51999aa20c9eb06c7211740a42c3de5b877eceea493d137f4af27bb05463d68601eb5c558703a6cf22583e9b98616b1637c#npm:17.0.2"],
             ["react-final-form", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.5.3"],
             ["react-router-dom", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:5.2.0"],
@@ -24556,6 +24557,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@types/react-dom",
             "@types/react",
             "react-dom",
+            "react"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["react-content-loader", [
+        ["npm:6.0.3", {
+          "packageLocation": "./.yarn/cache/react-content-loader-npm-6.0.3-d4d3b780ea-585d551222.zip/node_modules/react-content-loader/",
+          "packageDependencies": [
+            ["react-content-loader", "npm:6.0.3"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.3", {
+          "packageLocation": "./.yarn/$$virtual/react-content-loader-virtual-7bfa53e329/0/cache/react-content-loader-npm-6.0.3-d4d3b780ea-585d551222.zip/node_modules/react-content-loader/",
+          "packageDependencies": [
+            ["react-content-loader", "virtual:a90340927533309496736c06e16f93af4607445ef274a79bec384f328851d1ec0a2812cd5e8e5b7ee7a61f7f3518522bf588f16a2df5adf5e299aa3fcd6dccd7#npm:6.0.3"],
+            ["@types/react", "npm:17.0.11"],
+            ["react", "npm:17.0.2"]
+          ],
+          "packagePeers": [
+            "@types/react",
             "react"
           ],
           "linkType": "HARD",
