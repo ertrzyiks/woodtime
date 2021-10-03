@@ -1,7 +1,4 @@
-import React, {Dispatch, ReactNode, useContext, useEffect, useReducer, useState} from 'react'
-import {useMutation} from "@apollo/client";
-import {CREATE_CHECKPOINT, GET_EVENT} from "../../queries";
-import {Snackbar} from "@material-ui/core";
+import React, {Dispatch, ReactNode, useEffect, useReducer} from 'react'
 
 export interface Checkpoint {
   cpId: number
@@ -63,81 +60,6 @@ const reducer = (state: State, action: Action): State => {
   return state
 }
 
-export const Executor = () => {
-  const { queue } = useContext(CheckpointsStateContext)
-  const dispatch = useContext(CheckpointsDispatchContext)
-  const firstQueueElement = queue[0]
-
-  const [createCheckpoint] =
-    useMutation(CREATE_CHECKPOINT, {
-      awaitRefetchQueries: true,
-      onCompleted: (data) => {
-        const { cp_id, event_id } = data.createCheckpoint.checkpoint
-        dispatch({
-          type: 'delete',
-          id: cp_id,
-          eventId: event_id
-        })
-      }
-    })
-
-  useEffect(() => {
-    if (!firstQueueElement) {
-      return
-    }
-
-    createCheckpoint({
-      refetchQueries: [{ query: GET_EVENT, variables: { id: firstQueueElement.eventId } }],
-      variables: {
-        eventId: firstQueueElement.eventId,
-        cpId: firstQueueElement.checkpoint.cpId,
-        cpCode: firstQueueElement.checkpoint.cpCode,
-        skipped: firstQueueElement.checkpoint.skipped,
-        skipReason: firstQueueElement.checkpoint.skipReason
-      }
-    }).catch(err => {
-      dispatch({
-        type: 'errored',
-        checkpoint: firstQueueElement.checkpoint,
-        eventId: firstQueueElement.eventId,
-        error: err
-      })
-    })
-  }, [firstQueueElement, dispatch, createCheckpoint])
-
-  return null
-}
-
-export const ErrorReporter = () => {
-  const { errored } = useContext(CheckpointsStateContext)
-  const [open, setOpen] = useState(true)
-
-  const errors = errored.map(item => `Error during saving point ${item.checkpoint.cpId}`)
-
-  useEffect(() => {
-    setOpen(true)
-  }, [errored, setOpen])
-
-  if (errors.length === 0) {
-    return null
-  }
-
-  return (
-    <Snackbar
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      onClose={() => setOpen(false)}
-      open={open}
-      message={errors.map(message => (
-        <div>{message}</div>
-      ))}
-      autoHideDuration={5000}
-    />
-  )
-}
-
 const CheckpointsService = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, { queue: [], errored: [] }, initialValue => {
     const value = localStorage.getItem('checkpointsServiceStorage')
@@ -158,8 +80,6 @@ const CheckpointsService = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     localStorage.setItem('checkpointsServiceStorage', JSON.stringify(state))
   }, [state])
-
-
 
   return (
     <CheckpointsDispatchContext.Provider value={dispatch}>

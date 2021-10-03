@@ -37,7 +37,9 @@ import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
-import CheckpointsService, {Executor, ErrorReporter} from "./components/CheckpointsService/CheckpointsService";
+import CheckpointsService from "./components/CheckpointsService/CheckpointsService";
+import Executor from "./components/CheckpointsService/Executor";
+import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
 
 const getLink = () => {
   return createHttpLink({
