@@ -11,6 +11,8 @@ import EventIcon from '@material-ui/icons/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import Classic from '../Classic/Classic';
+import {useEventQueue} from "../CheckpointsService/useEventQueue";
+import {QueueItem} from "../CheckpointsService/CheckpointsService";
 
 const EVENT_TYPES = {
   SCORE: 1,
@@ -30,8 +32,31 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   </ContentLoader>
 )
 
+function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
+  if (!event) {
+    return event
+  }
+
+  return {
+    ...event,
+    checkpoints: [
+      ...event.checkpoints,
+      ...items.map(item => ({
+        id: 0,
+        cp_id: item.cpId,
+        cp_code: item.cpCode,
+        skipped: item.skipped,
+        skip_reason: item.skipReason,
+        pending: true,
+        error: item.error
+      }))
+    ]
+  }
+}
+
 const EventPage = () => {
   const { id } = useParams<{ id: string }>();
+  const items = useEventQueue(parseInt(id, 10))
 
   const classes = useBreadcrumbStyles();
   const isInitialNavigation = useInitialNavigation();
@@ -41,7 +66,7 @@ const EventPage = () => {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
   });
-  const event = data?.event;
+  const event = mergeCheckpoints(data?.event, items)
 
   if (loading && !data) {
     return (

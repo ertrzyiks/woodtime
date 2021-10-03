@@ -37,6 +37,7 @@ import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
+import CheckpointsService, {Executor, ErrorReporter} from "./components/CheckpointsService/CheckpointsService";
 
 const getLink = () => {
   return createHttpLink({
@@ -139,32 +140,36 @@ function App() {
 
         {client ? (
           <ApolloProvider client={client}>
-            <Switch>
-              <Route path="/" exact>
-                <EventList />
-              </Route>
-              <Route path="/events/new" exact>
-                <EventList />
-                <AddEvent />
-              </Route>
-              <Route path="/events/:id" exact>
-                <EventPage />
-              </Route>
-              <Route path="/events/:id/add-checkpoint" exact>
-                <AddCheckpointPage />
-              </Route>
-              <Route path="/virtual-challenges" exact>
-                <VirtualChallengeList />
-              </Route>
-              <Route path="/virtual-challenges/new" exact>
-                <AddVirtualChallenge />
-              </Route>
-              <Route path="/virtual-challenges/:id" exact>
-                <VirtualChallenge />
-              </Route>
-            </Switch>
+            <CheckpointsService>
+              <Executor />
+              <ErrorReporter />
 
-            <BottomBar className={classes.bottomBar}/>
+              <Switch>
+                <Route path="/" exact>
+                  <EventList />
+                </Route>
+                <Route path="/events/new" exact>
+                  <EventList />
+                  <AddEvent />
+                </Route>
+                <Route path="/events/:id" exact>
+                  <EventPage />
+                </Route>
+                <Route path="/events/:id/add-checkpoint" exact>
+                  <AddCheckpointPage />
+                </Route>
+                <Route path="/virtual-challenges" exact>
+                  <VirtualChallengeList />
+                </Route>
+                <Route path="/virtual-challenges/new" exact>
+                  <AddVirtualChallenge />
+                </Route>
+                <Route path="/virtual-challenges/:id" exact>
+                  <VirtualChallenge />
+                </Route>
+              </Switch>
+            </CheckpointsService>
+          <BottomBar className={classes.bottomBar}/>
           </ApolloProvider>
         ) : (
           <div className={classes.loaderWrapper}>

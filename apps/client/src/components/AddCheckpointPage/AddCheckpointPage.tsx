@@ -1,13 +1,11 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { Form, Field } from 'react-final-form';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Box, Button, TextField } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { useHistory, useParams } from 'react-router-dom';
-import { FORM_ERROR } from 'final-form';
-import {CREATE_CHECKPOINT, GET_EVENT} from '../../queries';
-import { useMutation } from '@apollo/client';
+import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsService";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,55 +27,23 @@ const AddCheckpointPage = () => {
   const { id: eventId } = useParams<{ id: string }>();
 
   const history = useHistory();
-
-  const [createCheckpoint, { loading: creationLoading, error: creationError }] =
-    useMutation<any, Values>(CREATE_CHECKPOINT, {
-      refetchQueries: [{ query: GET_EVENT, variables: { id: parseInt(eventId, 10) } }],
-      awaitRefetchQueries: true,
-      onCompleted: (data) => {
-        history.push(`/events/${data.createCheckpoint.checkpoint.event_id}`);
-      },
-    });
+  const dispatch = useContext(CheckpointsDispatchContext)
 
   const handleCheckpointSubmit = (checkpoint: any) => {
-    try {
-      return createCheckpoint({
-        variables: {
-          eventId: parseInt(eventId, 10),
+      dispatch({
+        type: 'add',
+        eventId: parseInt(eventId, 10),
+        checkpoint: {
           cpId: parseInt(checkpoint.cpId, 10),
           cpCode: checkpoint.cpCode,
           skipped: checkpoint.skipped,
-          skipReason: checkpoint.skipReason,
-        },
+          skipReason: checkpoint.skipReason
+        }
       });
-    } catch (err) {
-      if (!err) {
-        return {
-          [FORM_ERROR]: 'Something went wrong',
-        };
-      }
-
-      if (err.message && err.message.startsWith('Checkpoint')) {
-        return {
-          id: 'Id already taken',
-        };
-      }
-
-      return {
-        [FORM_ERROR]: err.message || err,
-      };
-    }
+    history.push(`/events/${eventId}`)
   };
 
   const classes = useStyles();
-
-  if (creationLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (creationError) {
-    return <p>Error :(</p>;
-  }
 
   return (
     <Form<Values>
@@ -90,9 +56,6 @@ const AddCheckpointPage = () => {
 
         return (
           <form onSubmit={handleSubmit}>
-            {submitError && (
-              <div className="error">{submitError}</div> // not showing
-            )}
             <Field
               name="cpId"
               render={({ input, meta }) => (
@@ -155,7 +118,7 @@ const AddCheckpointPage = () => {
         );
       }}
     />
-  );
-};
+  )
+}
 
 export default AddCheckpointPage;
