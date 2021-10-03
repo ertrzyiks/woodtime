@@ -8,11 +8,10 @@ import {
 import ClearIcon from '@material-ui/icons/Clear';
 import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
-import { useMutation } from '@apollo/client';
-import { DELETE_CHECKPOINT } from '../../queries';
 
 interface Props {
   checkpoint: Checkpoint;
+  onDelete: (checkpoint: Checkpoint) => void
   eventId: number;
 }
 
@@ -44,15 +43,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const CheckpointCard = ({ checkpoint }: Props) => {
-  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
-    refetchQueries: ['getEvent'],
-    awaitRefetchQueries: true,
-  });
+const CheckpointCard = ({ checkpoint, onDelete }: Props) => {
 
-  const handleDeleteClick = (checkpointId: number) => {
-    return deleteCheckpoint({ variables: { id: checkpointId } });
-  };
 
   const classes = useStyles();
 
@@ -83,7 +75,7 @@ const CheckpointCard = ({ checkpoint }: Props) => {
       <div className={classes.deleteIcon}>
         <IconButton
           aria-label="delete"
-          onClick={() => handleDeleteClick(checkpoint.id)}
+          onClick={() => onDelete(checkpoint)}
         >
           <ClearIcon />
         </IconButton>

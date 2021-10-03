@@ -37,7 +37,7 @@ import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
-import CheckpointsService, {Executor} from "./components/CheckpointsService/CheckpointsService";
+import CheckpointsService, {Executor, ErrorReporter} from "./components/CheckpointsService/CheckpointsService";
 
 const getLink = () => {
   return createHttpLink({
@@ -142,6 +142,7 @@ function App() {
           <ApolloProvider client={client}>
             <CheckpointsService>
               <Executor />
+              <ErrorReporter />
 
               <Switch>
                 <Route path="/" exact>

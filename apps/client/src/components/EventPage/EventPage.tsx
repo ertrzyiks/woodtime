@@ -33,6 +33,10 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
 )
 
 function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
+  if (!event) {
+    return event
+  }
+
   return {
     ...event,
     checkpoints: [
@@ -42,7 +46,9 @@ function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
         cp_id: item.cpId,
         cp_code: item.cpCode,
         skipped: item.skipped,
-        skip_reason: item.skipReason
+        skip_reason: item.skipReason,
+        pending: true,
+        error: item.error
       }))
     ]
   }

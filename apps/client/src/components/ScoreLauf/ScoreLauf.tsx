@@ -9,7 +9,7 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import React from 'react';
+import React, {useContext} from 'react';
 import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel'
 import { OrienteeringEvent } from '../../types/OrienteeringEvent';
 
@@ -18,6 +18,10 @@ import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../CheckpointCard/CheckpointCard';
 import Solution from '../Solution/Solution';
+import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsService";
+import {useMutation} from "@apollo/client";
+import {Checkpoint} from "../../types/Checkpoint";
+import {DELETE_CHECKPOINT} from "../../queries";
 
 
 interface Props {
@@ -37,6 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
     item: {
       padding: 5,
     },
+    pendingItem: {
+      opacity: 0.7
+    },
     control: {
       padding: theme.spacing(2),
     },
@@ -55,6 +62,24 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
 
   const classes = useStyles();
 
+  const dispatch = useContext(CheckpointsDispatchContext)
+  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
+    refetchQueries: ['getEvent'],
+    awaitRefetchQueries: true,
+  });
+
+  const handleDeleteClick = (checkpoint: Checkpoint) => {
+    if (checkpoint.pending) {
+      return dispatch({
+        type: 'delete',
+        eventId: event.id,
+        id: checkpoint.cp_id
+      })
+    }
+
+    return deleteCheckpoint({ variables: { id: checkpoint.id } });
+  };
+
   return (
     <Box m={1}>
       <Typography variant="h6">{event.name}</Typography>
@@ -68,11 +93,12 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
           <Grid item xs={12}>
             <Grid container justify="flex-start" spacing={spacing}>
               {checkpoints.map((checkpoint) => (
-                <Grid key={checkpoint.cp_id} item className={classes.item}>
+                <Grid key={checkpoint.cp_id} item className={[classes.item].concat(checkpoint.pending ? [classes.pendingItem] : []).join(' ')}>
                   <Paper className={classes.paper}>
                     <CheckpointCard
                       checkpoint={checkpoint}
                       eventId={event.id}
+                      onDelete={handleDeleteClick}
                     />
                   </Paper>
                 </Grid>
