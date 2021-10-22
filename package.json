@@ -5,8 +5,7 @@
     "node": "14"
   },
   "workspaces": [
-    "apps/*",
-    "libs/*"
+    "apps/*"
   ],
   "scripts": {
     "build": "yarn workspaces foreach run build",
