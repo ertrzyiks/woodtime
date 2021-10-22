@@ -12,7 +12,8 @@ import {
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
-import { CREATE_CHECKPOINT, DELETE_CHECKPOINT } from '../../queries';
+import { CreateCheckpointDocument } from '../../queries/createCheckpoint';
+import { DeleteCheckpointDocument } from '../../queries/deleteCheckpoint';
 
 interface Props {
   id: number;
@@ -42,7 +43,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
   const history = useHistory();
 
   const [createCheckpoint, { loading: creationLoading, error: creationError }] =
-    useMutation<any, Values>(CREATE_CHECKPOINT, {
+    useMutation<any, Values>(CreateCheckpointDocument, {
       refetchQueries: ['getEvent'],
       awaitRefetchQueries: true,
       onCompleted: (data) => {
@@ -50,7 +51,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
       },
     });
 
-  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
+  const [deleteCheckpoint] = useMutation(DeleteCheckpointDocument, {
     refetchQueries: ['getEvent'],
     awaitRefetchQueries: true,
   });

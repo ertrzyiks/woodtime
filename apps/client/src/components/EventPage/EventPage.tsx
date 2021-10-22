@@ -4,7 +4,7 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
 import ScoreLauf from '../ScoreLauf/ScoreLauf';
 import VirtualEvent from '../VirtualEvent/VirtualEvent';
-import { GET_EVENT } from '../../queries/event';
+import { GetEventDocument } from '../../queries/event';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { Box, Breadcrumbs, Link, Typography } from '@material-ui/core';
 import EventIcon from '@material-ui/icons/Event';
@@ -61,11 +61,12 @@ const EventPage = () => {
   const classes = useBreadcrumbStyles();
   const isInitialNavigation = useInitialNavigation();
 
-  const { loading, error, data } = useQuery(GET_EVENT, {
+  const { loading, error, data } = useQuery(GetEventDocument, {
     variables: { id: parseInt(id, 10) },
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
   });
+
   const event = mergeCheckpoints(data?.event, items)
 
   if (loading && !data) {

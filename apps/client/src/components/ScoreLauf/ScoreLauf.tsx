@@ -21,7 +21,7 @@ import Solution from '../Solution/Solution';
 import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsService";
 import {useMutation} from "@apollo/client";
 import {Checkpoint} from "../../types/Checkpoint";
-import {DELETE_CHECKPOINT} from "../../queries";
+import {DeleteCheckpointDocument} from "../../queries/deleteCheckpoint";
 
 
 interface Props {
@@ -63,7 +63,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
   const classes = useStyles();
 
   const dispatch = useContext(CheckpointsDispatchContext)
-  const [deleteCheckpoint] = useMutation(DELETE_CHECKPOINT, {
+  const [deleteCheckpoint] = useMutation(DeleteCheckpointDocument, {
     refetchQueries: ['getEvent'],
     awaitRefetchQueries: true,
   });

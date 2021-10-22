@@ -1,0 +1,6 @@
+mutation DeleteCheckpoint($id: Int!) {
+  deleteCheckpoint(id: $id) {
+    id
+  }
+}
+

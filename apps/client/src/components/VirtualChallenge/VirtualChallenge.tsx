@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@apollo/client';
 import React from 'react'
 import {useHistory, useParams } from "react-router-dom"
-import {GET_VIRTUAL_CHALLENGE} from "../../queries/getVirtualChallenge";
+import {GetVirtualChallengeDocument} from "../../queries/getVirtualChallenge";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import { Link as RouterLink } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
@@ -11,8 +11,8 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import Button from '@material-ui/core/Button';
-import {ENROLL_VIRTUAL_CHALLENGE} from "../../queries/enrollVirtualChallenge";
-import {GET_EVENTS} from "../../queries";
+import {EnrollVirtualChallengeDocument} from "../../queries/enrollVirtualChallenge";
+import {GetEventsDocument} from "../../queries/getEvents";
 
 const VirtualChallenge = () => {
   const isInitialNavigation = useInitialNavigation();
@@ -21,7 +21,7 @@ const VirtualChallenge = () => {
   const history = useHistory();
 
   const { id } = useParams<{ id: string }>()
-  const { data } = useQuery(GET_VIRTUAL_CHALLENGE, {
+  const { data } = useQuery(GetVirtualChallengeDocument, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
     variables: {
@@ -29,11 +29,13 @@ const VirtualChallenge = () => {
     }
   })
 
-  const [enroll] = useMutation(ENROLL_VIRTUAL_CHALLENGE, {
-    refetchQueries: [{ query: GET_EVENTS }],
+  const [enroll] = useMutation(EnrollVirtualChallengeDocument, {
+    refetchQueries: [{ query: GetEventsDocument }],
     awaitRefetchQueries: true,
     onCompleted: (data) => {
-      history.push(`/events/${data.enrollVirtualChallenge.event.id}`);
+      if (data.enrollVirtualChallenge.event) {
+        history.push(`/events/${data.enrollVirtualChallenge.event.id}`);
+      }
     },
     variables: {
       id: parseInt(id, 10)

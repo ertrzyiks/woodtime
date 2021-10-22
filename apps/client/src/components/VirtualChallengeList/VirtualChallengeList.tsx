@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import PublicIcon from '@material-ui/icons/Public';
 
 import React from 'react'
-import {GET_VIRTUAL_CHALLENGES} from "../../queries/getVirtualChallenges";
+import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
 import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import List from '@material-ui/core/List';
@@ -32,7 +32,7 @@ const VirtualChallengeList = () => {
   const isInitialNavigation = useInitialNavigation();
   const classes = useStyles()
 
-  const { data, loading } = useQuery(GET_VIRTUAL_CHALLENGES, {
+  const { data, loading } = useQuery(GetVirtualChallengesDocument, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
   })
@@ -57,7 +57,7 @@ const VirtualChallengeList = () => {
       <LoadingIndicator active={loading} />
 
       <List>
-        {data.virtualChallenges.nodes.map((challenge: any) => (
+        {(data?.virtualChallenges.nodes ?? []).map(challenge => (
           <ListItem key={challenge.id} button component={Link} to={`/virtual-challenges/${challenge.id}`}>
             <ListItemText
               primary={challenge.name}

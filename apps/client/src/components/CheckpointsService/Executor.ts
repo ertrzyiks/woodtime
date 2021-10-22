@@ -1,7 +1,8 @@
 import {CheckpointsDispatchContext, CheckpointsStateContext} from "./CheckpointsService";
 import {useContext, useEffect} from "react";
 import {useMutation} from "@apollo/client";
-import {CREATE_CHECKPOINT, GET_EVENT} from "../../queries";
+import {CreateCheckpointDocument} from "../../queries/createCheckpoint";
+import {GetEventDocument} from "../../queries/event";
 
 const Executor = () => {
   const { queue } = useContext(CheckpointsStateContext)
@@ -9,9 +10,13 @@ const Executor = () => {
   const firstQueueElement = queue[0]
 
   const [createCheckpoint] =
-    useMutation(CREATE_CHECKPOINT, {
+    useMutation(CreateCheckpointDocument, {
       awaitRefetchQueries: true,
       onCompleted: (data) => {
+        if (!data.createCheckpoint.checkpoint) {
+          return
+        }
+
         const { cp_id, event_id } = data.createCheckpoint.checkpoint
         dispatch({
           type: 'delete',
@@ -27,7 +32,7 @@ const Executor = () => {
     }
 
     createCheckpoint({
-      refetchQueries: [{ query: GET_EVENT, variables: { id: firstQueueElement.eventId } }],
+      refetchQueries: [{ query: GetEventDocument, variables: { id: firstQueueElement.eventId } }],
       variables: {
         eventId: firstQueueElement.eventId,
         cpId: firstQueueElement.checkpoint.cpId,
