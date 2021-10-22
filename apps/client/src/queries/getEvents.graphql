@@ -1,0 +1,8 @@
+query getEvents {
+  events {
+    id
+    name
+    checkpoint_count
+    created_at
+  }
+}

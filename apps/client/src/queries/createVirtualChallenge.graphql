@@ -1,0 +1,20 @@
+mutation CreateVirtualChallenge(
+  $input: CreateVirtualChallengeInput!
+) {
+  createVirtualChallenge(
+    input: $input
+  ) {
+    success
+    virtualChallenge {
+      id
+      name
+      checkpoints {
+        points {
+          lat
+          lng
+        }
+        totalCount
+      }
+    }
+  }
+}

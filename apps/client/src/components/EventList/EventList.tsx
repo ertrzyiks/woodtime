@@ -18,7 +18,8 @@ import ListIcon from '@material-ui/icons/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';
-import { GET_EVENTS, DELETE_EVENT } from '../../queries';
+import { GetEventsDocument } from '../../queries/getEvents';
+import { DeleteEventDocument } from '../../queries/deleteEvent';
 import SimpleChecklist from '../SimpleChecklist/SimpleChecklist';
 import React, { useState } from 'react';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
@@ -64,13 +65,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const EventList = () => {
   const isInitialNavigation = useInitialNavigation();
-  const { loading, error, data } = useQuery(GET_EVENTS, {
+  const { loading, error, data } = useQuery(GetEventsDocument, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
   });
   const [showChecklist, setShowChecklist] = useState(false);
 
-  const [deleteEvent] = useMutation(DELETE_EVENT, {
+  const [deleteEvent] = useMutation(DeleteEventDocument, {
     refetchQueries: ['getEvents'],
     awaitRefetchQueries: true,
   });
@@ -114,7 +115,7 @@ const EventList = () => {
       {error && <p>Error :(</p>}
 
       <List>
-        {[...data.events]
+        {[...data?.events ?? []]
           .sort((a: { id: number }, b: { id: number }) => b.id - a.id)
           // TODO: generate types
           .map(

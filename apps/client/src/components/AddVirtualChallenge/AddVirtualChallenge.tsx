@@ -3,8 +3,8 @@ import { Button, Slider } from '@material-ui/core'
 import { useLazyQuery, useMutation } from '@apollo/client'
 
 import Map from './Map'
-import {GET_VIRTUAL_POINTS} from '../../queries/getVirtualPoints'
-import {CREATE_VIRTUAL_CHALLENGE} from "../../queries/createVirtualChallenge";
+import { GetVirtualPointsDocument } from '../../queries/getVirtualPoints'
+import { CreateVirtualChallengeDocument } from "../../queries/createVirtualChallenge";
 
 interface Coords {
   lat: number
@@ -13,12 +13,12 @@ interface Coords {
 
 const AddVirtualChallenge = () => {
   const [points, setPoints] = useState<Coords[]>([])
-  const [getPoints, { loading, data }] = useLazyQuery(GET_VIRTUAL_POINTS, {
+  const [getPoints, { loading, data }] = useLazyQuery(GetVirtualPointsDocument, {
     fetchPolicy: 'no-cache',
     notifyOnNetworkStatusChange: true
   })
 
-  const [create] = useMutation(CREATE_VIRTUAL_CHALLENGE)
+  const [create] = useMutation(CreateVirtualChallengeDocument)
 
   const [startPoint, setStartPoint] = useState<[number, number] | null>(null)
   const initialPoint: [number, number] = useMemo(() => [54.372158, 18.638306], [])
