@@ -1,10 +1,7 @@
-FROM node:16-alpine3.11
+FROM alpine
 
-ENV PORT=80 NODE_ENV=production
-EXPOSE 80
-COPY . /app
+COPY package.json /app/package.json
+COPY ./apps/*/package.json /app
 WORKDIR /app
-RUN yarn install --immutable-cache --immutable
 
-ENTRYPOINT ["yarn"]
-CMD ["workspace", "api", "start:prod"]
+ENTRYPOINT ["/bin/sh"]

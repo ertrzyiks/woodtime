@@ -3,16 +3,23 @@
   "version": "1.0.0",
   "scripts": {
     "start:prod": "knex migrate:latest && node src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/development.js"
   },
   "dependencies": {
-    "apollo-server": "^2.25.1",
-    "apollo-server-express": "^2.25.1",
+    "apollo-server": "^3.4.0",
+    "apollo-server-express": "^3.4.0",
+    "connect-sqlite3": "^0.9.12",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.2",
     "geolib": "^3.3.1",
     "graphql": "^15.5.0",
     "knex": "^0.95.6",
     "prettier": "2.3.1",
     "sqlite3": "^5.0.2"
+  },
+  "devDependencies": {
+    "selfsigned": "^1.10.11"
   }
 }

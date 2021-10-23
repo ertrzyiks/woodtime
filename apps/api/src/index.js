@@ -1,88 +1,19 @@
-const { gql } = require("apollo-server");
-const express = require("express");
-const { ApolloServer } = require("apollo-server-express");
-const { AuthenticationError } = require("apollo-server-express");
-const typeDefs = require("./schema");
+const {app, server} = require('./app')
 
-const {
-  events,
-  event,
-  checkpoints,
-  createEvent,
-  deleteEvent,
-  createCheckpoint,
-  createVirtualChallenge,
-  enrollVirtualChallenge,
-  deleteCheckpoint,
-  pointsNearby,
-  virtualChallenges,
-  virtualChallenge,
-  checkInVirtualCheckpoint
-} = require("./resolvers");
+async function init() {
+  await server.start()
+  server.applyMiddleware({
+    app,
+    path: "/woodtime",
+    cors: {
+      origin: 'https://woodtime.ertrzyiks.me',
+      credentials: true
+    }
+  });
 
-const app = express();
+  app.listen(process.env.PORT || 8080, () => {
+    console.log(`🚀  Server ready at http://localhost:8080/woodtime`);
+  });
+}
 
-const users = [];
-const accessTokens = [];
-const refreshTokens = [];
-
-const getUser = (token) => {
-  const t = accessTokens.find((accessToken) => accessToken === token);
-
-  if (!t) {
-    return null;
-  }
-
-  const user = users.find((u) => u.id === t.userId);
-
-  return user;
-};
-
-const resolvers = {
-  Query: {
-    me: (parent, args, context) => {
-      return context.user;
-    },
-    events,
-    event,
-    pointsNearby,
-    virtualChallenges,
-    virtualChallenge
-  },
-  Event: {
-    checkpoints,
-  },
-  Mutation: {
-    createUser: () => {
-      const user = {
-        id: (users.length + 1).toString(),
-        name: "Test",
-      };
-
-      users.push(user);
-
-      return user;
-    },
-    createEvent,
-    deleteEvent,
-    createCheckpoint,
-    deleteCheckpoint,
-    createVirtualChallenge,
-    enrollVirtualChallenge,
-    checkInVirtualCheckpoint
-  },
-};
-
-const context = async ({ req }) => {
-  const token = (req.headers.authorization || "").replace("Bearer ", "");
-
-  return { user: getUser(token) };
-};
-
-const server = new ApolloServer({ typeDefs, resolvers, context });
-
-server.applyMiddleware({ app, path: "/woodtime" });
-
-app.listen(process.env.PORT || 8080, () => {
-  console.log(`🚀  Server ready at http://localhost:8080/woodtime`);
-});
+init()
