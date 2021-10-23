@@ -73,7 +73,7 @@ type Query {
     virtualChallenge(id: Int!): VirtualChallenge
 }
 
-type CreateUserPayload {
+type SignInPayload {
     success: Boolean!
     user: User
     accessToken: String
@@ -133,7 +133,7 @@ type CheckInViertualCheckpointResult {
 }
 
 type Mutation {
-    createUser(name: String!): CreateUserPayload
+    signIn(name: String!): SignInPayload
     login(token: String!): LoginPayload
     joinEvent(id: String!): JoinEventPayload
 

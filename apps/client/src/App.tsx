@@ -40,9 +40,11 @@ import InitialNavigationDetector from "./components/InitialNavigationDetector/In
 import CheckpointsService from "./components/CheckpointsService/CheckpointsService";
 import Executor from "./components/CheckpointsService/Executor";
 import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
+import SignIn from "./components/SignIn/SignIn";
 
 const getLink = () => {
   return createHttpLink({
+    credentials: 'include',
     uri:
       process.env.REACT_APP_GRAPHQL_ENDPOINT ||
       'http://localhost:8080/woodtime',
@@ -168,6 +170,9 @@ function App() {
                 </Route>
                 <Route path="/virtual-challenges/:id" exact>
                   <VirtualChallenge />
+                </Route>
+                <Route path="/sign-in" exact>
+                  <SignIn />
                 </Route>
               </Switch>
             </CheckpointsService>

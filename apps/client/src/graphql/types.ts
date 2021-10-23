@@ -58,14 +58,6 @@ export type CreateEventResult = {
   success: Scalars['Boolean'];
 };
 
-export type CreateUserPayload = {
-  __typename?: 'CreateUserPayload';
-  accessToken?: Maybe<Scalars['String']>;
-  refreshToken?: Maybe<Scalars['String']>;
-  success: Scalars['Boolean'];
-  user?: Maybe<User>;
-};
-
 export type CreateVirtualChallengeInput = {
   checkpoints?: Maybe<Array<Maybe<CoordinatesInput>>>;
   name: Scalars['String'];
@@ -131,13 +123,13 @@ export type Mutation = {
   checkInVirtualCheckpoint: CheckInViertualCheckpointResult;
   createCheckpoint: CreateCheckpointResult;
   createEvent?: Maybe<CreateEventResult>;
-  createUser?: Maybe<CreateUserPayload>;
   createVirtualChallenge: CreateVirtualChallengeResult;
   deleteCheckpoint: DeleteCheckpointResult;
   deleteEvent?: Maybe<DeleteEventResult>;
   enrollVirtualChallenge: EnrollVirtualChallengeResult;
   joinEvent?: Maybe<JoinEventPayload>;
   login?: Maybe<LoginPayload>;
+  signIn?: Maybe<SignInPayload>;
 };
 
 
@@ -160,11 +152,6 @@ export type MutationCreateEventArgs = {
   checkpointCount: Scalars['Int'];
   name: Scalars['String'];
   type: Scalars['Int'];
-};
-
-
-export type MutationCreateUserArgs = {
-  name: Scalars['String'];
 };
 
 
@@ -197,6 +184,11 @@ export type MutationLoginArgs = {
   token: Scalars['String'];
 };
 
+
+export type MutationSignInArgs = {
+  name: Scalars['String'];
+};
+
 export type PointsNearbyInput = {
   count: Scalars['Int'];
   radius: Scalars['Int'];
@@ -226,6 +218,14 @@ export type QueryPointsNearbyArgs = {
 
 export type QueryVirtualChallengeArgs = {
   id: Scalars['Int'];
+};
+
+export type SignInPayload = {
+  __typename?: 'SignInPayload';
+  accessToken?: Maybe<Scalars['String']>;
+  refreshToken?: Maybe<Scalars['String']>;
+  success: Scalars['Boolean'];
+  user?: Maybe<User>;
 };
 
 export type User = {
