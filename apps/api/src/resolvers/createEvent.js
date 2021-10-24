@@ -1,5 +1,5 @@
 const { AuthenticationError } = require("apollo-server-express");
-
+const { v4: uuidv4 } = require('uuid')
 const knex = require("../../knex");
 
 module.exports = async (_, { name, checkpointCount, type }, context) => {
@@ -11,6 +11,7 @@ module.exports = async (_, { name, checkpointCount, type }, context) => {
     name,
     type,
     checkpoint_count: checkpointCount,
+    invite_token: uuidv4(),
     virtual_challenge_id: null,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),

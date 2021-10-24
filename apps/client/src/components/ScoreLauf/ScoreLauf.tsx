@@ -22,6 +22,7 @@ import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsServi
 import {useMutation} from "@apollo/client";
 import {Checkpoint} from "../../types/Checkpoint";
 import {DeleteCheckpointDocument} from "../../queries/deleteCheckpoint";
+import Participants from "../Participants/Participants";
 
 
 interface Props {
@@ -83,6 +84,13 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
   return (
     <Box m={1}>
       <Typography variant="h6">{event.name}</Typography>
+
+      <Participants
+        list={[]}
+        eventId={event.id}
+        inviteToken={event.invite_token}
+      />
+
       <LinearProgressWithLabel
         current={checkpoints.length}
         max={event.checkpoint_count}
