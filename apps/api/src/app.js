@@ -2,7 +2,10 @@ const express = require("express");
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const SQLiteStore = require('connect-sqlite3')(session)
-const { ApolloServer } = require("apollo-server-express");
+const { ApolloServer, AuthenticationError, ApolloError } = require("apollo-server-express")
+const { applyMiddleware } = require('graphql-middleware')
+const { makeExecutableSchema } = require('@graphql-tools/schema')
+const { shield, allow, rule } = require('graphql-shield')
 const typeDefs = require("./schema");
 const config = require('./config')[process.env.NODE_ENV || 'development']
 
@@ -55,7 +58,42 @@ const resolvers = {
     enrollVirtualChallenge,
     checkInVirtualCheckpoint
   },
-};
+}
+
+const isAuthenticated = rule()(async (parent, args, ctx, info) => {
+  return Boolean(ctx.user)
+})
+
+const permissions = shield({
+  Query: {
+    '*': isAuthenticated,
+    me: allow
+  },
+  Mutation: {
+    '*': isAuthenticated,
+    signIn: allow
+  }
+},{
+  fallbackError: async (thrownThing, parent, args, context, info) => {
+    if (thrownThing === null) {
+      return new AuthenticationError('Access denied')
+    }
+    if (thrownThing instanceof ApolloError) {
+      // expected errors
+      return thrownThing
+    }
+    if (thrownThing instanceof Error) {
+      // unexpected errors
+      console.error(thrownThing)
+      return new ApolloError('Internal server error', 'ERR_INTERNAL_SERVER')
+    }
+
+    // what the hell got thrown
+    console.error('The resolver threw something that is not an error.')
+    console.error(thrownThing)
+    return new ApolloError('Internal server error', 'ERR_INTERNAL_SERVER')
+  }
+})
 
 const context = async ({ req }) => {
   const userId = req.session.user_id
@@ -68,12 +106,15 @@ const context = async ({ req }) => {
   };
 };
 
-const server = new ApolloServer({
+const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
+})
+
+const server = new ApolloServer({
+  schema: applyMiddleware(schema, permissions),
   context
 });
-
 
 app.set('trust proxy', 1)
 

@@ -1,16 +1,10 @@
 const getDistance = require('geolib/es/getDistance').default
-const { AuthenticationError } = require("apollo-server-express");
 const knex = require("../../knex");
 
 module.exports = async (
   _,
-  { event_id, position },
-  context
+  { event_id, position }
 ) => {
-  if (!context.user) {
-    throw new AuthenticationError
-  }
-
   const events = await knex
     .select("id","type", "virtual_challenge_id")
     .from("events")

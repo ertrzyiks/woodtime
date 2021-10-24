@@ -1,12 +1,6 @@
-const { AuthenticationError } = require("apollo-server-express");
-
 const knex = require("../../knex");
 
-module.exports = async (_, { input }, context) => {
-  if (!context.user) {
-    throw new AuthenticationError
-  }
-
+module.exports = async (_, { input }) => {
   const challenge = {
     name: input.name,
     checkpoints: JSON.stringify(input.checkpoints),

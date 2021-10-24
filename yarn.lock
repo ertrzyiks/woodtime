@@ -2039,6 +2039,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.10.5":
+  version: 7.15.4
+  resolution: "@babel/runtime@npm:7.15.4"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: c40825430400e47c19b97e4142d5315d2910305b9714d44a711472587ee2fd4521fdba5f02ddd9df3902f5e988d9854fa83f4da1e0c091f70f6983fa52480606
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.10.4, @babel/template@npm:^7.14.5, @babel/template@npm:^7.3.3":
   version: 7.14.5
   resolution: "@babel/template@npm:7.14.5"
@@ -4076,6 +4085,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/yup@npm:0.29.11":
+  version: 0.29.11
+  resolution: "@types/yup@npm:0.29.11"
+  checksum: 703fa2075231a831ee09087128c5ca3c45670a3854d9564d037c46e1f51247d3e00e468d73efb4b4e8ba3df880ddf8494c4cefcd96adddb8fcca06add70e192c
+  languageName: node
+  linkType: hard
+
 "@types/zen-observable@npm:^0.8.0":
   version: 0.8.2
   resolution: "@types/zen-observable@npm:0.8.2"
@@ -4760,6 +4776,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "api@workspace:apps/api"
   dependencies:
+    "@graphql-tools/schema": ^8.3.0
     apollo-server: ^3.4.0
     apollo-server-express: ^3.4.0
     connect-sqlite3: ^0.9.12
@@ -4769,6 +4786,8 @@ __metadata:
     express-session: ^1.17.2
     geolib: ^3.3.1
     graphql: ^15.5.0
+    graphql-middleware: ^6.1.10
+    graphql-shield: ^7.5.0
     knex: ^0.95.6
     prettier: 2.3.1
     selfsigned: ^1.10.11
@@ -9824,6 +9843,18 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"graphql-middleware@npm:^6.1.10":
+  version: 6.1.10
+  resolution: "graphql-middleware@npm:6.1.10"
+  dependencies:
+    "@graphql-tools/delegate": ^8.4.0
+    "@graphql-tools/schema": ^8.3.0
+  peerDependencies:
+    graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+  checksum: 116c1a659ec155b331333f6bfc4098c31e25859ef2056a742695d09ab001820f648537fc709eb6aec43e1f1e2a0129707886bcc11efd4bc9d8dcea94b7e50ebf
+  languageName: node
+  linkType: hard
+
 "graphql-request@npm:^3.3.0":
   version: 3.6.1
   resolution: "graphql-request@npm:3.6.1"
@@ -9834,6 +9865,20 @@ fsevents@^1.2.7:
   peerDependencies:
     graphql: 14.x || 15.x
   checksum: 15e98c29760fca8ce230459dd2448a56eca54f7fcce9cb5f3fd82c9af1e31bfb5a85b67ef405479d9a45acae4d2a1f278ebda6ca1950cad9a5b40dc215b82dd3
+  languageName: node
+  linkType: hard
+
+"graphql-shield@npm:^7.5.0":
+  version: 7.5.0
+  resolution: "graphql-shield@npm:7.5.0"
+  dependencies:
+    "@types/yup": 0.29.11
+    object-hash: ^2.0.3
+    yup: ^0.31.0
+  peerDependencies:
+    graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
+    graphql-middleware: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^6.0.0
+  checksum: a0eb1afa483b654da01ff41648b6c9d3b7eeff63a29f305112e51c904e0a74f88ce50e0993958d9381ba34fc308f85834031097f0f4b89f22704a871408d3d63
   languageName: node
   linkType: hard
 
@@ -12570,6 +12615,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"lodash-es@npm:^4.17.11":
+  version: 4.17.21
+  resolution: "lodash-es@npm:4.17.21"
+  checksum: 05cbffad6e2adbb331a4e16fbd826e7faee403a1a04873b82b42c0f22090f280839f85b95393f487c1303c8a3d2a010048bf06151a6cbe03eee4d388fb0a12d2
+  languageName: node
+  linkType: hard
+
 "lodash._reinterpolate@npm:^3.0.0":
   version: 3.0.0
   resolution: "lodash._reinterpolate@npm:3.0.0"
@@ -13855,6 +13907,13 @@ fsevents@^1.2.7:
     define-property: ^0.2.5
     kind-of: ^3.0.3
   checksum: a9e35f07e3a2c882a7e979090360d1a20ab51d1fa19dfdac3aa8873b328a7c4c7683946ee97c824ae40079d848d6740a3788fa14f2185155dab7ed970a72c783
+  languageName: node
+  linkType: hard
+
+"object-hash@npm:^2.0.3":
+  version: 2.2.0
+  resolution: "object-hash@npm:2.2.0"
+  checksum: 55ba841e3adce9c4f1b9b46b41983eda40f854e0d01af2802d3ae18a7085a17168d6b81731d43fdf1d6bcbb3c9f9c56d22c8fea992203ad90a38d7d919bc28f1
   languageName: node
   linkType: hard
 
@@ -15607,6 +15666,13 @@ fsevents@^1.2.7:
     object-assign: ^4.1.1
     react-is: ^16.8.1
   checksum: 5eef82fdda64252c7e75aa5c8cc28a24bbdece0f540adb60ce67c205cf978a5bd56b83e4f269f91c6e4dcfd80b36f2a2dec24d362e278913db2086ca9c6f9430
+  languageName: node
+  linkType: hard
+
+"property-expr@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "property-expr@npm:2.0.4"
+  checksum: 7ac142e189f0feef685f327f582efe13bfbc24a0b6e2328afdb38520bc140caa5f91dfa9529f2539b4468d85dc83a593e1ef0e0f7401b525368bb634b323bf54
   languageName: node
   linkType: hard
 
@@ -18443,6 +18509,13 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"toposort@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "toposort@npm:2.0.2"
+  checksum: d64c74b570391c9432873f48e231b439ee56bc49f7cb9780b505cfdf5cb832f808d0bae072515d93834dd6bceca5bb34448b5b4b408335e4d4716eaf68195dcb
+  languageName: node
+  linkType: hard
+
 "tough-cookie@npm:^4.0.0":
   version: 4.0.0
   resolution: "tough-cookie@npm:4.0.0"
@@ -19966,6 +20039,19 @@ typescript@^4.1.2:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
+  languageName: node
+  linkType: hard
+
+"yup@npm:^0.31.0":
+  version: 0.31.1
+  resolution: "yup@npm:0.31.1"
+  dependencies:
+    "@babel/runtime": ^7.10.5
+    lodash: ^4.17.20
+    lodash-es: ^4.17.11
+    property-expr: ^2.0.4
+    toposort: ^2.0.2
+  checksum: 79bf28d6afa4cebcabe3322bb82eec93632289cad47dbe47a89ae067f4438b3a7de8ac2e30977539727510450a4f73ed9051c6d6aa2718d9f1ba6b345179cb7d
   languageName: node
   linkType: hard
 

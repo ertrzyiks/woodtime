@@ -1,12 +1,6 @@
-const { AuthenticationError } = require("apollo-server-express");
-
 const knex = require("../../knex");
 
-module.exports = async (_, {}, context) => {
-  if (!context.user) {
-    throw new AuthenticationError
-  }
-
+module.exports = async (_, {}, { user }) => {
   return knex
     .select(
       "events.id",
@@ -18,5 +12,5 @@ module.exports = async (_, {}, context) => {
       "events.updated_at")
     .from("events")
     .join('participants', 'events.id', '=', 'participants.event_id')
-    .where('participants.user_id', context.user.id)
+    .where('participants.user_id', user.id)
 };

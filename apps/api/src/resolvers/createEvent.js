@@ -1,12 +1,7 @@
-const { AuthenticationError } = require("apollo-server-express");
 const { v4: uuidv4 } = require('uuid')
 const knex = require("../../knex");
 
-module.exports = async (_, { name, checkpointCount, type }, context) => {
-  if (!context.user) {
-    throw new AuthenticationError
-  }
-
+module.exports = async (_, { name, checkpointCount, type }) => {
   const event = {
     name,
     type,
