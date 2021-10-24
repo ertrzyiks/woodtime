@@ -1,6 +1,6 @@
 const knex = require("../../knex");
 
-module.exports = async (_, { name }, context) => {
+module.exports = async (_, { name }, { signIn }) => {
   const user = {
     name,
     source: 'direct',
@@ -11,7 +11,7 @@ module.exports = async (_, { name }, context) => {
   const createdUsersIds = await knex("users").insert(user)
   const id = createdUsersIds[0]
 
-  context.signIn(id)
+  signIn(id)
 
   return {
     success: true,

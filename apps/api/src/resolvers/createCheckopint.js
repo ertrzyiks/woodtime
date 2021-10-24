@@ -1,15 +1,9 @@
 const knex = require("../../knex");
-const { AuthenticationError } = require("apollo-server-express");
 
 module.exports = async (
   _,
-  { event_id, cp_id, cp_code, skipped, skip_reason },
-  context
+  { event_id, cp_id, cp_code, skipped, skip_reason }
 ) => {
-  if (!context.user) {
-    throw new AuthenticationError
-  }
-
   const checkpoint = {
     event_id,
     cp_id,
