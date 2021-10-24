@@ -1,6 +1,12 @@
+const { AuthenticationError } = require("apollo-server-express");
+
 const knex = require("../../knex");
 
-module.exports = async (_, { id }) => {
+module.exports = async (_, { id }, context) => {
+  if (!context.user) {
+    throw new AuthenticationError
+  }
+
   const rows = await knex
     .select("id", "name", "type", "checkpoint_count","virtual_challenge_id", "created_at", "updated_at")
     .from("events")

@@ -1,6 +1,11 @@
 const knex = require("../../knex");
+const { AuthenticationError } = require("apollo-server-express");
 
-module.exports = async ({ id }) => {
+module.exports = async ({ id }, {}, context) => {
+  if (!context.user) {
+    throw new AuthenticationError
+  }
+
   return knex
     .select(
       "id",
@@ -15,5 +20,5 @@ module.exports = async ({ id }) => {
     .from("checkpoints")
     .where({
       event_id: id,
-    });
-};
+    })
+}

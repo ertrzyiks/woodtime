@@ -3,7 +3,6 @@ const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const SQLiteStore = require('connect-sqlite3')(session)
 const { ApolloServer } = require("apollo-server-express");
-const { AuthenticationError } = require("apollo-server-express");
 const typeDefs = require("./schema");
 const config = require('./config')[process.env.NODE_ENV || 'development']
 
@@ -20,16 +19,12 @@ const {
   pointsNearby,
   virtualChallenges,
   virtualChallenge,
-  checkInVirtualCheckpoint
+  checkInVirtualCheckpoint,
+  getUser,
+  signIn
 } = require("./resolvers");
 
 const app = express();
-
-const users = [];
-
-const getUser = (id) => {
-  return users.find((u) => u.id === id);
-};
 
 const resolvers = {
   Query: {
@@ -46,21 +41,7 @@ const resolvers = {
     checkpoints,
   },
   Mutation: {
-    signIn: (_, args, context) => {
-      const user = {
-        id: users.length.toString(),
-        name: args.name,
-      };
-
-      users.push(user)
-
-      context.signIn(user.id)
-
-      return {
-        success: true,
-        user
-      };
-    },
+    signIn,
     createEvent,
     deleteEvent,
     createCheckpoint,
@@ -78,7 +59,7 @@ const context = async ({ req }) => {
     signIn: (id) => {
       req.session.user_id = id
     },
-    user: getUser(userId)
+    user: await getUser(userId)
   };
 };
 
