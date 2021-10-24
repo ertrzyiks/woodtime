@@ -8,8 +8,10 @@ module.exports = {
   createVirtualChallenge: require("./createVirtualChallenge"),
   enrollVirtualChallenge: require("./enrollVirtualChallenge"),
   deleteCheckpoint: require("./deleteCheckpoint"),
+  getUser: require("./getUser"),
   pointsNearby: require("./pointsNearby"),
   virtualChallenges: require("./virtualChallenges"),
   virtualChallenge: require("./virtualChallenge"),
   checkInVirtualCheckpoint: require("./checkInVirtualCheckpoint"),
+  signIn: require("./signIn"),
 };

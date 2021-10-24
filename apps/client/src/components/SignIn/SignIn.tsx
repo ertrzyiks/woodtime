@@ -2,19 +2,27 @@ import React from 'react'
 import { Field, Form } from 'react-final-form'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import {useMutation, useQuery} from "@apollo/client";
+import {useMutation} from "@apollo/client";
 import {SignInDocument} from "../../queries/signIn";
-import {MeDocument} from "../../queries/me";
+import {Box} from "@material-ui/core";
 
 interface Values {
   name: string
 }
 
 const SignIn = () => {
-  const { data } = useQuery(MeDocument, {
-    fetchPolicy: 'network-only'
+  const [signIn] = useMutation(SignInDocument, {
+    onCompleted: () => {
+      const urlParams = new URLSearchParams(window.location.search)
+
+      const redirect = urlParams.get('redirect_url')
+      if (redirect) {
+        window.location.href = decodeURIComponent(redirect)
+      } else {
+        window.location.href = '/'
+      }
+    }
   })
-  const [signIn] = useMutation(SignInDocument)
 
   const handleSubmit = (values: Values) => {
     return signIn({
@@ -23,36 +31,36 @@ const SignIn = () => {
   }
 
   return (
-    <Form<Values>
-      onSubmit={handleSubmit}
-      render={({ handleSubmit }) => {
-        return (
-          <form onSubmit={handleSubmit}>
-            <div>
-              Session: {data?.me?.name}
-            </div>
-            <Field
-              name="name"
-              render={({ input, meta }) => (
-                <div>
-                  <TextField
-                    id="standard-basic"
-                    label="Name"
-                    required
-                    autoComplete="off"
-                    onChange={input.onChange}
-                  />
-                  {meta.touched && meta.error && <span>{meta.error}</span>}
-                </div>
-              )}
-            />
-            <Button variant="contained" color="primary" type="submit">
-              Create
-            </Button>
-          </form>
-        )
-      }}
-    />
+    <Box px={2} py={1}>
+      <Form<Values>
+        onSubmit={handleSubmit}
+        render={({ handleSubmit }) => {
+          return (
+            <form onSubmit={handleSubmit}>
+              <h2>Sign In</h2>
+              <Field
+                name="name"
+                render={({ input, meta }) => (
+                  <Box my={1}>
+                    <TextField
+                      id="standard-basic"
+                      label="Name"
+                      required
+                      autoComplete="off"
+                      onChange={input.onChange}
+                    />
+                    {meta.touched && meta.error && <span>{meta.error}</span>}
+                  </Box>
+                )}
+              />
+              <Button variant="contained" color="primary" type="submit">
+                Create
+              </Button>
+            </form>
+          )
+        }}
+      />
+    </Box>
   )
 }
 

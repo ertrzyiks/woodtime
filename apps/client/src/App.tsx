@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { onError } from "@apollo/client/link/error";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import {
   AppBar,
@@ -21,6 +22,7 @@ import {
 } from 'react-router-dom';
 import {
   ApolloClient,
+  ApolloLink,
   ApolloProvider,
   createHttpLink,
   InMemoryCache,
@@ -40,7 +42,17 @@ import InitialNavigationDetector from "./components/InitialNavigationDetector/In
 import CheckpointsService from "./components/CheckpointsService/CheckpointsService";
 import Executor from "./components/CheckpointsService/Executor";
 import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
-import SignIn from "./components/SignIn/SignIn";
+import SignIn from "./components/SignIn/SignIn"
+
+const errorLink = onError(({ graphQLErrors }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({extensions}) => {
+      if (extensions && extensions.code) {
+        window.location.href = '/sign-in?redirect_url=' + encodeURIComponent(window.location.href)
+      }
+    });
+  }
+})
 
 const getLink = () => {
   return createHttpLink({
@@ -119,7 +131,7 @@ function App() {
       setClient(
         new ApolloClient({
           cache,
-          link: getLink()
+          link: ApolloLink.from([errorLink, getLink()])
         }),
       );
     }
