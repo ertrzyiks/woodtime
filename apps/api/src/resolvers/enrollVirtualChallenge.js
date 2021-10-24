@@ -30,8 +30,17 @@ module.exports = async (_, { id }, context) => {
 
   const createdEventIds = await knex("events").insert(event);
 
+  const eventId = createdEventIds[0]
+
+  await knex('participants').insert({
+    user_id: context.user.id,
+    event_id: eventId,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  })
+
   return {
     success: true,
-    event: { id: createdEventIds[0], ...event },
+    event: { id: eventId, ...event },
   };
 };
