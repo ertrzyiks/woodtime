@@ -17,11 +17,5 @@ module.exports = async (_, { id }, context) => {
   }
 
   const event = rows[0]
-  const { virtual_challenge_id, ...rest } = event
-  return {
-    ...rest,
-    virtual_challenge: virtual_challenge_id
-      ? { id: virtual_challenge_id }
-      : null
-  }
+  return event
 };

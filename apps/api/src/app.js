@@ -40,6 +40,9 @@ const resolvers = {
   },
   Event: {
     checkpoints,
+    virtual_challenge: (parent) => {
+      return parent.virtual_challenge_id ? { id: parent.virtual_challenge_id } : null
+    }
   },
   Mutation: {
     signIn,

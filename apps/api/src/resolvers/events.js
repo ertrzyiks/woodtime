@@ -8,6 +8,15 @@ module.exports = async (_, {}, context) => {
   }
 
   return knex
-    .select("id", "name",  "type", "virtual_challenge_id", "checkpoint_count", "created_at", "updated_at")
+    .select(
+      "events.id",
+      "events.name",
+      "events.type",
+      "events.virtual_challenge_id",
+      "events.checkpoint_count",
+      "events.created_at",
+      "events.updated_at")
     .from("events")
+    .join('participants', 'events.id', '=', 'participants.event_id')
+    .where('participants.user_id', context.user.id)
 };
