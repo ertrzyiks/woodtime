@@ -93,6 +93,7 @@ export type Event = {
   checkpoints: Array<Checkpoint>;
   created_at: Scalars['String'];
   id: Scalars['Int'];
+  invite_token?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   type: Scalars['Int'];
   updated_at: Scalars['String'];
@@ -176,7 +177,8 @@ export type MutationEnrollVirtualChallengeArgs = {
 
 
 export type MutationJoinEventArgs = {
-  id: Scalars['String'];
+  id: Scalars['Int'];
+  token: Scalars['String'];
 };
 
 

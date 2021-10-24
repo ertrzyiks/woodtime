@@ -8,7 +8,7 @@ module.exports = async (_, { id }, context) => {
   }
 
   const rows = await knex
-    .select("id", "name", "type", "checkpoint_count","virtual_challenge_id", "created_at", "updated_at")
+    .select("id", "name", "type", "invite_token", "checkpoint_count","virtual_challenge_id", "created_at", "updated_at")
     .from("events")
     .where({ id })
 

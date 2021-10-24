@@ -1,0 +1,5 @@
+mutation JoinEvent($id: Int!, $token: String!) {
+  joinEvent(id: $id, token: $token) {
+    success
+  }
+}

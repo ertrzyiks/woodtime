@@ -13,6 +13,7 @@ type Event {
     id: Int!
     name: String!
     type: Int!
+    invite_token: String
     checkpoint_count: Int!
     checkpoints: [Checkpoint!]!
     created_at: String!
@@ -135,7 +136,7 @@ type CheckInViertualCheckpointResult {
 type Mutation {
     signIn(name: String!): SignInPayload
     login(token: String!): LoginPayload
-    joinEvent(id: String!): JoinEventPayload
+    joinEvent(id: Int!, token: String!): JoinEventPayload
 
     createEvent(
         name: String!

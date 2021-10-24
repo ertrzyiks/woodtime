@@ -43,6 +43,7 @@ import CheckpointsService from "./components/CheckpointsService/CheckpointsServi
 import Executor from "./components/CheckpointsService/Executor";
 import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
 import SignIn from "./components/SignIn/SignIn"
+import JoinEvent from "./components/JoinEvent/JoinEvent";
 
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
@@ -182,6 +183,9 @@ function App() {
                 </Route>
                 <Route path="/virtual-challenges/:id" exact>
                   <VirtualChallenge />
+                </Route>
+                <Route path="/join/:id" exact>
+                  <JoinEvent />
                 </Route>
                 <Route path="/sign-in" exact>
                   <SignIn />
