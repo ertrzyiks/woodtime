@@ -4777,6 +4777,7 @@ __metadata:
   resolution: "api@workspace:apps/api"
   dependencies:
     "@graphql-tools/schema": ^8.3.0
+    apollo-datasource: ^3.2.0
     apollo-server: ^3.4.0
     apollo-server-express: ^3.4.0
     connect-sqlite3: ^0.9.12
