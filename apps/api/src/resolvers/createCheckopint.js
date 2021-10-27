@@ -2,22 +2,19 @@ const knex = require("../../knex");
 
 module.exports = async (
   _,
-  { event_id, cp_id, cp_code, skipped, skip_reason }
+  { event_id, cp_id, cp_code, skipped, skip_reason },
+  { dataSources: { db } }
 ) => {
-  const checkpoint = {
-    event_id,
-    cp_id,
-    cp_code: cp_code || null,
+  const checkpoint = await db.createCheckpoint({
+    eventId: event_id,
+    cpId: cp_id,
+    cpCode: cp_code,
     skipped,
-    skip_reason: skip_reason || null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
-
-  const createdCheckpointIds = await knex("checkpoints").insert(checkpoint);
+    skipReason: skip_reason
+  })
 
   return {
     success: true,
-    checkpoint: { id: createdCheckpointIds[0], ...checkpoint },
+    checkpoint,
   };
 };
