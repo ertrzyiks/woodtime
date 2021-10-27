@@ -48,7 +48,7 @@ import JoinEvent from "./components/JoinEvent/JoinEvent";
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({extensions}) => {
-      if (extensions && extensions.code) {
+      if (extensions && extensions.code === 'UNAUTHENTICATED') {
         window.location.href = '/sign-in?redirect_url=' + encodeURIComponent(window.location.href)
       }
     });

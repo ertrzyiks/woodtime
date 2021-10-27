@@ -1,7 +1,5 @@
-const knex = require("../../knex");
-
-module.exports = async (_, { id }) => {
-  await knex("events").where({ id }).del();
+module.exports = async (_, { id }, { dataSources: { db }}) => {
+  await db.deleteEventById(id)
 
   return {
     id,

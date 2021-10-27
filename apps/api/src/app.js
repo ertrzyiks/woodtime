@@ -7,6 +7,7 @@ const { applyMiddleware } = require('graphql-middleware')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
 const { shield, allow, rule } = require('graphql-shield')
 const typeDefs = require("./schema");
+const Database = require("./datasources/database");
 const config = require('./config')[process.env.NODE_ENV || 'development']
 
 const {
@@ -24,7 +25,6 @@ const {
   virtualChallenges,
   virtualChallenge,
   checkInVirtualCheckpoint,
-  getUser,
   signIn
 } = require("./resolvers");
 
@@ -102,7 +102,7 @@ const context = async ({ req }) => {
     signIn: (id) => {
       req.session.user_id = id
     },
-    user: await getUser(userId)
+    _userId: userId
   };
 };
 
@@ -111,9 +111,17 @@ const schema = makeExecutableSchema({
   resolvers,
 })
 
+const loadSessionUser = async (resolve, root, args, context, info) => {
+  const user = context._userId ? await context.dataSources.db.findUserById(context._userId) : null
+  return resolve(root, args, { ...context, user }, info)
+}
+
 const server = new ApolloServer({
-  schema: applyMiddleware(schema, permissions),
-  context
+  schema: applyMiddleware(schema, loadSessionUser, permissions),
+  context,
+  dataSources: () => ({
+    db: new Database()
+  })
 });
 
 app.set('trust proxy', 1)
