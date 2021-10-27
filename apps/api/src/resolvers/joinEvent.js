@@ -1,25 +1,15 @@
-const knex = require("../../knex");
+module.exports = async (_, { id, token }, { user, dataSources: { db } }) => {
+  const event = await db.findEventById(id)
 
-module.exports = async (_, { id, token }, { user }) => {
-  const rows = await knex
-    .select("id", "name", "type", "invite_token", "checkpoint_count","virtual_challenge_id", "created_at", "updated_at")
-    .from("events")
-    .where({ id })
-
-  if (rows.length === 0) {
+  if (!event) {
     return {
       success: false
     }
   }
 
-  const event = rows[0]
+  const participant = await db.findParticipant({ userId: user.id, eventId: event.id })
 
-  const participants = await knex
-    .select("id")
-    .from("participants")
-    .where({ user_id: user.id, event_id: event.id })
-
-  if (participants.length > 0) {
+  if (participant) {
     return {
       success: true,
       event
@@ -32,12 +22,7 @@ module.exports = async (_, { id, token }, { user }) => {
     }
   }
 
-  await knex('participants').insert({
-    user_id: context.user.id,
-    event_id: event.id,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  })
+  await db.createParticipant({ userId: user.id, eventId: event.id })
 
   return {
     success: true,

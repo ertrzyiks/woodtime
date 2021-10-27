@@ -67,6 +67,15 @@ class Database extends DataSource {
     }
   }
 
+  async findParticipant({ userId, eventId }) {
+    const participants = await knex
+      .select("id")
+      .from("participants")
+      .where({ user_id: userId, event_id: eventId })
+
+    return participants[0]
+  }
+
   async createParticipant({ userId, eventId }) {
     const participant = {
       user_id: userId,
@@ -80,6 +89,29 @@ class Database extends DataSource {
       id: ids[0],
       ...participant
     }
+  }
+
+  async createCheckpoint({ eventId, cpId, cpCode, skipped, skipReason }) {
+    const checkpoint = {
+      event_id: eventId,
+      cp_id: cpId,
+      cp_code: cpCode || null,
+      skipped,
+      skip_reason: skipReason || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    const ids = await knex("checkpoints").insert(checkpoint)
+
+    return {
+      id: ids[0],
+      ...checkpoint
+    }
+  }
+
+  deleteCheckpoint(id) {
+    return knex("checkpoints").where({ id }).del()
   }
 }
 
