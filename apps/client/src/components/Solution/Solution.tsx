@@ -1,6 +1,7 @@
 import { Box, Typography } from '@material-ui/core';
 import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
+import {useTranslation} from "react-i18next";
 
 interface Props {
   checkpoints: Checkpoint[];
@@ -8,6 +9,8 @@ interface Props {
 }
 
 const Solution = ({ checkpoints, max }: Props) => {
+  const { t } = useTranslation()
+
   const seqCheckpointIds = Array(max)
     .fill(max)
     .map((_, idx) => 1 + idx);
@@ -24,7 +27,7 @@ const Solution = ({ checkpoints, max }: Props) => {
   return (
     <Box mt={3}>
       <Box minWidth={35} ml={1} mb={1}>
-        <Typography variant="h6">Solution:</Typography>
+        <Typography variant="h6">{t('event.solution')}</Typography>
       </Box>
       <Box display="flex" alignItems="center">
         <Box width="100%" ml={1}>

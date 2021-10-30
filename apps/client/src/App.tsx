@@ -44,6 +44,8 @@ import Executor from "./components/CheckpointsService/Executor";
 import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
 import SignIn from "./components/SignIn/SignIn"
 import JoinEvent from "./components/JoinEvent/JoinEvent";
+import { init as initI18n } from './i18n'
+import {useTranslation} from "react-i18next";
 
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
@@ -91,6 +93,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 function BottomBar({ className }: { className: string }) {
+  const { t } = useTranslation()
   const history = useHistory()
   const location = useLocation()
 
@@ -111,11 +114,13 @@ function BottomBar({ className }: { className: string }) {
       showLabels
       className={className}
     >
-      <BottomNavigationAction label="Events" icon={<EventIcon />} />
-      <BottomNavigationAction label="Virtual Challenges" icon={<PublicIcon />} />
+      <BottomNavigationAction label={t('navigation.events')} icon={<EventIcon />} />
+      <BottomNavigationAction label={t('navigation.virtual_challenges')} icon={<PublicIcon />} />
     </BottomNavigation>
   )
 }
+
+initI18n()
 
 function App() {
   const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)

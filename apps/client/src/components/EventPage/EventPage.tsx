@@ -13,6 +13,7 @@ import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import Classic from '../Classic/Classic';
 import {useEventQueue} from "../CheckpointsService/useEventQueue";
 import {QueueItem} from "../CheckpointsService/CheckpointsService";
+import {useTranslation} from "react-i18next";
 
 const EVENT_TYPES = {
   SCORE: 1,
@@ -55,6 +56,7 @@ function mergeCheckpoints(event: any, items: QueueItem['checkpoint'][]) {
 }
 
 const EventPage = () => {
+  const { t } = useTranslation()
   const { id } = useParams<{ id: string }>();
   const items = useEventQueue(parseInt(id, 10))
 
@@ -81,7 +83,7 @@ const EventPage = () => {
               className={classes.link}
             >
               <EventIcon className={classes.icon} />
-              Events
+              {t('navigation.events')}
             </Link>
           </Breadcrumbs>
         </Box>
@@ -124,7 +126,7 @@ const EventPage = () => {
             className={classes.link}
           >
             <EventIcon className={classes.icon} />
-            Events
+            {t('navigation.events')}
           </Link>
           <Typography color="textPrimary">{event.name}</Typography>
         </Breadcrumbs>
