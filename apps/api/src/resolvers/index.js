@@ -4,7 +4,7 @@ module.exports = {
   checkpoints: require("./checkpoints"),
   createEvent: require("./createEvent"),
   deleteEvent: require("./deleteEvent"),
-  createCheckpoint: require("./createCheckopint"),
+  createCheckpoint: require("./createCheckpoint"),
   createVirtualChallenge: require("./createVirtualChallenge"),
   enrollVirtualChallenge: require("./enrollVirtualChallenge"),
   joinEvent: require("./joinEvent"),
