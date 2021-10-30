@@ -113,6 +113,37 @@ class Database extends DataSource {
   deleteCheckpoint(id) {
     return knex("checkpoints").where({ id }).del()
   }
+
+  async findCheckpointById(id) {
+    const rows = await knex
+      .select("id", "event_id")
+      .from("checkpoints")
+      .where({ id })
+
+    if (rows.length <= 0) {
+      return null
+    }
+
+    return rows[0]
+  }
+
+  findCheckpointsForEvent(id) {
+    return knex
+      .select(
+        "id",
+        "cp_id",
+        "event_id",
+        "cp_code",
+        "skipped",
+        "skip_reason",
+        "created_at",
+        "updated_at"
+      )
+      .from("checkpoints")
+      .where({
+        event_id: id,
+      })
+  }
 }
 
 module.exports = Database
