@@ -25,6 +25,7 @@ import React, { useState } from 'react';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
+import {useTranslation} from "react-i18next";
 
 const Event = ({
   id,
@@ -64,6 +65,7 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const EventList = () => {
+  const { t } = useTranslation()
   const isInitialNavigation = useInitialNavigation();
   const { loading, error, data } = useQuery(GetEventsDocument, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
@@ -105,7 +107,7 @@ const EventList = () => {
         <Breadcrumbs aria-label="breadcrumb">
           <Typography color="textPrimary" className={breadcrumbClasses.link}>
             <EventIcon className={breadcrumbClasses.icon} />
-            Events
+            {t('navigation.events')}
           </Typography>
         </Breadcrumbs>
       </Box>
