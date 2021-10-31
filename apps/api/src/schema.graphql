@@ -18,6 +18,7 @@ type Event {
     checkpoints: [Checkpoint!]!
     created_at: String!
     updated_at: String!
+    participants: [User!]!
     virtual_challenge: EventVirtualChallenge
 }
 

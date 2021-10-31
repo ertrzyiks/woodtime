@@ -76,6 +76,14 @@ class Database extends DataSource {
     return participants[0]
   }
 
+  findParticipantsForEvent(id) {
+    return knex
+      .select('users.id', 'users.name')
+      .from("participants")
+      .join('users', 'users.id', '=', 'participants.user_id')
+      .where({ event_id: id })
+  }
+
   async createParticipant({ userId, eventId }) {
     const participant = {
       user_id: userId,

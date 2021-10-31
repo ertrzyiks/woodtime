@@ -4,6 +4,7 @@ import { OrienteeringEvent } from '../../types/OrienteeringEvent';
 import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
 import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel';
 import CheckpointListItem from '../CheckpointListItem/CheckpointListItem';
+import Participants from "../Participants/Participants";
 
 interface Props {
   event: OrienteeringEvent;
@@ -19,6 +20,13 @@ const Classic = ({ event }: Props) => {
   return (
     <Box m={1}>
       <Typography variant="h6">{name}</Typography>
+
+      <Participants
+        list={event.participants}
+        eventId={event.id}
+        inviteToken={event.invite_token}
+      />
+
       <LinearProgressWithLabel
         current={checkpoints.length}
         max={checkpoint_count}

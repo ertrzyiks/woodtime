@@ -8,6 +8,10 @@ query getEvent($id: Int!) {
     virtual_challenge {
       id
     }
+    participants {
+      id
+      name
+    }
     checkpoints {
       id
       cp_id

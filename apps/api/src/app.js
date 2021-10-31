@@ -21,6 +21,7 @@ const {
   enrollVirtualChallenge,
   joinEvent,
   deleteCheckpoint,
+  participants,
   pointsNearby,
   virtualChallenges,
   virtualChallenge,
@@ -45,7 +46,8 @@ const resolvers = {
     checkpoints,
     virtual_challenge: (parent) => {
       return parent.virtual_challenge_id ? { id: parent.virtual_challenge_id } : null
-    }
+    },
+    participants
   },
   Mutation: {
     signIn,

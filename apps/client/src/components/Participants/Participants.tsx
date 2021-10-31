@@ -1,9 +1,11 @@
 import React from 'react'
 import IconButton from "@material-ui/core/IconButton";
+import Box from "@material-ui/core/Box";
+import Chip from "@material-ui/core/Chip";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import {useTranslation} from "react-i18next";
 
-const Participants = ({ list, eventId, inviteToken }: { list: string[], eventId: number, inviteToken: string|null}) => {
+const Participants = ({ list, eventId, inviteToken }: { list: {id: number, name: string}[], eventId: number, inviteToken: string|null}) => {
   const { t } = useTranslation()
   const inviteUrl = `${window.location.protocol}//${window.location.host}/join/${eventId}?token=${inviteToken}`
 
@@ -21,10 +23,20 @@ const Participants = ({ list, eventId, inviteToken }: { list: string[], eventId:
 
   return (
     <div>
-      {t('event.actions.invite')}:
-      <IconButton aria-label="add" onClick={handleClick}>
-        <PersonAddIcon />
-      </IconButton>
+      <Box style={{ display: 'flex', alignItems: 'center' }}>
+        {list.map((user, index) => (
+          <Box key={user.id} mr={1}>
+            <Chip label={user.name} size='small' variant='outlined' />
+          </Box>
+        ))}
+
+        <Box>
+          <IconButton aria-label="add" onClick={handleClick}>
+            <PersonAddIcon />
+          </IconButton>
+          {t('event.actions.invite')}
+        </Box>
+      </Box>
     </div>
   )
 }

@@ -95,6 +95,7 @@ export type Event = {
   id: Scalars['Int'];
   invite_token?: Maybe<Scalars['String']>;
   name: Scalars['String'];
+  participants: Array<User>;
   type: Scalars['Int'];
   updated_at: Scalars['String'];
   virtual_challenge?: Maybe<EventVirtualChallenge>;
