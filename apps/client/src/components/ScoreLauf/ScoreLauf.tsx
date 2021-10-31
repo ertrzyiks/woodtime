@@ -86,7 +86,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       <Typography variant="h6">{event.name}</Typography>
 
       <Participants
-        list={[]}
+        list={event.participants}
         eventId={event.id}
         inviteToken={event.invite_token}
       />
