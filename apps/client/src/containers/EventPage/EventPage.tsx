@@ -2,17 +2,17 @@ import React, { ReactNode } from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
-import ScoreLauf from '../ScoreLauf/ScoreLauf';
-import VirtualEvent from '../VirtualEvent/VirtualEvent';
+import ScoreLauf from './components/ScoreLauf/ScoreLauf';
+import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
 import { GetEventDocument } from '../../queries/event';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { Box, Breadcrumbs, Link, Typography } from '@material-ui/core';
 import EventIcon from '@material-ui/icons/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
-import Classic from '../Classic/Classic';
-import {useEventQueue} from "../CheckpointsService/useEventQueue";
-import {QueueItem} from "../CheckpointsService/CheckpointsService";
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import Classic from './components/Classic/Classic';
+import {useEventQueue} from "../../components/CheckpointsService/useEventQueue";
+import {QueueItem} from "../../components/CheckpointsService/CheckpointsService";
 import {useTranslation} from "react-i18next";
 
 const EVENT_TYPES = {

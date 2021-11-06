@@ -20,11 +20,11 @@ import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';
 import { GetEventsDocument } from '../../queries/getEvents';
 import { DeleteEventDocument } from '../../queries/deleteEvent';
-import SimpleChecklist from '../SimpleChecklist/SimpleChecklist';
+import SimpleChecklist from '../../components/SimpleChecklist/SimpleChecklist';
 import React, { useState } from 'react';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import {useTranslation} from "react-i18next";
 
 const Event = ({
@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     listWrapper: {},
     addEventButton: {
-      position: 'absolute',
+      position: 'fixed',
       right: '1em',
       bottom: '5em',
     },
