@@ -5,7 +5,7 @@ import { Box, Button, TextField } from '@material-ui/core';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { useHistory, useParams } from 'react-router-dom';
-import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsService";
+import {CheckpointsDispatchContext} from "../../components/CheckpointsService/CheckpointsService";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

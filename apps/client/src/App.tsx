@@ -29,21 +29,21 @@ import {
   NormalizedCacheObject,
 } from '@apollo/client';
 
-import EventList from './components/EventList/EventList';
-import AddEvent from './components/AddEvent/AddEvent';
-import EventPage from './components/EventPage/EventPage';
-import AddCheckpointPage from './components/AddCheckpointPage/AddCheckpointPage';
-import AddVirtualChallenge from './components/AddVirtualChallenge/AddVirtualChallenge';
-import VirtualChallengeList from './components/VirtualChallengeList/VirtualChallengeList';
-import VirtualChallenge from './components/VirtualChallenge/VirtualChallenge';
+import EventList from './containers/EventList/EventList';
+import AddEvent from './containers/AddEvent/AddEvent';
+import EventPage from './containers/EventPage/EventPage';
+import AddCheckpointPage from './containers/AddCheckpointPage/AddCheckpointPage';
+import AddVirtualChallenge from './containers/AddVirtualChallenge/AddVirtualChallenge';
+import VirtualChallengeList from './containers/VirtualChallengeList/VirtualChallengeList';
+import VirtualChallenge from './containers/VirtualChallenge/VirtualChallenge';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import {LocalStorageWrapper, persistCache} from "apollo3-cache-persist"
 import InitialNavigationDetector from "./components/InitialNavigationDetector/InitialNavigationDetector";
 import CheckpointsService from "./components/CheckpointsService/CheckpointsService";
 import Executor from "./components/CheckpointsService/Executor";
 import ErrorReporter from "./components/CheckpointsService/ErrorReporter";
-import SignIn from "./components/SignIn/SignIn"
-import JoinEvent from "./components/JoinEvent/JoinEvent";
+import SignIn from "./containers/SignIn/SignIn"
+import JoinEvent from "./containers/JoinEvent/JoinEvent";
 import { init as initI18n } from './i18n'
 import {useTranslation} from "react-i18next";
 

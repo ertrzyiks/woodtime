@@ -6,7 +6,7 @@ import PublicIcon from '@material-ui/icons/Public';
 
 import React from 'react'
 import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
-import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
+import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';

@@ -1,10 +1,10 @@
 import { Box, Typography } from '@material-ui/core';
 import React from 'react';
-import { OrienteeringEvent } from '../../types/OrienteeringEvent';
-import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
-import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel';
-import CheckpointListItem from '../CheckpointListItem/CheckpointListItem';
-import Participants from "../Participants/Participants";
+import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
+import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
+import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel';
+import CheckpointListItem from '../../../../components/CheckpointListItem/CheckpointListItem';
+import Participants from "../../../../components/Participants/Participants";
 
 interface Props {
   event: OrienteeringEvent;

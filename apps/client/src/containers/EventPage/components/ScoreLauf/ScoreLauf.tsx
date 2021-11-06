@@ -10,19 +10,19 @@ import {
   Typography,
 } from '@material-ui/core';
 import React, {useContext} from 'react';
-import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel'
-import { OrienteeringEvent } from '../../types/OrienteeringEvent';
+import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
+import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 
 import AddIcon from '@material-ui/icons/Add';
 import { Link } from 'react-router-dom';
-import MissingCheckpointsArea from '../MissingCheckpointsArea/MissingCheckpointsArea';
-import CheckpointCard from '../CheckpointCard/CheckpointCard';
-import Solution from '../Solution/Solution';
-import {CheckpointsDispatchContext} from "../CheckpointsService/CheckpointsService";
+import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
+import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
+import Solution from '../../../../components/Solution/Solution';
+import {CheckpointsDispatchContext} from "../../../../components/CheckpointsService/CheckpointsService";
 import {useMutation} from "@apollo/client";
-import {Checkpoint} from "../../types/Checkpoint";
-import {DeleteCheckpointDocument} from "../../queries/deleteCheckpoint";
-import Participants from "../Participants/Participants";
+import {Checkpoint} from "../../../../types/Checkpoint";
+import {DeleteCheckpointDocument} from "../../../../queries/deleteCheckpoint";
+import Participants from "../../../../components/Participants/Participants";
 
 
 interface Props {
