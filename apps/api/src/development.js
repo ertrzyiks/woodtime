@@ -97,7 +97,7 @@ async function init() {
     app,
     path: '/woodtime',
     cors: {
-      origin: ['https://studio.apollographql.com', 'http://localhost:3000'],
+      origin: ['https://studio.apollographql.com', 'http://localhost:3000', 'http://localhost:6006'],
       credentials: true
     }
   });
