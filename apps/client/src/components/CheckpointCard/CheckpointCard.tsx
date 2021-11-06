@@ -44,8 +44,6 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const CheckpointCard = ({ checkpoint, onDelete }: Props) => {
-
-
   const classes = useStyles();
 
   return (

@@ -14,9 +14,18 @@
     "start": "yarn build && yarn client start",
     "client": "yarn workspace client",
     "api": "yarn workspace api",
-    "scanner": "yarn workspace @woodtime/scanner"
+    "storybook": "start-storybook -p 6006"
+  },
+  "resolutions": {
+    "babel-loader": "8.1.0",
+    "webpack": "4.44.2"
   },
   "dependencies": {
+    "@storybook/addon-actions": "^6.3.12",
+    "@storybook/addon-essentials": "^6.3.12",
+    "@storybook/addon-links": "^6.3.12",
+    "@storybook/addons": "^6.3.12",
+    "@storybook/react": "^6.3.12",
     "global": "^4.4.0",
     "prettier": "^2.3.1"
   },
