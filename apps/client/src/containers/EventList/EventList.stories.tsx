@@ -7,6 +7,9 @@ import EventList from './EventList';
 export default {
   title: 'Pages/EventList',
   component: EventList,
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  }
 }
 
 export const Active = () => (
