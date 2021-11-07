@@ -7,6 +7,9 @@ import { MemoryRouter, Route } from "react-router-dom";
 export default {
   title: 'Pages/EventPage',
   component: EventPage,
+  parameters: {
+    chromatic: { disableSnapshot: true }
+  }
 }
 
 export const Active = () => (
