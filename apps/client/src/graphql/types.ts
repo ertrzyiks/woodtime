@@ -23,9 +23,9 @@ export type Checkpoint = {
   cp_id: Scalars['Int'];
   created_at: Scalars['String'];
   event_id: Scalars['Int'];
-  id?: Maybe<Scalars['Int']>;
+  id: Scalars['Int'];
   skip_reason?: Maybe<Scalars['String']>;
-  skipped?: Maybe<Scalars['Boolean']>;
+  skipped: Scalars['Boolean'];
   updated_at: Scalars['String'];
 };
 

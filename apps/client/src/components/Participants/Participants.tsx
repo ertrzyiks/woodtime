@@ -5,7 +5,7 @@ import Chip from "@material-ui/core/Chip";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import {useTranslation} from "react-i18next";
 
-const Participants = ({ list, eventId, inviteToken }: { list: {id: number, name: string}[], eventId: number, inviteToken: string|null}) => {
+const Participants = ({ list, eventId, inviteToken }: { list: {id: string, name: string}[], eventId: number, inviteToken: string|null}) => {
   const { t } = useTranslation()
   const inviteUrl = `${window.location.protocol}//${window.location.host}/join/${eventId}?token=${inviteToken}`
 

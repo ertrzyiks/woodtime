@@ -36,9 +36,9 @@ const Executor = () => {
       variables: {
         eventId: firstQueueElement.eventId,
         cpId: firstQueueElement.checkpoint.cpId,
-        cpCode: firstQueueElement.checkpoint.cpCode,
+        cpCode: firstQueueElement.checkpoint.cpCode ?? null,
         skipped: firstQueueElement.checkpoint.skipped,
-        skipReason: firstQueueElement.checkpoint.skipReason
+        skipReason: firstQueueElement.checkpoint.skipReason ?? null
       }
     }).catch(err => {
       dispatch({
