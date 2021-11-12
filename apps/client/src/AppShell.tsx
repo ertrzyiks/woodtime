@@ -70,12 +70,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 initI18n()
 
-function AppShell({ children }: { children: ReactNode }) {
-  const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(null)
+function AppShell({ apolloClient, children }: { apolloClient?: ApolloClient<NormalizedCacheObject>, children: ReactNode }) {
+  const [client, setClient] = useState<ApolloClient<NormalizedCacheObject> | null>(apolloClient ?? null)
   const classes = useStyles()
 
   useEffect(() => {
     async function init() {
+      if (client) {
+        return
+      }
+
       const cache = new InMemoryCache()
 
       await persistCache({
@@ -91,7 +95,7 @@ function AppShell({ children }: { children: ReactNode }) {
     }
 
     init().catch(console.error);
-  }, [setClient])
+  }, [client, setClient])
 
   return (
     <>

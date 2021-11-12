@@ -1,6 +1,6 @@
 overwrite: true
 schema: "../api/src/schema.graphql"
-documents: "src/queries/*.graphql"
+documents: "src/**/*.graphql"
 generates:
   src/graphql/types.ts:
     plugins:
@@ -15,3 +15,5 @@ generates:
       - typed-document-node
     config:
       avoidOptionals: true
+      scalars:
+        DateTime: string

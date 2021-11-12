@@ -12,6 +12,19 @@ module.exports = {
       type: 'filesystem'
     }
 
+    config.module.rules.push({
+      test: /schema\.graphql$/,
+      exclude: [/node_modules/],
+      use: [
+        {
+          loader: 'raw-loader',
+          options: {
+            esModule: false
+          }
+        }
+      ]
+    })
+
     // Return the altered config
     return config;
   },

@@ -9,6 +9,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
 };
 
 export type CheckInViertualCheckpointResult = {
@@ -21,12 +22,12 @@ export type Checkpoint = {
   __typename?: 'Checkpoint';
   cp_code?: Maybe<Scalars['String']>;
   cp_id: Scalars['Int'];
-  created_at: Scalars['String'];
+  created_at: Scalars['DateTime'];
   event_id: Scalars['Int'];
   id: Scalars['Int'];
   skip_reason?: Maybe<Scalars['String']>;
   skipped: Scalars['Boolean'];
-  updated_at: Scalars['String'];
+  updated_at: Scalars['DateTime'];
 };
 
 export type Coordinates = {
@@ -91,13 +92,13 @@ export type Event = {
   __typename?: 'Event';
   checkpoint_count: Scalars['Int'];
   checkpoints: Array<Checkpoint>;
-  created_at: Scalars['String'];
+  created_at: Scalars['DateTime'];
   id: Scalars['Int'];
   invite_token?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   participants: Array<User>;
   type: Scalars['Int'];
-  updated_at: Scalars['String'];
+  updated_at: Scalars['DateTime'];
   virtual_challenge?: Maybe<EventVirtualChallenge>;
 };
 
@@ -240,11 +241,11 @@ export type User = {
 export type VirtualChallenge = {
   __typename?: 'VirtualChallenge';
   checkpoints: CoordinatesConnection;
-  created_at: Scalars['String'];
+  created_at: Scalars['DateTime'];
   id: Scalars['Int'];
   name: Scalars['String'];
   radius: Scalars['Int'];
-  updated_at: Scalars['String'];
+  updated_at: Scalars['DateTime'];
 };
 
 export type VirtualChallengeConnection = {

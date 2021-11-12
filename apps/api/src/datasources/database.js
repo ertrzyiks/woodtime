@@ -2,6 +2,15 @@ const { DataSource } = require('apollo-datasource')
 const knex = require("../../knex")
 const { v4: uuidv4 } = require('uuid')
 
+const resolveDates = (obj) => {
+  const { created_at, updated_at, ...rest } = obj
+  return {
+    ...rest,
+    created_at: new Date(created_at),
+    updated_at: new Date(updated_at)
+  }
+}
+
 class Database extends DataSource {
   initialize(config) {
     this.context = config.context
@@ -16,8 +25,8 @@ class Database extends DataSource {
     return user[0]
   }
 
-  findEventsForUser({ id }) {
-    return knex
+  async findEventsForUser({ id }) {
+    const events = await knex
       .select(
         "events.id",
         "events.name",
@@ -29,6 +38,8 @@ class Database extends DataSource {
       .from("events")
       .join('participants', 'events.id', '=', 'participants.event_id')
       .where('participants.user_id', id)
+
+    return events.map(event => resolveDates(event))
   }
 
   async findEventById(id) {
@@ -41,7 +52,9 @@ class Database extends DataSource {
       return null
     }
 
-    return rows[0]
+    const event = rows[0]
+
+    return resolveDates(event)
   }
 
   deleteEventById(id) {
@@ -63,7 +76,7 @@ class Database extends DataSource {
 
     return {
       id: ids[0],
-      ...event
+      ...resolveDates(event)
     }
   }
 
@@ -114,7 +127,7 @@ class Database extends DataSource {
 
     return {
       id: ids[0],
-      ...checkpoint
+      ...resolveDates(checkpoint)
     }
   }
 
@@ -132,11 +145,12 @@ class Database extends DataSource {
       return null
     }
 
-    return rows[0]
+    const checkpoint = rows[0]
+    return resolveDates(checkpoint)
   }
 
-  findCheckpointsForEvent(id) {
-    return knex
+  async findCheckpointsForEvent(id) {
+    const checkpoints = await knex
       .select(
         "id",
         "cp_id",
@@ -151,6 +165,8 @@ class Database extends DataSource {
       .where({
         event_id: id,
       })
+
+    return checkpoints.map(checkpoint => resolveDates(checkpoint))
   }
 }
 
