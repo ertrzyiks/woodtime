@@ -4039,6 +4039,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graphql-tools/merge@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "@graphql-tools/merge@npm:8.2.1"
+  dependencies:
+    "@graphql-tools/utils": ^8.5.1
+    tslib: ~2.3.0
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: b2c126fc697ad1cf0fb2c09d3766d791ba6243a318edfa24932b558628244f822b9454bd47cd98f5a7eee90caca264573695c582e10730b7a67785fea21c346c
+  languageName: node
+  linkType: hard
+
 "@graphql-tools/mock@npm:^8.1.2":
   version: 8.4.1
   resolution: "@graphql-tools/mock@npm:8.4.1"
@@ -4050,6 +4062,20 @@ __metadata:
   peerDependencies:
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
   checksum: b651743e197a4444b0f145013639fc9c4f8be43591149124153ed6271ea616618378cc0456f87cb4b7e4124204c0ee9eb6464e6831db84f10b4de92bcf8f6546
+  languageName: node
+  linkType: hard
+
+"@graphql-tools/mock@npm:^8.4.3":
+  version: 8.4.3
+  resolution: "@graphql-tools/mock@npm:8.4.3"
+  dependencies:
+    "@graphql-tools/schema": ^8.3.1
+    "@graphql-tools/utils": ^8.5.1
+    fast-json-stable-stringify: ^2.1.0
+    tslib: ~2.3.0
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: 2955b2f6a809922f798beda3c22aa886e29bc62f44d12e473c298964669807086afbcfabcfc7eeabf6a6aef665be056bffa3fb3c758ab2e8716448c4bcc3c9d2
   languageName: node
   linkType: hard
 
@@ -4121,6 +4147,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graphql-tools/schema@npm:^8.3.1":
+  version: 8.3.1
+  resolution: "@graphql-tools/schema@npm:8.3.1"
+  dependencies:
+    "@graphql-tools/merge": ^8.2.1
+    "@graphql-tools/utils": ^8.5.1
+    tslib: ~2.3.0
+    value-or-promise: 1.0.11
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: 5fd6dbd3f4e92fd1b9a627e04b339bf2a4564768299e45576f79df70e167c3ec6c822576c37b3ba6537e2dd561b3b445b322bc90b205389260b7084fe777f5d4
+  languageName: node
+  linkType: hard
+
 "@graphql-tools/url-loader@npm:^7.0.11, @graphql-tools/url-loader@npm:^7.0.3, @graphql-tools/url-loader@npm:^7.1.0":
   version: 7.4.0
   resolution: "@graphql-tools/url-loader@npm:7.4.0"
@@ -4164,7 +4204,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-tools/utils@npm:^8.5.2":
+"@graphql-tools/utils@npm:^8.5.1, @graphql-tools/utils@npm:^8.5.2":
   version: 8.5.3
   resolution: "@graphql-tools/utils@npm:8.5.3"
   dependencies:
@@ -10021,6 +10061,8 @@ __metadata:
     "@graphql-codegen/typed-document-node": ^2.2.0
     "@graphql-codegen/typescript": 2.3.1
     "@graphql-codegen/typescript-operations": 2.2.0
+    "@graphql-tools/mock": ^8.4.3
+    "@graphql-tools/schema": ^8.3.1
     "@graphql-typed-document-node/core": ^3.1.0
     "@material-ui/core": ^4.11.4
     "@material-ui/icons": ^4.11.2
@@ -25832,6 +25874,7 @@ typescript@^4.1.2:
     chromatic: ^6.0.5
     global: ^4.4.0
     prettier: ^2.3.1
+    raw-loader: ^4.0.2
     webpack: 5.63.0
   languageName: unknown
   linkType: soft

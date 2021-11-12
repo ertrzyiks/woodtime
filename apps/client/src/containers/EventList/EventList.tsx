@@ -98,7 +98,7 @@ const EventList = () => {
   }
 
   if (error) {
-    return <p>Error :(</p>;
+    return <p>Error :( {error.toString()}</p>;
   }
 
   return (

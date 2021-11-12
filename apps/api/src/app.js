@@ -4,11 +4,29 @@ const cookieParser = require('cookie-parser')
 const SQLiteStore = require('connect-sqlite3')(session)
 const { ApolloServer, AuthenticationError, ApolloError } = require("apollo-server-express")
 const { applyMiddleware } = require('graphql-middleware')
+const { GraphQLScalarType, Kind } = require('graphql')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
 const { shield, allow, rule } = require('graphql-shield')
 const typeDefs = require("./schema");
 const Database = require("./datasources/database");
 const config = require('./config')[process.env.NODE_ENV || 'development']
+
+const dateTimeScalar = new GraphQLScalarType({
+  name: 'DateTime',
+  description: 'Date time custom scalar type',
+  serialize(value) {
+    return value.toISOString()
+  },
+  parseValue(value) {
+    return new Date(value)
+  },
+  parseLiteral(ast) {
+    if (ast.kind === Kind.STRING) {
+      return new Date(ast.value)
+    }
+    return null
+  },
+})
 
 const {
   events,
@@ -32,6 +50,7 @@ const {
 const app = express();
 
 const resolvers = {
+  DateTime: dateTimeScalar,
   Query: {
     me: (parent, args, context) => {
       return context.user

@@ -3,7 +3,7 @@ import { Field, Form } from 'react-final-form'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import {useMutation} from "@apollo/client";
-import {SignInDocument} from "../../queries/signIn";
+import {SignInDocument} from "./data/signIn";
 import {Box} from "@material-ui/core";
 
 interface Values {
