@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import EventPage from './EventPage';
 import { MemoryRouter, Route } from "react-router-dom";
 import AppShell from '../../AppShell'
-import getMockedApolloClient from "../../support/storybook/decorators/getMockedApolloClient";
+import getMockedApolloClient from "../../support/storybook/getMockedApolloClient";
 
 export default {
   title: 'Pages/EventPage',

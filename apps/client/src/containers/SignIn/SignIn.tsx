@@ -5,21 +5,24 @@ import TextField from '@material-ui/core/TextField'
 import {useMutation} from "@apollo/client";
 import {SignInDocument} from "./data/signIn";
 import {Box} from "@material-ui/core";
+import {useHistory} from "react-router-dom";
 
 interface Values {
   name: string
 }
 
 const SignIn = () => {
+  const history = useHistory()
+
   const [signIn] = useMutation(SignInDocument, {
     onCompleted: () => {
-      const urlParams = new URLSearchParams(window.location.search)
+      const urlParams = new URLSearchParams(history.location.search)
 
       const redirect = urlParams.get('redirect_url')
       if (redirect) {
         window.location.href = decodeURIComponent(redirect)
       } else {
-        window.location.href = '/'
+        history.push('/')
       }
     }
   })
