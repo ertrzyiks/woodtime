@@ -8,9 +8,6 @@ import getMockedApolloClient from "../../support/storybook/decorators/getMockedA
 export default {
   title: 'Pages/EventList',
   component: EventList,
-  parameters: {
-    chromatic: { disableSnapshot: true }
-  },
   argTypes: {
     onNavigate: { action: 'navigation' }
   },
@@ -58,3 +55,6 @@ export const RealServer = ({ onNavigate } : Args) => {
   );
 }
 
+RealServer.parameters = {
+  chromatic: { disableSnapshot: true }
+}
