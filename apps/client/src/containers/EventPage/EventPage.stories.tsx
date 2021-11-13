@@ -8,9 +8,6 @@ import getMockedApolloClient from "../../support/storybook/decorators/getMockedA
 export default {
   title: 'Pages/EventPage',
   component: EventPage,
-  parameters: {
-    chromatic: { disableSnapshot: true }
-  },
   argTypes: {
     type: {
       table: {
@@ -98,4 +95,8 @@ export const RealServer = ({ eventId }: { eventId: number }) => (
 
 RealServer.args = {
   eventId: 1
+}
+
+RealServer.parameters = {
+  chromatic: { disableSnapshot: true }
 }
