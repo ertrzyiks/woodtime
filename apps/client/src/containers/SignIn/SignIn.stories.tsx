@@ -1,51 +1,55 @@
-import React from 'react';
-import {MemoryRouter} from 'react-router-dom'
+import React, { useRef } from 'react';
+import { MemoryRouter } from "react-router-dom";
 
-import EventList from './EventList';
-import AppShell from "../../AppShell";
+import SignIn from './SignIn';
+import AppShell from '../../AppShell'
 import getMockedApolloClient from "../../support/storybook/getMockedApolloClient";
 import {useNavigationLog} from "../../support/storybook/useNavigationLog";
 
 export default {
-  title: 'Pages/EventList',
-  component: EventList,
+  title: 'Pages/SignIn',
+  component: SignIn,
   argTypes: {
     onNavigate: { action: 'navigation' }
   },
   decorators: [
     (Story: React.ComponentType) => (
-      <MemoryRouter initialEntries={['/events']} initialIndex={0}>
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
         <Story />
       </MemoryRouter>
     )
   ]
 }
 
-const { client } = getMockedApolloClient()
-
 interface Args {
   onNavigate: (params: { pathname: string }) => void
 }
 
-export const Mocked = ({ onNavigate } : Args) => {
+export const Mocked = ({ onNavigate }: Args) => {
   useNavigationLog({ onNavigate })
+
+  const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>()
+  if (!apolloRef.current) {
+    apolloRef.current = getMockedApolloClient()
+  }
+
+  const { client } = apolloRef.current
 
   return (
     <AppShell apolloClient={client}>
-      <EventList />
+      <SignIn />
     </AppShell>
-  );
+  )
 }
 
-
-export const RealServer = ({ onNavigate } : Args) => {
+export const RealServer = ({ onNavigate }: Args) => {
   useNavigationLog({ onNavigate })
 
   return (
     <AppShell>
-      <EventList />
+      <SignIn  />
     </AppShell>
-  );
+  )
 }
 
 RealServer.parameters = {
