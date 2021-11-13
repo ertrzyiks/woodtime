@@ -2,7 +2,7 @@ import {CheckpointsDispatchContext, CheckpointsStateContext} from "./Checkpoints
 import {useContext, useEffect} from "react";
 import {useMutation} from "@apollo/client";
 import {CreateCheckpointDocument} from "../../queries/createCheckpoint";
-import {GetEventDocument} from "../../queries/event";
+import {GetEventDocument} from "../../containers/EventPage/data/getEvent";
 
 const Executor = () => {
   const { queue } = useContext(CheckpointsStateContext)

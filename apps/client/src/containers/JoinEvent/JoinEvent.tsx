@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import {useMutation} from "@apollo/client";
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
-import {JoinEventDocument} from "../../queries/joinEvent";
+import {JoinEventDocument} from "./data/joinEvent";
 
 const JoinEvent = () => {
   const { id } = useParams<{ id: string }>()

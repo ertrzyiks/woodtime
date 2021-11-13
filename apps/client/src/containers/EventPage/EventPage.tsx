@@ -4,7 +4,7 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';
 import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
-import {GetEventDocument, GetEventQuery} from '../../queries/event';
+import {GetEventDocument, GetEventQuery} from './data/getEvent';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { Box, Breadcrumbs, Link, Typography } from '@material-ui/core';
 import EventIcon from '@material-ui/icons/Event';
@@ -37,7 +37,7 @@ function mergeCheckpoints(event: GetEventQuery['event'] | undefined, items: Queu
   if (!event) {
     return event
   }
-  
+
   return {
     ...event,
     checkpoints: [
