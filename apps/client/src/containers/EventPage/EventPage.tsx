@@ -67,7 +67,7 @@ const EventPage = () => {
     variables: { id: parseInt(id, 10) },
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  });
+  })
 
   const event = mergeCheckpoints(data?.event, items)
 
