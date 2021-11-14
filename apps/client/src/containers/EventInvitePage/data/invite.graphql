@@ -1,0 +1,12 @@
+mutation InviteToEvent($eventId: String!, $friendId: String!) {
+    inviteToEvent(id: $eventId, friendId: $friendId) {
+        success
+        event {
+            id
+            participants {
+                id
+                name
+            }
+        }
+    }
+}

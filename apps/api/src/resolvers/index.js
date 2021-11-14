@@ -8,6 +8,7 @@ module.exports = {
   createVirtualChallenge: require("./createVirtualChallenge"),
   enrollVirtualChallenge: require("./enrollVirtualChallenge"),
   friends: require('./friends'),
+  inviteToEvent: require("./inviteToEvent"),
   joinEvent: require("./joinEvent"),
   deleteCheckpoint: require("./deleteCheckpoint"),
   participants: require("./participants"),

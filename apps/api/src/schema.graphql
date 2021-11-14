@@ -102,6 +102,11 @@ type JoinEventPayload {
     event: Event
 }
 
+type InviteToEventPayload {
+    success: Boolean!
+    event: Event
+}
+
 type CreateEventResult {
     success: Boolean!
     event: Event!
@@ -146,6 +151,7 @@ type Mutation {
     signIn(name: String!): SignInPayload
     login(token: String!): LoginPayload
     joinEvent(id: Int!, token: String!): JoinEventPayload
+    inviteToEvent(id: String!, friendId: String!): InviteToEventPayload
 
     createEvent(
         name: String!

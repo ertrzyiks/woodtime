@@ -3,9 +3,10 @@ import {useTranslation} from "react-i18next";
 import {Link as RouterLink, useParams} from "react-router-dom";
 import {Box, Breadcrumbs, Link, Typography} from "@material-ui/core";
 import EventIcon from "@material-ui/icons/Event";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {GetEventDocument} from "../EventPage/data/getEvent";
 import {GetFriendsDocument} from "./data/getFriends";
+import {InviteToEventDocument} from "./data/invite";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import ContentLoader from "react-content-loader";
@@ -44,6 +45,8 @@ const EventInvitePage = () => {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
   })
+
+  const [invite] = useMutation(InviteToEventDocument)
 
   if (loading && !data) {
     return (
@@ -134,7 +137,7 @@ const EventInvitePage = () => {
 
         <Box mt={1}>
           {friendsData?.me?.friends.map(friend => (
-            <Button key={friend.id}>
+            <Button key={friend.id} onClick={() => invite({ variables: { eventId: event.id.toString(), friendId: friend.id }})}>
               + {friend.name}
             </Button>
           ))}
