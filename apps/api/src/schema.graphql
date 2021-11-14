@@ -29,6 +29,12 @@ type User {
     name: String!
 }
 
+type Me {
+    id: String!
+    name: String!
+    friends: [User!]!
+}
+
 type Coordinates {
     lat: String!
     lng: String!
@@ -69,7 +75,7 @@ type VirtualChallengeConnection {
 }
 
 type Query {
-    me: User
+    me: Me
     events: [Event!]!
     event(id: Int!): Event
     pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!

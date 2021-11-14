@@ -1,0 +1,8 @@
+query GetFriends {
+  me {
+    friends {
+      id
+      name
+    }
+  }
+}

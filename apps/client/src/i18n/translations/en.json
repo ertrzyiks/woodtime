@@ -3,5 +3,6 @@
   "navigation.virtual_challenges": "Virtual Challenges",
   "event.solution": "Solution",
   "event.missing_checkpoints": "Missing",
-  "event.actions.invite": "Copy invitation link"
+  "event.actions.invite": "Copy invitation link",
+  "event.actions.inviteFriend": "Invite friends"
 }

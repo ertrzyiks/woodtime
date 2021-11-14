@@ -121,6 +121,13 @@ export type LoginPayload = {
   user?: Maybe<User>;
 };
 
+export type Me = {
+  __typename?: 'Me';
+  friends: Array<User>;
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   checkInVirtualCheckpoint: CheckInViertualCheckpointResult;
@@ -203,7 +210,7 @@ export type Query = {
   __typename?: 'Query';
   event?: Maybe<Event>;
   events: Array<Event>;
-  me?: Maybe<User>;
+  me?: Maybe<Me>;
   pointsNearby: CoordinatesConnection;
   virtualChallenge?: Maybe<VirtualChallenge>;
   virtualChallenges: VirtualChallengeConnection;

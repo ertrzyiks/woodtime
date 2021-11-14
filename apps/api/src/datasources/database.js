@@ -168,6 +168,19 @@ class Database extends DataSource {
 
     return checkpoints.map(checkpoint => resolveDates(checkpoint))
   }
+
+  async findFriendForUser({ id }) {
+    const subquery = knex.select('event_id').from('participants').where({ user_id: id })
+    const friends = await knex
+      .select('users.id', 'name')
+      .distinct('user_id')
+      .join('users', 'users.id', '=', 'participants.user_id')
+      .from('participants')
+      .where('event_id', 'in', subquery)
+      .andWhereNot({ user_id: id })
+
+    return friends
+  }
 }
 
 module.exports = Database

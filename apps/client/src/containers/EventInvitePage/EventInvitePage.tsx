@@ -5,12 +5,14 @@ import {Box, Breadcrumbs, Link, Typography} from "@material-ui/core";
 import EventIcon from "@material-ui/icons/Event";
 import {useQuery} from "@apollo/client";
 import {GetEventDocument} from "../EventPage/data/getEvent";
+import {GetFriendsDocument} from "./data/getFriends";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import ContentLoader from "react-content-loader";
 import IconButton from "@material-ui/core/IconButton";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
+import Button from "@material-ui/core/Button";
 
 const Loader = ({ children, width, height } : { width: number, height: number, children: ReactNode }) => (
   <ContentLoader
@@ -36,6 +38,11 @@ const EventInvitePage = () => {
     variables: { id: parseInt(id, 10) },
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
     nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
+  })
+
+  const { data: friendsData } = useQuery(GetFriendsDocument, {
+    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
+    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
   })
 
   if (loading && !data) {
@@ -120,6 +127,19 @@ const EventInvitePage = () => {
           <PersonAddIcon />
         </IconButton>
         {t('event.actions.invite')}
+      </Box>
+
+      <Box p={2}>
+        {t('event.actions.inviteFriend')}
+
+        <Box mt={1}>
+          {friendsData?.me?.friends.map(friend => (
+            <Button key={friend.id}>
+              + {friend.name}
+            </Button>
+          ))}
+        </Box>
+
       </Box>
     </div>
   )
