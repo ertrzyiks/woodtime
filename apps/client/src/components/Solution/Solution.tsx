@@ -31,7 +31,7 @@ const Solution = ({ checkpoints, max }: Props) => {
       </Box>
       <Box display="flex" alignItems="center">
         <Box width="100%" ml={1}>
-          {parsedCodes.join(' ')}
+          {parsedCodes.join(' ').toUpperCase()}
         </Box>
       </Box>
     </Box>
