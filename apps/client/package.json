@@ -59,7 +59,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "prettier --write \"src/**/*.{js,json,jsx,ts,tsx,md,css,scss,jql,graphql}\"",
-    "generate": "graphql-codegen --config codegen.yml"
+    "generate": "graphql-codegen --config codegen.yml",
+    "ts-check": "tsc --p tsconfig.json"
   },
   "eslintConfig": {
     "extends": [
