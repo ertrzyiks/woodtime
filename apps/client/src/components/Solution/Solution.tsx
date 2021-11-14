@@ -17,8 +17,12 @@ const Solution = ({ checkpoints, max }: Props) => {
 
   const parsedCodes = seqCheckpointIds.map((id: number) => {
     const matchingCheckpoint = checkpoints.find((ch) => ch.cp_id === id);
-    if (!matchingCheckpoint || matchingCheckpoint.skipped) {
+    if (!matchingCheckpoint) {
       return '...';
+    }
+
+    if (matchingCheckpoint.skipped) {
+      return '???';
     }
 
     return matchingCheckpoint.cp_code;

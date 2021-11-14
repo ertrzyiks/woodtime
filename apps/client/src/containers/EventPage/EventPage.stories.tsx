@@ -4,6 +4,7 @@ import EventPage from './EventPage';
 import { MemoryRouter, Route } from "react-router-dom";
 import AppShell from '../../AppShell'
 import getMockedApolloClient from "../../support/storybook/getMockedApolloClient";
+import {Story} from "@storybook/react";
 
 export default {
   title: 'Pages/EventPage',
@@ -17,14 +18,22 @@ export default {
   }
 }
 
+interface MockCheckpoint {
+  cp_id: string
+  cp_code?: string
+  skipped?: boolean
+  skip_reason?: string
+}
+
 interface MockEventArgs {
   name: string
   type: number
   checkpoint_count: number
-  checkpoints: { cp_id: string, cp_code: string }[]
+  checkpoints: MockCheckpoint[]
+  participants: { id: number, name: string }[]
 }
 
-const MockTemplate = ({ ...args }: MockEventArgs) => {
+const MockTemplate: Story<MockEventArgs> = ({ ...args }: MockEventArgs) => {
   const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>()
   if (!apolloRef.current) {
     apolloRef.current = getMockedApolloClient()
@@ -64,7 +73,7 @@ export const Classic = MockTemplate.bind({})
 Classic.args = {
   ...MockTemplate.args,
   name: 'Classic event',
-  type: 1
+  type: 2
 }
 
 export const ScoreLauf = MockTemplate.bind({})
@@ -72,7 +81,19 @@ export const ScoreLauf = MockTemplate.bind({})
 ScoreLauf.args = {
   ...MockTemplate.args,
   name: 'ScoreLauf event',
-  type: 2
+  type: 1
+}
+
+export const ScoreLaufSkippedCheckpoints = MockTemplate.bind({})
+
+ScoreLaufSkippedCheckpoints.args = {
+  ...MockTemplate.args,
+  name: 'ScoreLauf event with skipped checkpoints',
+  type: 1,
+  checkpoints: [
+    { cp_id: '1', cp_code: 'LOR' },
+    { cp_id: '2', skipped: true, skip_reason: '' }
+  ]
 }
 
 export const Virtual = MockTemplate.bind({})
