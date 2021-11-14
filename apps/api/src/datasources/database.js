@@ -178,8 +178,22 @@ class Database extends DataSource {
       .from('participants')
       .where('event_id', 'in', subquery)
       .andWhereNot({ user_id: id })
+      .limit(10)
 
     return friends
+  }
+
+  async isFriendForUser({ id, friendId }) {
+    const subquery = knex.select('event_id').from('participants').where({ user_id: id })
+
+    const friends = await knex
+      .select('users.id')
+      .join('users', 'users.id', '=', 'participants.user_id')
+      .from('participants')
+      .where('event_id', 'in', subquery)
+      .andWhere({ user_id: friendId })
+
+    return friends.length > 0
   }
 }
 

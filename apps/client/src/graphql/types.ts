@@ -107,6 +107,12 @@ export type EventVirtualChallenge = {
   id: Scalars['Int'];
 };
 
+export type InviteToEventPayload = {
+  __typename?: 'InviteToEventPayload';
+  event?: Maybe<Event>;
+  success: Scalars['Boolean'];
+};
+
 export type JoinEventPayload = {
   __typename?: 'JoinEventPayload';
   event?: Maybe<Event>;
@@ -137,6 +143,7 @@ export type Mutation = {
   deleteCheckpoint: DeleteCheckpointResult;
   deleteEvent?: Maybe<DeleteEventResult>;
   enrollVirtualChallenge: EnrollVirtualChallengeResult;
+  inviteToEvent?: Maybe<InviteToEventPayload>;
   joinEvent?: Maybe<JoinEventPayload>;
   login?: Maybe<LoginPayload>;
   signIn?: Maybe<SignInPayload>;
@@ -182,6 +189,12 @@ export type MutationDeleteEventArgs = {
 
 export type MutationEnrollVirtualChallengeArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationInviteToEventArgs = {
+  friendId: Scalars['String'];
+  id: Scalars['String'];
 };
 
 
