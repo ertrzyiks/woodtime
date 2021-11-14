@@ -33,6 +33,13 @@ const MockTemplate = ({ ...args }: MockEventArgs) => {
   const { client, store } = apolloRef.current
 
   store.set('Event', '99', { id: '99', ...args })
+  store.set('Query', 'ROOT', 'me', {
+    id: '1',
+    friends: [
+      { id: '2', name: 'Tom' },
+      { id: '3', name: 'Alice' }
+    ]
+  })
 
   return (
     <MemoryRouter initialEntries={['/events/99/invite']} initialIndex={0}>
