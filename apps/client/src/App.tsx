@@ -8,6 +8,7 @@ import {
 import EventList from './containers/EventList/EventList';
 import AddEvent from './containers/AddEvent/AddEvent';
 import EventPage from './containers/EventPage/EventPage';
+import EventInvitePage from './containers/EventInvitePage/EventInvitePage';
 import AddCheckpointPage from './containers/AddCheckpointPage/AddCheckpointPage';
 import AddVirtualChallenge from './containers/AddVirtualChallenge/AddVirtualChallenge';
 import VirtualChallengeList from './containers/VirtualChallengeList/VirtualChallengeList';
@@ -32,6 +33,9 @@ function App() {
             </Route>
             <Route path="/events/:id" exact>
               <EventPage />
+            </Route>
+            <Route path="/events/:id/invite" exact>
+              <EventInvitePage />
             </Route>
             <Route path="/events/:id/add-checkpoint" exact>
               <AddCheckpointPage />

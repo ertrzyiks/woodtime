@@ -24,7 +24,6 @@ const Classic = ({ event }: Props) => {
       <Participants
         list={event.participants}
         eventId={event.id}
-        inviteToken={event.invite_token}
       />
 
       <LinearProgressWithLabel
