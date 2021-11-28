@@ -11,6 +11,8 @@ generates:
       baseTypesPath: ./graphql/types.ts
       extension: .ts
     plugins:
+      - add:
+          content: '/* eslint-disable */'
       - typescript-operations
       - typed-document-node
     config:
