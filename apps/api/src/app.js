@@ -160,6 +160,7 @@ app.use(session({
   }),
   secret: config.session.secret,
   resave: false,
+  rolling: true,
   saveUninitialized: false,
   cookie: {
     maxAge: config.session.cookie.maxAge,
