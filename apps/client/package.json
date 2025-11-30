@@ -27,7 +27,7 @@
     "i18next": "21.10.0",
     "i18next-browser-languagedetector": "6.1.8",
     "leaflet": "1.9.4",
-    "prettier": "2.3.1",
+    "prettier": "2.3.2",
     "react": "17.0.2",
     "react-content-loader": "6.2.1",
     "react-dom": "17.0.2",
