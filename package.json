@@ -25,7 +25,7 @@
     "@storybook/react": "6.5.16",
     "chromatic": "6.24.1",
     "global": "4.4.0",
-    "prettier": "2.3.2"
+    "prettier": "2.8.8"
   },
   "sideEffects": false
 }
