@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Switch,
-  Route,
-  BrowserRouter as Router,
-} from 'react-router-dom';
+import { Switch, Route, BrowserRouter as Router } from 'react-router-dom';
 
 import EventList from './containers/EventList/EventList';
 import AddEvent from './containers/AddEvent/AddEvent';
@@ -13,14 +9,14 @@ import AddCheckpointPage from './containers/AddCheckpointPage/AddCheckpointPage'
 import AddVirtualChallenge from './containers/AddVirtualChallenge/AddVirtualChallenge';
 import VirtualChallengeList from './containers/VirtualChallengeList/VirtualChallengeList';
 import VirtualChallenge from './containers/VirtualChallenge/VirtualChallenge';
-import AppShell from "./AppShell";
-import Layout from "./Layout";
-import SignIn from "./containers/SignIn/SignIn"
-import JoinEvent from "./containers/JoinEvent/JoinEvent";
+import AppShell from './AppShell';
+import Layout from './Layout';
+import SignIn from './containers/SignIn/SignIn';
+import JoinEvent from './containers/JoinEvent/JoinEvent';
 
 function App() {
   return (
-    <Router basename={process.env.PUBLIC_URL}>
+    <Router basename={import.meta.env.BASE_URL}>
       <AppShell>
         <Layout>
           <Switch>
