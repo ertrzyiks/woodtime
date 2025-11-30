@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: client-dist
-          path: apps/client/build
+          path: apps/client/dist
 
   deploy_api:
     name: "Deploy API"
@@ -90,10 +90,10 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: client-dist
-          path: build
+          path: dist
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.7.4
         with:
           branch: gh-pages
-          folder: build
+          folder: dist
