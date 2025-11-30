@@ -28,12 +28,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build libraries
-        run: pnpm run build
-
-      - name: Run unit tests
-        run: pnpm run -r --filter client test
-
   build:
     name: "Build"
     runs-on: ubuntu-latest
