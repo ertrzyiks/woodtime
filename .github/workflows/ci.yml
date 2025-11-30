@@ -57,7 +57,7 @@ jobs:
         run: yarn client build:dist
 
       - name: Save build folder
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v5
         with:
           name: client-dist
           path: apps/client/build
@@ -89,7 +89,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Download build folder
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v6
         with:
           name: client-dist
           path: build
