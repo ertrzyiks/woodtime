@@ -4,7 +4,7 @@ ENV PORT=80 NODE_ENV=production
 EXPOSE 80
 COPY . /app
 WORKDIR /app
-RUN yarn install --immutable-cache --immutable
+RUN pnpm install
 
-ENTRYPOINT ["yarn"]
-CMD ["workspace", "api", "start:prod"]
+ENTRYPOINT ["pnpm"]
+CMD ["run", "-r", "--filter", "api", "start:prod"]
