@@ -2,7 +2,7 @@
   "name": "woodtime",
   "private": true,
   "engines": {
-    "node": "14"
+    "node": "22"
   },
   "scripts": {
     "build": "yarn workspaces foreach run build",
