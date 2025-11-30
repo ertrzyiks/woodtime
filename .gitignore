@@ -107,3 +107,7 @@ dist
 
 # TernJS port file
 .tern-port
+
+# npm/yarn lock files (using pnpm-lock.yaml instead)
+package-lock.json
+yarn.lock

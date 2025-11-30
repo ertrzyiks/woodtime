@@ -36,7 +36,7 @@ const getLink = () => {
   return createHttpLink({
     credentials: 'include',
     uri:
-      process.env.REACT_APP_GRAPHQL_ENDPOINT ||
+      import.meta.env.VITE_GRAPHQL_ENDPOINT ||
       'https://localhost:8080/woodtime',
   });
 };

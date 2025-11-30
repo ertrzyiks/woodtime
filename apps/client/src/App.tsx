@@ -20,7 +20,7 @@ import JoinEvent from "./containers/JoinEvent/JoinEvent";
 
 function App() {
   return (
-    <Router basename={process.env.PUBLIC_URL}>
+    <Router basename={import.meta.env.BASE_URL}>
       <AppShell>
         <Layout>
           <Switch>
