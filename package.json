@@ -4,9 +4,6 @@
   "engines": {
     "node": "14"
   },
-  "workspaces": [
-    "apps/*"
-  ],
   "scripts": {
     "build": "yarn workspaces foreach run build",
     "build:watch": "yarn workspaces foreach run build:watch",
@@ -37,6 +34,5 @@
   "devDependencies": {
     "webpack": "5.63.0"
   },
-  "sideEffects": false,
-  "packageManager": "yarn@3.0.0-rc.2"
+  "sideEffects": false
 }

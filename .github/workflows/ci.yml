@@ -4,16 +4,11 @@ on:
   push:
     branches: [main]
   pull_request:
-    types: [
-        synchronize,
-        opened,
-        reopened,
-        ready_for_review
-    ]
+    types: [synchronize, opened, reopened, ready_for_review]
 
 jobs:
   unit_tests:
-    name: 'Unit tests'
+    name: "Unit tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -22,19 +17,19 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '16'
+          node-version: "16"
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache
+        run: pnpm install
 
       - name: Build libraries
-        run: yarn build
+        run: pnpm build
 
       - name: Run unit tests
-        run: yarn client test
+        run: pnpm client test
 
   build:
-    name: 'Build'
+    name: "Build"
     runs-on: ubuntu-latest
 
     steps:
@@ -43,18 +38,18 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: '16'
+          node-version: "16"
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache
+        run: pnpm install
 
       - name: Build all dependencies
-        run: yarn build
+        run: pnpm build
 
       - name: Build the client application
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
-        run: yarn client build:dist
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: pnpm client build:dist
 
       - name: Save build folder
         uses: actions/upload-artifact@v5
@@ -63,8 +58,8 @@ jobs:
           path: apps/client/build
 
   deploy_api:
-    name: 'Deploy API'
-    needs: [ unit_tests ]
+    name: "Deploy API"
+    needs: [unit_tests]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
@@ -81,7 +76,7 @@ jobs:
           git push dokku HEAD:master --force
 
   deploy_web:
-    name: 'Deploy Web'
+    name: "Deploy Web"
     needs: [build, unit_tests, deploy_api]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
