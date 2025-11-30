@@ -70,11 +70,11 @@
     ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "2.2.2",
+    "@graphql-codegen/cli": "2.16.5",
     "@graphql-codegen/near-operation-file-preset": "2.5.0",
     "@graphql-codegen/typed-document-node": "2.3.13",
-    "@graphql-codegen/typescript": "2.3.1",
-    "@graphql-codegen/typescript-operations": "2.2.4",
+    "@graphql-codegen/typescript": "2.8.8",
+    "@graphql-codegen/typescript-operations": "2.5.13",
     "@vitejs/plugin-react": "5.1.1",
     "concurrently": "6.5.1",
     "vite": "7.2.4"
