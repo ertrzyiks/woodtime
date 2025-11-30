@@ -55,9 +55,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build all dependencies
-        run: pnpm run build
-
       - name: Build the client application
         env:
           NODE_OPTIONS: "--max_old_space_size=4096"
