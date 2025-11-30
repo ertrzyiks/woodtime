@@ -7,9 +7,9 @@
   },
   "dependencies": {
     "@graphql-tools/schema": "8.5.1",
-    "apollo-datasource": "^3.2.0",
-    "apollo-server": "^3.4.0",
-    "apollo-server-express": "^3.4.0",
+    "apollo-datasource": "3.3.2",
+    "apollo-server": "3.13.0",
+    "apollo-server-express": "3.13.0",
     "connect-sqlite3": "0.9.16",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
