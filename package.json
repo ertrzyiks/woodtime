@@ -15,7 +15,8 @@
     "build-storybook": "build-storybook --docs"
   },
   "resolutions": {
-    "babel-loader": "8.1.0"
+    "babel-loader": "8.1.0",
+    "react-scripts/webpack": "4.44.2"
   },
   "dependencies": {
     "@storybook/addon-actions": "^6.3.12",
