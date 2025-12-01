@@ -13,7 +13,7 @@
     "connect-sqlite3": "0.9.16",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
-    "express": "4.21.2",
+    "express": "4.22.0",
     "express-session": "1.18.2",
     "geolib": "3.3.4",
     "graphql": "15.10.1",
