@@ -6,7 +6,7 @@ COPY . /app
 WORKDIR /app
 
 FROM base AS prod-deps
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile -r --filter api
 
 FROM base
 ENV PORT=80 NODE_ENV=production
