@@ -77,6 +77,6 @@
     "@graphql-codegen/typescript-operations": "2.5.13",
     "@vitejs/plugin-react": "5.1.1",
     "concurrently": "6.5.1",
-    "vite": "7.2.4"
+    "vite": "7.2.6"
   }
 }
