@@ -1,3 +1,7 @@
 packages:
-  # all packages in direct subdirs of packages/
-  - "apps/*"
+  - apps/*
+
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - esbuild
+  - sqlite3
