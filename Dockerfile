@@ -12,6 +12,7 @@ FROM base
 ENV PORT=80 NODE_ENV=production
 COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=prod-deps /app/apps/api/node_modules /app/apps/api/node_modules
+ENV PORT=80
 EXPOSE 80
 
 ENTRYPOINT ["pnpm"]
