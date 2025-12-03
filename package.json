@@ -23,7 +23,7 @@
     "@storybook/builder-webpack5": "6.5.16",
     "@storybook/manager-webpack5": "6.5.16",
     "@storybook/react": "6.5.16",
-    "chromatic": "6.24.1",
+    "chromatic": "13.3.4",
     "global": "4.4.0",
     "prettier": "2.8.8"
   },

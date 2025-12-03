@@ -33,8 +33,8 @@ importers:
         specifier: 6.5.16
         version: 6.5.16(@babel/core@7.28.5)(@storybook/builder-webpack5@6.5.16(eslint@7.32.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(typescript@4.9.5))(@storybook/manager-webpack5@6.5.16(encoding@0.1.13)(eslint@7.32.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(typescript@4.9.5))(@types/webpack@4.41.40)(encoding@0.1.13)(eslint@7.32.0)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(require-from-string@2.0.2)(sockjs-client@1.6.1)(type-fest@0.21.3)(typescript@4.9.5)(webpack-dev-server@3.11.1(webpack@5.103.0))(webpack-hot-middleware@2.26.1)
       chromatic:
-        specifier: 6.24.1
-        version: 6.24.1
+        specifier: 13.3.4
+        version: 13.3.4
       global:
         specifier: 4.4.0
         version: 4.4.0
@@ -67,7 +67,7 @@ importers:
         version: 2.8.5
       express:
         specifier: 4.22.1
-        version: 4.22.1
+        version: 4.22.1(supports-color@6.1.0)
       express-session:
         specifier: 1.18.2
         version: 1.18.2
@@ -3448,9 +3448,17 @@ packages:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
 
-  chromatic@6.24.1:
-    resolution: {integrity: sha512-XbpdWWHvFpEHtcq1Km71UcuQ07effB+8q8L47E1Y7HJmJ4ZCoKCuPd8liNrbnvwEAxqfBZvTcONYU/3BPz2i5w==}
+  chromatic@13.3.4:
+    resolution: {integrity: sha512-TR5rvyH0ESXobBB3bV8jc87AEAFQC7/n+Eb4XWhJz6hW3YNxIQPVjcbgLv+a4oKHEl1dUBueWSoIQsOVGTd+RQ==}
     hasBin: true
+    peerDependencies:
+      '@chromatic-com/cypress': ^0.*.* || ^1.0.0
+      '@chromatic-com/playwright': ^0.*.* || ^1.0.0
+    peerDependenciesMeta:
+      '@chromatic-com/cypress':
+        optional: true
+      '@chromatic-com/playwright':
+        optional: true
 
   chrome-trace-event@1.0.4:
     resolution: {integrity: sha512-rNjApaLzuwaOTjCiT8lSDdGN1APCiqkChLMJxJPWLunPAt5fy8xgU9/jNOchV84wfIxrA0lRQB7oCT8jrn/wrQ==}
@@ -12327,7 +12335,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@6.1.0)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -12505,9 +12513,9 @@ snapshots:
       accepts: 1.3.8
       apollo-server-core: 3.13.0(encoding@0.1.13)(graphql@15.10.1)
       apollo-server-types: 3.8.0(encoding@0.1.13)(graphql@15.10.1)
-      body-parser: 1.20.3
+      body-parser: 1.20.3(supports-color@6.1.0)
       cors: 2.8.5
-      express: 4.22.1
+      express: 4.22.1(supports-color@6.1.0)
       graphql: 15.10.1
       parseurl: 1.3.3
     transitivePeerDependencies:
@@ -12536,7 +12544,7 @@ snapshots:
       '@types/express': 4.17.14
       apollo-server-core: 3.13.0(encoding@0.1.13)(graphql@15.10.1)
       apollo-server-express: 3.13.0(encoding@0.1.13)(express@4.22.1)(graphql@15.10.1)
-      express: 4.22.1
+      express: 4.22.1(supports-color@6.1.0)
       graphql: 15.10.1
     transitivePeerDependencies:
       - encoding
@@ -12950,23 +12958,6 @@ snapshots:
 
   bn.js@5.2.2: {}
 
-  body-parser@1.20.3:
-    dependencies:
-      bytes: 3.1.2
-      content-type: 1.0.5
-      debug: 2.6.9
-      depd: 2.0.0
-      destroy: 1.2.0
-      http-errors: 2.0.0
-      iconv-lite: 0.4.24
-      on-finished: 2.4.1
-      qs: 6.13.0
-      raw-body: 2.5.2
-      type-is: 1.6.18
-      unpipe: 1.0.0
-    transitivePeerDependencies:
-      - supports-color
-
   body-parser@1.20.3(supports-color@6.1.0):
     dependencies:
       bytes: 3.1.2
@@ -13170,7 +13161,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       mkdirp: 1.0.4
       p-map: 4.0.0
-      promise-inflight: 1.0.1
+      promise-inflight: 1.0.1(bluebird@3.7.2)
       rimraf: 3.0.2
       ssri: 8.0.1
       tar: 6.2.1
@@ -13347,7 +13338,7 @@ snapshots:
 
   chownr@2.0.0: {}
 
-  chromatic@6.24.1: {}
+  chromatic@13.3.4: {}
 
   chrome-trace-event@1.0.4: {}
 
@@ -13791,10 +13782,6 @@ snapshots:
 
   debounce@1.2.1: {}
 
-  debug@2.6.9:
-    dependencies:
-      ms: 2.0.0
-
   debug@2.6.9(supports-color@6.1.0):
     dependencies:
       ms: 2.0.0
@@ -13810,11 +13797,6 @@ snapshots:
   debug@4.3.2:
     dependencies:
       ms: 2.1.2
-
-  debug@4.4.3:
-    dependencies:
-      ms: 2.1.3
-    optional: true
 
   debug@4.4.3(supports-color@6.1.0):
     dependencies:
@@ -14578,7 +14560,7 @@ snapshots:
     dependencies:
       cookie: 0.7.2
       cookie-signature: 1.0.7
-      debug: 2.6.9
+      debug: 2.6.9(supports-color@6.1.0)
       depd: 2.0.0
       on-headers: 1.1.0
       parseurl: 1.3.3
@@ -14615,42 +14597,6 @@ snapshots:
       safe-buffer: 5.2.1
       send: 0.19.0(supports-color@6.1.0)
       serve-static: 1.16.2(supports-color@6.1.0)
-      setprototypeof: 1.2.0
-      statuses: 2.0.1
-      type-is: 1.6.18
-      utils-merge: 1.0.1
-      vary: 1.1.2
-    transitivePeerDependencies:
-      - supports-color
-
-  express@4.22.1:
-    dependencies:
-      accepts: 1.3.8
-      array-flatten: 1.1.1
-      body-parser: 1.20.3
-      content-disposition: 0.5.4
-      content-type: 1.0.5
-      cookie: 0.7.2
-      cookie-signature: 1.0.7
-      debug: 2.6.9
-      depd: 2.0.0
-      encodeurl: 2.0.0
-      escape-html: 1.0.3
-      etag: 1.8.1
-      finalhandler: 1.3.1
-      fresh: 0.5.2
-      http-errors: 2.0.0
-      merge-descriptors: 1.0.3
-      methods: 1.1.2
-      on-finished: 2.4.1
-      parseurl: 1.3.3
-      path-to-regexp: 0.1.12
-      proxy-addr: 2.0.7
-      qs: 6.14.0
-      range-parser: 1.2.1
-      safe-buffer: 5.2.1
-      send: 0.19.0
-      serve-static: 1.16.2
       setprototypeof: 1.2.0
       statuses: 2.0.1
       type-is: 1.6.18
@@ -14836,18 +14782,6 @@ snapshots:
   final-form@4.20.10:
     dependencies:
       '@babel/runtime': 7.28.4
-
-  finalhandler@1.3.1:
-    dependencies:
-      debug: 2.6.9
-      encodeurl: 2.0.0
-      escape-html: 1.0.3
-      on-finished: 2.4.1
-      parseurl: 1.3.3
-      statuses: 2.0.1
-      unpipe: 1.0.0
-    transitivePeerDependencies:
-      - supports-color
 
   finalhandler@1.3.1(supports-color@6.1.0):
     dependencies:
@@ -15516,7 +15450,7 @@ snapshots:
     dependencies:
       '@tootallnate/once': 1.1.2
       agent-base: 6.0.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@6.1.0)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -15553,7 +15487,7 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@6.1.0)
     transitivePeerDependencies:
       - supports-color
     optional: true
@@ -17369,8 +17303,6 @@ snapshots:
 
   progress@2.0.3: {}
 
-  promise-inflight@1.0.1: {}
-
   promise-inflight@1.0.1(bluebird@3.7.2):
     optionalDependencies:
       bluebird: 3.7.2
@@ -18043,24 +17975,6 @@ snapshots:
 
   semver@7.7.3: {}
 
-  send@0.19.0:
-    dependencies:
-      debug: 2.6.9
-      depd: 2.0.0
-      destroy: 1.2.0
-      encodeurl: 1.0.2
-      escape-html: 1.0.3
-      etag: 1.8.1
-      fresh: 0.5.2
-      http-errors: 2.0.0
-      mime: 1.6.0
-      ms: 2.1.3
-      on-finished: 2.4.1
-      range-parser: 1.2.1
-      statuses: 2.0.1
-    transitivePeerDependencies:
-      - supports-color
-
   send@0.19.0(supports-color@6.1.0):
     dependencies:
       debug: 2.6.9(supports-color@6.1.0)
@@ -18117,15 +18031,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
     optional: true
-
-  serve-static@1.16.2:
-    dependencies:
-      encodeurl: 2.0.0
-      escape-html: 1.0.3
-      parseurl: 1.3.3
-      send: 0.19.0
-    transitivePeerDependencies:
-      - supports-color
 
   serve-static@1.16.2(supports-color@6.1.0):
     dependencies:
@@ -18308,7 +18213,7 @@ snapshots:
   socks-proxy-agent@6.2.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@6.1.0)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color
