@@ -143,6 +143,9 @@ Create `src/database/schemas/` directory with schema definitions:
 ```typescript
 import { RxJsonSchema } from 'rxdb';
 
+// Constants for schema validation
+const MAX_EVENT_ID = 999999999; // Maximum event ID supported by the system
+
 export const eventSchema: RxJsonSchema<any> = {
   version: 0,
   primaryKey: 'id',
@@ -151,7 +154,7 @@ export const eventSchema: RxJsonSchema<any> = {
     id: {
       type: 'number',
       minimum: 0,
-      maximum: 999999999
+      maximum: MAX_EVENT_ID
     },
     name: {
       type: 'string'
@@ -243,8 +246,11 @@ export const collections = {
 
 #### Step 2.1: Install GraphQL Replication Plugin
 
+The GraphQL replication functionality is included in the main RxDB package:
+
 ```bash
-pnpm add rxdb/plugins/replication-graphql
+# RxDB replication is included in the main package
+# No additional plugin installation needed for GraphQL replication
 ```
 
 #### Step 2.2: Configure GraphQL Replication
@@ -447,11 +453,39 @@ extend type Mutation {
 ```
 
 **Backend implementation requirements:**
-- Add `deleted` boolean column to all tables
-- Add `_modified` timestamp column (updated on every change)
+- Add `deleted` boolean column to all tables (events, checkpoints, users, virtualchallenges)
+- Add `_modified` timestamp column (updated on every change via triggers or ORM hooks)
 - Implement pull queries that return documents modified after checkpoint
 - Implement push mutations that handle upsert operations
 - Handle conflict resolution (last-write-wins or custom strategy)
+
+**Database migration example** (located in `apps/api/migrations/`):
+```sql
+-- Migration: Add RxDB replication fields
+ALTER TABLE events 
+  ADD COLUMN deleted BOOLEAN DEFAULT FALSE NOT NULL,
+  ADD COLUMN _modified BIGINT DEFAULT 0 NOT NULL;
+
+-- Create trigger to update _modified on every change
+CREATE OR REPLACE FUNCTION update_modified_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW._modified = EXTRACT(EPOCH FROM NOW()) * 1000;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER events_modified_trigger
+BEFORE INSERT OR UPDATE ON events
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_timestamp();
+
+-- Create index for replication queries
+CREATE INDEX idx_events_modified ON events(_modified);
+CREATE INDEX idx_events_deleted ON events(deleted);
+
+-- Repeat for checkpoints, users, virtualchallenges tables
+```
 
 ### Phase 3: React Integration (Week 2)
 
@@ -706,16 +740,22 @@ const handleDeleteClick = async (eventId: number) => {
 
 **For create operations:**
 ```typescript
-// Helper function to generate temporary negative IDs for offline-created documents
-const generateTempId = (() => {
-  let counter = -1;
-  return () => counter--;
-})();
+// Helper function to generate temporary IDs for offline-created documents
+// Uses timestamp + random component to avoid collisions
+const generateTempId = () => {
+  // Use negative timestamp-based ID to avoid collision with server IDs
+  // Format: -[timestamp][random] ensures uniqueness and ordering
+  return -(Date.now() * 1000 + Math.floor(Math.random() * 1000));
+};
+
+// Alternative: Use UUIDs if backend supports string IDs
+// import { v4 as uuidv4 } from 'uuid';
+// const generateTempId = () => `temp-${uuidv4()}`;
 
 const handleCreateEvent = async (eventData: any) => {
   await db.events.insert({
     ...eventData,
-    id: generateTempId(), // Use temporary negative ID
+    id: generateTempId(), // Use temporary ID
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     deleted: false,
