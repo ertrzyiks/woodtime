@@ -1068,10 +1068,16 @@ export function useEvents() {
   });
   
   const rxdbResult = useRxQuery(
-    (db) => USE_RXDB ? db.events.find({
-      selector: { deleted: false },
-      sort: [{ created_at: 'desc' }]
-    }) : null
+    (db) => {
+      // Always return a valid query, but with empty result set when not used
+      if (!USE_RXDB || !db) {
+        return null; // Hook should handle null gracefully
+      }
+      return db.events.find({
+        selector: { deleted: false },
+        sort: [{ created_at: 'desc' }]
+      });
+    }
   );
   
   // Return the active implementation's result
@@ -1093,6 +1099,8 @@ export function useEvents() {
 // Then in your component:
 const { data, loading, error } = useEvents();
 ```
+
+**Note**: The `useRxQuery` hook should be designed to handle null queries gracefully by returning empty data. If your hook implementation doesn't support this, use Option 1 (wrapper components) instead, which is the cleanest approach for migration.
 
 **Option 3: Separate Providers (Recommended)**
 ```typescript
