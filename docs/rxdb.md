@@ -150,7 +150,8 @@ export const eventSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'number',
-      maxLength: 100
+      minimum: 0,
+      maximum: 999999999
     },
     name: {
       type: 'string'
@@ -705,10 +706,16 @@ const handleDeleteClick = async (eventId: number) => {
 
 **For create operations:**
 ```typescript
+// Helper function to generate temporary negative IDs for offline-created documents
+const generateTempId = (() => {
+  let counter = -1;
+  return () => counter--;
+})();
+
 const handleCreateEvent = async (eventData: any) => {
   await db.events.insert({
     ...eventData,
-    id: generateTempId(), // Use temporary ID
+    id: generateTempId(), // Use temporary negative ID
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     deleted: false,
@@ -946,7 +953,7 @@ const conflictHandler = (
 - [RxDB Documentation](https://rxdb.info/)
 - [RxDB GraphQL Replication](https://rxdb.info/replication-graphql.html)
 - [RxDB Schema](https://rxdb.info/rx-schema.html)
-- [RxDB React Integration](https://rxdb.info/rx-database.html#hooks)
+- [RxDB React Integration](https://rxdb.info/react-database.html)
 
 ## Open Questions
 
