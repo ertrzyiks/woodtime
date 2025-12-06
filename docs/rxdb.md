@@ -937,7 +937,10 @@ const generateTempId = () => {
   // Use persistent client ID from localStorage to reduce collision risk
   let clientId = localStorage.getItem('client-id');
   if (!clientId) {
-    clientId = String(Math.floor(Math.random() * 1000000));
+    // Use crypto.getRandomValues for secure random client ID generation
+    const randomBytes = new Uint32Array(1);
+    crypto.getRandomValues(randomBytes);
+    clientId = String(randomBytes[0] % 1000000);
     localStorage.setItem('client-id', clientId);
   }
   
@@ -946,9 +949,10 @@ const generateTempId = () => {
   crypto.getRandomValues(randomBytes);
   
   // Combine timestamp, persistent clientId, and crypto random for collision resistance
+  // Use smaller multipliers to avoid integer overflow while maintaining uniqueness
   // With timestamp (ms precision), persistent clientId (1M range), and 32-bit random,
   // collision risk is extremely low even across multiple clients
-  return -(Date.now() * 1000000000 + parseInt(clientId) * 1000 + (randomBytes[0] % 1000));
+  return -(Date.now() * 1000000 + parseInt(clientId) * 1000 + (randomBytes[0] % 1000));
 };
 
 // Option 2: Use crypto.randomUUID() for guaranteed uniqueness (requires backend support for string IDs)
