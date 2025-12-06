@@ -148,8 +148,6 @@ Dexie is chosen as the storage adapter for RxDB in the browser for several reaso
 
 Alternative storage adapters exist (LokiJS, memory, etc.) but Dexie is the recommended choice for production browser applications due to its reliability and performance characteristics.
 
-```typescript
-```
 
 #### Step 1.3: Define RxDB Schemas
 
