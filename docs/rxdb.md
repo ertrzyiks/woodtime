@@ -588,37 +588,7 @@ This approach maintains flexibility while providing clear data relationships tha
 - Implement push mutations that handle upsert operations
 - Handle conflict resolution (last-write-wins or custom strategy)
 
-**Database migration example** (located in `apps/api/migrations/`):
-```sql
--- Migration: Add RxDB replication fields
-ALTER TABLE events 
-  ADD COLUMN deleted BOOLEAN DEFAULT FALSE NOT NULL,
-  ADD COLUMN _modified BIGINT DEFAULT 0 NOT NULL;
-
--- Create trigger to update _modified on every change
-CREATE OR REPLACE FUNCTION update_modified_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW._modified = EXTRACT(EPOCH FROM NOW()) * 1000;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER events_modified_trigger
-BEFORE INSERT OR UPDATE ON events
-FOR EACH ROW
-EXECUTE FUNCTION update_modified_timestamp();
-
--- Create index for replication queries
-CREATE INDEX idx_events_modified ON events(_modified);
-CREATE INDEX idx_events_deleted ON events(deleted);
-
--- Repeat for checkpoints, users, virtualchallenges tables
-```
-
-**SQLite3 Compatibility:**
-
-Yes, this approach works with SQLite3! The migration script above uses PostgreSQL syntax, but here's the SQLite3 equivalent:
+**Database migration example for SQLite3** (located in `apps/api/migrations/`):
 
 ```sql
 -- SQLite3 Migration: Add RxDB replication fields
@@ -649,12 +619,12 @@ CREATE INDEX idx_events_deleted ON events(deleted);
 -- Repeat for checkpoints, users, virtualchallenges tables
 ```
 
-**Key SQLite3 differences:**
-- Use `INTEGER` instead of `BOOLEAN` (0 = false, 1 = true)
-- Use `INTEGER` instead of `BIGINT` for timestamps
-- Triggers require separate INSERT and UPDATE triggers (no BEFORE triggers that modify NEW in SQLite)
-- Use `strftime('%s', 'now') * 1000` for millisecond timestamps instead of `EXTRACT(EPOCH FROM NOW())`
-- No stored procedures/functions - logic goes directly in triggers
+**Key SQLite3 considerations:**
+- Use `INTEGER` for boolean fields (0 = false, 1 = true)
+- Use `INTEGER` for timestamp fields to store milliseconds
+- SQLite requires separate INSERT and UPDATE triggers
+- Use `strftime('%s', 'now') * 1000` for millisecond timestamps
+- Logic goes directly in triggers (no stored procedures/functions)
 
 **Alternative approach for SQLite3** (if you're using Knex.js migrations):
 ```javascript
