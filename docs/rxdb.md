@@ -126,13 +126,29 @@ addRxPlugin(RxDBUpdatePlugin);
 export async function createDatabase() {
   const db = await createRxDatabase({
     name: 'woodtime',
-    storage: getRxStorageDexie(),
+    storage: getRxStorageDexie(), // Dexie.js provides a robust IndexedDB wrapper
     multiInstance: true, // For multi-tab support
     eventReduce: true, // Performance optimization
   });
 
   return db;
 }
+```
+
+**Why Dexie Storage?**
+
+Dexie is chosen as the storage adapter for RxDB in the browser for several reasons:
+
+1. **Battle-tested IndexedDB wrapper**: Dexie.js is a mature, well-maintained library that abstracts away many of IndexedDB's quirks and browser inconsistencies
+2. **Performance**: Dexie provides excellent query performance and optimized transactions
+3. **Cross-browser compatibility**: Works consistently across all modern browsers (Chrome, Firefox, Safari, Edge)
+4. **No external dependencies**: Pure JavaScript implementation that works offline
+5. **Large storage capacity**: IndexedDB can store significantly more data than localStorage (typically 50MB+ depending on browser)
+6. **Structured queries**: Supports complex queries with indexes, which is essential for efficient data retrieval
+
+Alternative storage adapters exist (LokiJS, memory, etc.) but Dexie is the recommended choice for production browser applications due to its reliability and performance characteristics.
+
+```typescript
 ```
 
 #### Step 1.3: Define RxDB Schemas
@@ -196,6 +212,58 @@ export const eventSchema: RxJsonSchema<any> = {
 - Add `_modified` timestamp for replication
 - Define appropriate indexes for query performance
 - Handle nested objects (checkpoints, participants) as separate collections with relationships
+
+**Additional schema example - `schemas/checkpoint.schema.ts`:**
+```typescript
+import { RxJsonSchema } from 'rxdb';
+
+export const checkpointSchema: RxJsonSchema<any> = {
+  version: 0,
+  primaryKey: 'id',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'number',
+      minimum: 0,
+      maximum: 999999999
+    },
+    event_id: {
+      type: 'number'
+    },
+    cp_id: {
+      type: 'number'
+    },
+    cp_code: {
+      type: 'string'
+    },
+    skipped: {
+      type: 'boolean'
+    },
+    skip_reason: {
+      type: ['string', 'null']
+    },
+    created_at: {
+      type: 'string',
+      format: 'date-time'
+    },
+    updated_at: {
+      type: 'string',
+      format: 'date-time'
+    },
+    deleted: {
+      type: 'boolean',
+      default: false
+    },
+    _modified: {
+      type: 'number'
+    }
+  },
+  required: ['id', 'event_id', 'cp_id', 'skipped', 'created_at', 'updated_at'],
+  indexes: ['event_id', 'created_at', 'updated_at', '_modified']
+};
+```
+
+**Note**: The `event_id` field creates a foreign key-like relationship. While RxDB doesn't enforce referential integrity like traditional databases, this field is indexed for efficient queries. You can query all checkpoints for an event using: `db.checkpoints.find({ selector: { event_id: eventId } })`
 
 #### Step 1.4: Create Collections
 
@@ -457,6 +525,62 @@ extend type Mutation {
 }
 ```
 
+**How Event-Checkpoint Relationships Are Maintained:**
+
+In RxDB, relationships are maintained through foreign key references, similar to relational databases, but without enforced referential integrity:
+
+1. **Collection Separation**: Events and checkpoints are stored in separate collections, each with their own schema and replication configuration
+
+2. **Foreign Key Pattern**: Each checkpoint document contains an `event_id` field that references its parent event:
+   ```typescript
+   checkpoint: {
+     id: 123,
+     event_id: 456,  // References the event
+     cp_id: 1,
+     // ... other fields
+   }
+   ```
+
+3. **Indexed Queries**: The `event_id` field is indexed in the checkpoint schema for efficient lookups:
+   ```typescript
+   // Query all checkpoints for a specific event
+   const checkpoints = await db.checkpoints
+     .find({ selector: { event_id: eventId } })
+     .exec();
+   ```
+
+4. **Instance Methods**: The event schema includes a helper method to fetch related checkpoints:
+   ```typescript
+   // From collections.ts
+   events: {
+     methods: {
+       getCheckpoints() {
+         return this.collection.database.checkpoints
+           .find({ selector: { event_id: this.id } })
+           .exec();
+       }
+     }
+   }
+   ```
+
+5. **Replication Independence**: Events and checkpoints replicate separately, allowing for partial sync scenarios where checkpoints can sync without their parent event (though queries would need to handle this)
+
+6. **Cascading Deletes** (optional): When deleting an event, you may want to soft-delete all associated checkpoints:
+   ```typescript
+   const event = await db.events.findOne(eventId).exec();
+   const checkpoints = await event.getCheckpoints();
+   
+   // Soft delete all checkpoints
+   await Promise.all(
+     checkpoints.map(cp => cp.update({ $set: { deleted: true } }))
+   );
+   
+   // Then soft delete the event
+   await event.update({ $set: { deleted: true } });
+   ```
+
+This approach maintains flexibility while providing clear data relationships that can be efficiently queried.
+
 **Backend implementation requirements:**
 - Add `deleted` boolean column to all tables (events, checkpoints, users, virtualchallenges)
 - Add `_modified` timestamp column (updated on every change via triggers or ORM hooks)
@@ -490,6 +614,80 @@ CREATE INDEX idx_events_modified ON events(_modified);
 CREATE INDEX idx_events_deleted ON events(deleted);
 
 -- Repeat for checkpoints, users, virtualchallenges tables
+```
+
+**SQLite3 Compatibility:**
+
+Yes, this approach works with SQLite3! The migration script above uses PostgreSQL syntax, but here's the SQLite3 equivalent:
+
+```sql
+-- SQLite3 Migration: Add RxDB replication fields
+ALTER TABLE events ADD COLUMN deleted INTEGER DEFAULT 0 NOT NULL;
+ALTER TABLE events ADD COLUMN _modified INTEGER DEFAULT 0 NOT NULL;
+
+-- SQLite3 uses triggers slightly differently
+CREATE TRIGGER events_modified_trigger
+AFTER INSERT ON events
+BEGIN
+  UPDATE events 
+  SET _modified = (strftime('%s', 'now') * 1000)
+  WHERE id = NEW.id;
+END;
+
+CREATE TRIGGER events_modified_update_trigger
+AFTER UPDATE ON events
+BEGIN
+  UPDATE events 
+  SET _modified = (strftime('%s', 'now') * 1000)
+  WHERE id = NEW.id;
+END;
+
+-- Create indexes for replication queries
+CREATE INDEX idx_events_modified ON events(_modified);
+CREATE INDEX idx_events_deleted ON events(deleted);
+
+-- Repeat for checkpoints, users, virtualchallenges tables
+```
+
+**Key SQLite3 differences:**
+- Use `INTEGER` instead of `BOOLEAN` (0 = false, 1 = true)
+- Use `INTEGER` instead of `BIGINT` for timestamps
+- Triggers require separate INSERT and UPDATE triggers (no BEFORE triggers that modify NEW in SQLite)
+- Use `strftime('%s', 'now') * 1000` for millisecond timestamps instead of `EXTRACT(EPOCH FROM NOW())`
+- No stored procedures/functions - logic goes directly in triggers
+
+**Alternative approach for SQLite3** (if you're using Knex.js migrations):
+```javascript
+// In your Knex migration file
+exports.up = async function(knex) {
+  await knex.schema.alterTable('events', (table) => {
+    table.integer('deleted').defaultTo(0).notNullable();
+    table.bigInteger('_modified').defaultTo(0).notNullable();
+  });
+  
+  await knex.raw(`
+    CREATE TRIGGER events_modified_trigger
+    AFTER INSERT ON events
+    BEGIN
+      UPDATE events 
+      SET _modified = (strftime('%s', 'now') * 1000)
+      WHERE id = NEW.id;
+    END;
+  `);
+  
+  await knex.raw(`
+    CREATE TRIGGER events_modified_update_trigger
+    AFTER UPDATE ON events
+    BEGIN
+      UPDATE events 
+      SET _modified = (strftime('%s', 'now') * 1000)
+      WHERE id = NEW.id;
+    END;
+  `);
+  
+  await knex.raw('CREATE INDEX idx_events_modified ON events(_modified)');
+  await knex.raw('CREATE INDEX idx_events_deleted ON events(deleted)');
+};
 ```
 
 ### Phase 3: React Integration (Week 2)
@@ -815,17 +1013,111 @@ Run both Apollo Client and RxDB simultaneously:
 4. Compare data consistency
 5. Monitor performance metrics
 
+**Important: Avoid Conditional Hook Calls**
+
+React hooks cannot be called conditionally. Instead, use a wrapper component or adapter pattern:
+
+**Option 1: Wrapper Component Pattern**
 ```typescript
+// Create separate components for each implementation
+// EventListRxDB.tsx
+import { useRxQuery } from '../../database/hooks/useRxQuery';
+
+export function EventListRxDB() {
+  const { data, loading, error } = useRxQuery(
+    (db) => db.events.find({
+      selector: { deleted: false },
+      sort: [{ created_at: 'desc' }]
+    })
+  );
+  
+  return <EventListView data={data} loading={loading} error={error} />;
+}
+
+// EventListApollo.tsx
+import { useQuery } from '@apollo/client';
+import { GetEventsDocument } from '../../queries/getEvents';
+
+export function EventListApollo() {
+  const { data, loading, error } = useQuery(GetEventsDocument);
+  
+  return <EventListView data={data?.events} loading={loading} error={error} />;
+}
+
+// EventList.tsx - Router decides which to use
 const USE_RXDB = import.meta.env.VITE_USE_RXDB === 'true';
 
-if (USE_RXDB) {
-  // Use RxDB
-  const { data, loading } = useRxQuery(/* ... */);
-} else {
-  // Use Apollo Client
-  const { data, loading } = useQuery(/* ... */);
+export default function EventList() {
+  return USE_RXDB ? <EventListRxDB /> : <EventListApollo />;
 }
 ```
+
+**Option 2: Data Adapter Pattern**
+```typescript
+// hooks/useEvents.ts
+import { useQuery } from '@apollo/client';
+import { useRxQuery } from '../../database/hooks/useRxQuery';
+import { GetEventsDocument } from '../../queries/getEvents';
+
+const USE_RXDB = import.meta.env.VITE_USE_RXDB === 'true';
+
+export function useEvents() {
+  // Call both hooks unconditionally
+  const apolloResult = useQuery(GetEventsDocument, {
+    skip: USE_RXDB // Skip query if using RxDB
+  });
+  
+  const rxdbResult = useRxQuery(
+    (db) => USE_RXDB ? db.events.find({
+      selector: { deleted: false },
+      sort: [{ created_at: 'desc' }]
+    }) : null
+  );
+  
+  // Return the active implementation's result
+  if (USE_RXDB) {
+    return {
+      data: rxdbResult.data,
+      loading: rxdbResult.loading,
+      error: rxdbResult.error
+    };
+  }
+  
+  return {
+    data: apolloResult.data?.events,
+    loading: apolloResult.loading,
+    error: apolloResult.error
+  };
+}
+
+// Then in your component:
+const { data, loading, error } = useEvents();
+```
+
+**Option 3: Separate Providers (Recommended)**
+```typescript
+// AppShell.tsx
+const USE_RXDB = import.meta.env.VITE_USE_RXDB === 'true';
+
+function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <PwaUpdateNotification />
+      {USE_RXDB ? (
+        <RxDBProvider>
+          {children}
+        </RxDBProvider>
+      ) : (
+        <ApolloProvider client={apolloClient}>
+          {children}
+        </ApolloProvider>
+      )}
+    </>
+  );
+}
+```
+
+The wrapper component pattern (Option 1) is cleanest for migration as it maintains clear separation and doesn't require modifying hooks to handle both implementations.
 
 #### Step 5.2: Data Migration
 
