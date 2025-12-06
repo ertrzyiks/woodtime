@@ -1,10 +1,3 @@
-import '@storybook/addon-console'
-import { configureActions } from '@storybook/addon-actions';
-
-configureActions({
-  clearOnStoryChange: true,
-});
-
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
   controls: {
@@ -13,4 +6,4 @@ export const parameters = {
       date: /Date$/,
     },
   },
-}
+};

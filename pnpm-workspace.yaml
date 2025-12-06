@@ -3,5 +3,6 @@ packages:
 
 onlyBuiltDependencies:
   - '@apollo/protobufjs'
+  - core-js-pure
   - esbuild
   - sqlite3

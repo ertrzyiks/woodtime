@@ -10,22 +10,11 @@
     "test": "pnpm run -r test",
     "start": "pnpm run -r --filter client start",
     "client": "pnpm run -r --filter client",
-    "api": "pnpm run -r --filter api",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook --docs"
+    "api": "pnpm run -r --filter api"
   },
   "dependencies": {
-    "@storybook/addon-actions": "6.5.16",
-    "@storybook/addon-console": "1.2.3",
-    "@storybook/addon-essentials": "6.5.16",
-    "@storybook/addon-links": "6.5.16",
-    "@storybook/addons": "6.5.16",
-    "@storybook/builder-webpack5": "6.5.16",
-    "@storybook/manager-webpack5": "6.5.16",
-    "@storybook/react": "6.5.16",
-    "chromatic": "13.3.4",
-    "global": "4.4.0",
-    "prettier": "3.7.4"
+    "global": "^4.4.0",
+    "prettier": "^3.7.4"
   },
   "sideEffects": false
 }
