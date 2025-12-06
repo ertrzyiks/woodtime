@@ -244,14 +244,19 @@ export const collections = {
 
 ### Phase 2: GraphQL Replication Setup (Week 1-2)
 
-#### Step 2.1: Install GraphQL Replication Plugin
+#### Step 2.1: Setup GraphQL Replication Plugin
 
-The GraphQL replication functionality is included in the main RxDB package:
+The GraphQL replication functionality is included in the main RxDB package but requires explicit plugin registration:
 
-```bash
-# RxDB replication is included in the main package
-# No additional plugin installation needed for GraphQL replication
+```typescript
+import { addRxPlugin } from 'rxdb';
+import { RxDBReplicationGraphQLPlugin } from 'rxdb/plugins/replication-graphql';
+
+// Register the GraphQL replication plugin
+addRxPlugin(RxDBReplicationGraphQLPlugin);
 ```
+
+**Note**: While the replication code is bundled with RxDB, you must explicitly import and register the plugin before using `replicateGraphQL()` in your application.
 
 #### Step 2.2: Configure GraphQL Replication
 
@@ -741,16 +746,20 @@ const handleDeleteClick = async (eventId: number) => {
 **For create operations:**
 ```typescript
 // Helper function to generate temporary IDs for offline-created documents
-// Uses timestamp + random component to avoid collisions
+// Uses timestamp + random component + client ID to avoid collisions across clients
 const generateTempId = () => {
-  // Use negative timestamp-based ID to avoid collision with server IDs
-  // Format: -[timestamp][random] ensures uniqueness and ordering
-  return -(Date.now() * 1000 + Math.floor(Math.random() * 1000));
+  // Option 1: Timestamp-based with randomness and client-specific prefix
+  // Use negative numbers to differentiate from server IDs
+  const clientId = Math.floor(Math.random() * 1000); // Or use a persistent client ID from localStorage
+  return -(Date.now() * 1000000 + clientId * 1000 + Math.floor(Math.random() * 1000));
 };
 
-// Alternative: Use UUIDs if backend supports string IDs
-// import { v4 as uuidv4 } from 'uuid';
-// const generateTempId = () => `temp-${uuidv4()}`;
+// Option 2: Use crypto.randomUUID() for guaranteed uniqueness (requires backend support for string IDs)
+// const generateTempId = () => `temp-${crypto.randomUUID()}`;
+
+// Option 3: Use a dedicated ID generation library
+// import { nanoid } from 'nanoid';
+// const generateTempId = () => `temp-${nanoid()}`;
 
 const handleCreateEvent = async (eventData: any) => {
   await db.events.insert({
@@ -764,6 +773,12 @@ const handleCreateEvent = async (eventData: any) => {
   // RxDB replication will sync to server and update with real ID
 };
 ```
+
+**Note**: The backend push resolver must handle ID mapping - when a document with a temporary (negative) ID is pushed, the server should:
+1. Generate a real positive ID
+2. Store the document with the real ID
+3. Return the document with the real ID
+4. RxDB will automatically update the local document with the new ID
 
 #### Step 4.3: Handle Relationships
 
@@ -993,7 +1008,7 @@ const conflictHandler = (
 - [RxDB Documentation](https://rxdb.info/)
 - [RxDB GraphQL Replication](https://rxdb.info/replication-graphql.html)
 - [RxDB Schema](https://rxdb.info/rx-schema.html)
-- [RxDB React Integration](https://rxdb.info/react-database.html)
+- [RxDB with React](https://rxdb.info/articles/react-database.html)
 
 ## Open Questions
 
