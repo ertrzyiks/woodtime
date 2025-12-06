@@ -664,7 +664,7 @@ exports.up = async function(knex) {
 Create `src/database/RxDBProvider.tsx`:
 
 ```typescript
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { RxDatabase } from 'rxdb';
 import { createDatabase } from './setup';
 import { collections } from './collections';
@@ -691,13 +691,12 @@ export const useRxDB = () => {
 export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [db, setDb] = useState<RxDatabase | null>(null);
   const [loading, setLoading] = useState(true);
+  const dbRef = useRef<RxDatabase | null>(null);
 
   useEffect(() => {
-    let database: RxDatabase | null = null;
-    
     async function init() {
       try {
-        database = await createDatabase();
+        const database = await createDatabase();
         
         // Add collections
         await database.addCollections(collections);
@@ -705,6 +704,7 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Setup replication
         setupReplication(database);
         
+        dbRef.current = database;
         setDb(database);
         setLoading(false);
       } catch (error) {
@@ -717,8 +717,8 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       // Cleanup: destroy the database instance when component unmounts
-      if (database) {
-        database.destroy();
+      if (dbRef.current) {
+        dbRef.current.destroy();
       }
     };
   }, []);
@@ -949,10 +949,11 @@ const generateTempId = () => {
   crypto.getRandomValues(randomBytes);
   
   // Combine timestamp, persistent clientId, and crypto random for collision resistance
-  // Use smaller multipliers to avoid integer overflow while maintaining uniqueness
-  // With timestamp (ms precision), persistent clientId (1M range), and 32-bit random,
+  // Use smaller multipliers to stay within JavaScript's safe integer range (2^53 - 1)
+  // Date.now() returns ~1.7e12, so we use 1000 multiplier (1.7e15) which is well within safe range
+  // With timestamp (ms precision), persistent clientId (1M range), and 10-bit random,
   // collision risk is extremely low even across multiple clients
-  return -(Date.now() * 1000000 + parseInt(clientId) * 1000 + (randomBytes[0] % 1000));
+  return -(Date.now() * 1000 + parseInt(clientId) + (randomBytes[0] % 1024));
 };
 
 // Option 2: Use crypto.randomUUID() for guaranteed uniqueness (requires backend support for string IDs)
