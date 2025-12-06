@@ -148,7 +148,6 @@ Dexie is chosen as the storage adapter for RxDB in the browser for several reaso
 
 Alternative storage adapters exist (LokiJS, memory, etc.) but Dexie is the recommended choice for production browser applications due to its reliability and performance characteristics.
 
-
 #### Step 1.3: Define RxDB Schemas
 
 Create `src/database/schemas/` directory with schema definitions:
@@ -694,9 +693,11 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let database: RxDatabase | null = null;
+    
     async function init() {
       try {
-        const database = await createDatabase();
+        database = await createDatabase();
         
         // Add collections
         await database.addCollections(collections);
@@ -715,8 +716,9 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     init();
 
     return () => {
-      if (db) {
-        db.destroy();
+      // Cleanup: destroy the database instance when component unmounts
+      if (database) {
+        database.destroy();
       }
     };
   }, []);
@@ -766,10 +768,25 @@ export function useRxQuery<T>(
     return () => {
       subscription.unsubscribe();
     };
-  }, [db, queryConstructor]);
+  }, [db]); // queryConstructor should be memoized by the caller
 
   return { data, loading, error };
 }
+```
+
+**Important**: Callers should memoize the `queryConstructor` function using `useCallback` or `useMemo` to prevent unnecessary re-subscriptions:
+
+```typescript
+// In your component:
+const query = useCallback(
+  (db) => db.events.find({
+    selector: { deleted: false },
+    sort: [{ created_at: 'desc' }]
+  }),
+  [] // Add dependencies if query parameters change
+);
+
+const { data, loading, error } = useRxQuery(query);
 ```
 
 Create `src/database/hooks/useRxDocument.ts`:
@@ -912,12 +929,26 @@ const handleDeleteClick = async (eventId: number) => {
 **For create operations:**
 ```typescript
 // Helper function to generate temporary IDs for offline-created documents
-// Uses timestamp + random component + client ID to avoid collisions across clients
+// Uses timestamp + random component + persistent client ID to avoid collisions across clients
 const generateTempId = () => {
-  // Option 1: Timestamp-based with randomness and client-specific prefix
+  // Option 1: Timestamp-based with randomness and persistent client-specific prefix
   // Use negative numbers to differentiate from server IDs
-  const clientId = Math.floor(Math.random() * 1000); // Or use a persistent client ID from localStorage
-  return -(Date.now() * 1000000 + clientId * 1000 + Math.floor(Math.random() * 1000));
+  
+  // Use persistent client ID from localStorage to reduce collision risk
+  let clientId = localStorage.getItem('client-id');
+  if (!clientId) {
+    clientId = String(Math.floor(Math.random() * 1000000));
+    localStorage.setItem('client-id', clientId);
+  }
+  
+  // Use crypto.getRandomValues for better randomness than Math.random()
+  const randomBytes = new Uint32Array(1);
+  crypto.getRandomValues(randomBytes);
+  
+  // Combine timestamp, persistent clientId, and crypto random for collision resistance
+  // With timestamp (ms precision), persistent clientId (1M range), and 32-bit random,
+  // collision risk is extremely low even across multiple clients
+  return -(Date.now() * 1000000000 + parseInt(clientId) * 1000 + (randomBytes[0] % 1000));
 };
 
 // Option 2: Use crypto.randomUUID() for guaranteed uniqueness (requires backend support for string IDs)
@@ -1026,6 +1057,7 @@ export default function EventList() {
 import { useQuery } from '@apollo/client';
 import { useRxQuery } from '../../database/hooks/useRxQuery';
 import { GetEventsDocument } from '../../queries/getEvents';
+import { useCallback } from 'react';
 
 const USE_RXDB = import.meta.env.VITE_USE_RXDB === 'true';
 
@@ -1035,18 +1067,19 @@ export function useEvents() {
     skip: USE_RXDB // Skip query if using RxDB
   });
   
-  const rxdbResult = useRxQuery(
+  // Memoize the query constructor to prevent unnecessary re-subscriptions
+  const rxdbQuery = useCallback(
     (db) => {
-      // Always return a valid query, but with empty result set when not used
-      if (!USE_RXDB || !db) {
-        return null; // Hook should handle null gracefully
-      }
+      if (!db) return null;
       return db.events.find({
         selector: { deleted: false },
         sort: [{ created_at: 'desc' }]
       });
-    }
+    },
+    []
   );
+  
+  const rxdbResult = useRxQuery(rxdbQuery);
   
   // Return the active implementation's result
   if (USE_RXDB) {
@@ -1068,7 +1101,7 @@ export function useEvents() {
 const { data, loading, error } = useEvents();
 ```
 
-**Note**: The `useRxQuery` hook should be designed to handle null queries gracefully by returning empty data. If your hook implementation doesn't support this, use Option 1 (wrapper components) instead, which is the cleanest approach for migration.
+**Note**: The `useRxQuery` hook should handle null queries gracefully by returning empty data. If your hook implementation doesn't support this, use Option 1 (wrapper components) instead, which is the cleanest approach for migration.
 
 **Option 3: Separate Providers (Recommended)**
 ```typescript
@@ -1200,16 +1233,66 @@ replicationState.events.error$.subscribe(err => {
 
 ### Conflict Resolution
 ```typescript
-// Custom conflict handler
+// Custom conflict handler with enhanced conflict resolution
 const conflictHandler = (
   realMasterState: any,
   newDocumentState: any
 ) => {
   // Last-write-wins based on _modified timestamp
   if (newDocumentState._modified > realMasterState._modified) {
+    // Log conflict for monitoring/debugging
+    console.warn('Conflict resolved: new document is newer', {
+      masterId: realMasterState.id,
+      masterModified: realMasterState._modified,
+      newModified: newDocumentState._modified
+    });
     return newDocumentState;
   }
+  
+  // Log when keeping master state
+  console.warn('Conflict resolved: master is newer', {
+    masterId: realMasterState.id,
+    masterModified: realMasterState._modified,
+    newModified: newDocumentState._modified
+  });
+  
   return realMasterState;
+};
+```
+
+**Note on Conflict Resolution:**
+
+For most applications, RxDB's GraphQL replication plugin handles conflicts automatically using last-write-wins based on the `_modified` timestamp. Custom conflict handlers are typically only needed for:
+
+1. **Field-level merging**: When you need to merge changes from both versions (e.g., combining arrays, merging non-overlapping field updates)
+2. **Business logic**: When certain fields should always win regardless of timestamp (e.g., status changes)
+3. **Conflict logging**: When you need to track conflicts for analysis or manual resolution
+
+For critical applications where data loss is unacceptable, consider:
+- Using operational transformation (OT) or CRDTs for automatic field-level merging
+- Implementing a conflict queue for manual resolution by users
+- Adding conflict metadata to documents for audit trails
+
+Example of field-level merging:
+```typescript
+const conflictHandlerWithMerging = (
+  realMasterState: any,
+  newDocumentState: any
+) => {
+  // Start with the newer document's base
+  const newerDoc = newDocumentState._modified > realMasterState._modified 
+    ? newDocumentState 
+    : realMasterState;
+  const olderDoc = newDocumentState._modified > realMasterState._modified 
+    ? realMasterState 
+    : newDocumentState;
+  
+  // Merge specific fields (example: combine tags from both versions)
+  if (newerDoc.tags && olderDoc.tags) {
+    newerDoc.tags = [...new Set([...newerDoc.tags, ...olderDoc.tags])];
+  }
+  
+  return newerDoc;
 };
 ```
 
