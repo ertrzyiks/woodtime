@@ -47,7 +47,3 @@ export const RealServer = ({ onNavigate } : Args) => {
     </AppShell>
   );
 }
-
-RealServer.parameters = {
-  chromatic: { disableSnapshot: true }
-}

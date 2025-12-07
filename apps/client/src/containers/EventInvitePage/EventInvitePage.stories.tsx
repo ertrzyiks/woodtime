@@ -87,7 +87,3 @@ export const RealServer = ({ eventId }: { eventId: number }) => (
 RealServer.args = {
   eventId: 1
 }
-
-RealServer.parameters = {
-  chromatic: { disableSnapshot: true }
-}
