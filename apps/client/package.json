@@ -34,7 +34,7 @@
     "react-i18next": "16.4.0",
     "react-router-dom": "5.3.4",
     "typescript": "4.9.5",
-    "vitest": "^4.0.15",
+    "vitest": "4.0.15",
     "web-vitals": "1.1.2",
     "workbox-background-sync": "5.1.4",
     "workbox-broadcast-update": "5.1.4",
@@ -79,10 +79,10 @@
     "@graphql-codegen/typescript-operations": "2.5.13",
     "@storybook/react": "10.1.4",
     "@storybook/react-vite": "10.1.4",
-    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/jest-dom": "6.9.1",
     "@vitejs/plugin-react": "5.1.1",
     "concurrently": "9.2.1",
-    "jsdom": "^27.2.0",
+    "jsdom": "27.2.0",
     "storybook": "10.1.4",
     "vite": "7.2.6"
   }
