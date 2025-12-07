@@ -1,5 +1,5 @@
 /* eslint-disable */
-import * as Types from '../../../graphql/types.js';
+import * as Types from '../../../graphql/types';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type GetEventQueryVariables = Types.Exact<{

@@ -7,7 +7,7 @@ import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
 import {GetEventDocument, GetEventQuery} from './data/getEvent';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { Box, Breadcrumbs, Link, Typography } from '@material-ui/core';
-import EventIcon from '@material-ui/icons/Event';
+import EventIcon from '@mui/icons-material/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import Classic from './components/Classic/Classic';

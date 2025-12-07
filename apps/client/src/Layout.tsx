@@ -8,8 +8,8 @@ import {
   BottomNavigation,
   BottomNavigationAction
 } from '@material-ui/core';
-import PublicIcon from '@material-ui/icons/Public';
-import EventIcon from '@material-ui/icons/Event';
+import PublicIcon from '@mui/icons-material/Public';
+import EventIcon from '@mui/icons-material/Event';
 import {
   Link as RouterLink,
   useHistory,
