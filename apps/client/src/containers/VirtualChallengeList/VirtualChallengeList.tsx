@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Typography from '@material-ui/core/Typography';
-import PublicIcon from '@material-ui/icons/Public';
+import PublicIcon from '@mui/icons-material/Public';
 
 import React from 'react'
 import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
@@ -15,7 +15,7 @@ import ListItemText from '@material-ui/core/ListItemText/ListItemText';
 import { format } from 'date-fns';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import Fab from "@material-ui/core/Fab";
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import {createStyles, makeStyles, Theme} from "@material-ui/core";
 
 const useStyles = makeStyles((theme: Theme) =>

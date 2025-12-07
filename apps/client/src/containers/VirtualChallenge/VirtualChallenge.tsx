@@ -6,7 +6,7 @@ import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import { Link as RouterLink } from 'react-router-dom';
 import Box from '@material-ui/core/Box';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import PublicIcon from '@material-ui/icons/Public';
+import PublicIcon from '@mui/icons-material/Public';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
