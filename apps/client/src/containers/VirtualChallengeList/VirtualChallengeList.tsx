@@ -11,7 +11,7 @@ import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { Link } from 'react-router-dom';
-import ListItemText from '@mui/material/ListItemText/ListItemText';
+import ListItemText from '@mui/material/ListItemText';
 import { format } from 'date-fns';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import Fab from "@mui/material/Fab";
