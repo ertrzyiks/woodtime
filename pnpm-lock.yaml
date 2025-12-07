@@ -97,8 +97,8 @@ importers:
         specifier: 4.12.4
         version: 4.12.4(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       '@mui/icons-material':
-        specifier: 5.0.0
-        version: 5.0.0(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.90)(react@17.0.2)
+        specifier: 5.0.5
+        version: 5.0.5(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.90)(react@17.0.2)
       '@testing-library/jest-dom':
         specifier: 5.17.0
         version: 5.17.0
@@ -1262,11 +1262,11 @@ packages:
   '@mui/core-downloads-tracker@5.18.0':
     resolution: {integrity: sha512-jbhwoQ1AY200PSSOrNXmrFCaSDSJWP7qk6urkTmIirvRXDROkqe+QwcLlUiw/PrREwsIF/vm3/dAXvjlMHF0RA==}
 
-  '@mui/icons-material@5.0.0':
-    resolution: {integrity: sha512-Vl5pMIdD1MC+LVBEKDQkWeoU/0mdxx/WLBuTVo5y2yzOzEp8gcwkegtiUyN1gubiXcqzNNZQNvJ6/YSdFRr84Q==}
+  '@mui/icons-material@5.0.5':
+    resolution: {integrity: sha512-beJo4kmgZwr+2x0ppgHcqqdNQYX4WKddJyMn4eHJAh9dNAGyeY1AJ/8Po+TJKyoSr3C2ZqnW7WrSonAJr2HrUw==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
-      '@mui/material': ^5.0.0-rc.0
+      '@mui/material': ^5.0.0
       '@types/react': ^16.8.6 || ^17.0.0
       react: ^17.0.2
     peerDependenciesMeta:
@@ -7136,7 +7136,7 @@ snapshots:
 
   '@mui/core-downloads-tracker@5.18.0': {}
 
-  '@mui/icons-material@5.0.0(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.90)(react@17.0.2)':
+  '@mui/icons-material@5.0.5(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.90)(react@17.0.2)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@mui/material': 5.18.0(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react@17.0.2))(@types/react@17.0.90)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
