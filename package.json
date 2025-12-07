@@ -13,8 +13,8 @@
     "api": "pnpm run -r --filter api"
   },
   "dependencies": {
-    "global": "^4.4.0",
-    "prettier": "^3.7.4"
+    "global": "4.4.0",
+    "prettier": "3.7.4"
   },
   "sideEffects": false
 }
