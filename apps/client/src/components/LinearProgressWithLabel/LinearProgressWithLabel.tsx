@@ -1,7 +1,7 @@
 import LinearProgress, {
   LinearProgressProps,
-} from '@material-ui/core/LinearProgress';
-import { Box, Typography } from "@material-ui/core";
+} from '@mui/material/LinearProgress';
+import { Box, Typography } from "@mui/material";
 
 function LinearProgressWithLabel({
  current,

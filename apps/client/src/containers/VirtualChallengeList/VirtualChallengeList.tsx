@@ -1,22 +1,23 @@
 import { useQuery } from '@apollo/client';
-import Box from '@material-ui/core/Box';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Typography from '@material-ui/core/Typography';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Typography from '@mui/material/Typography';
 import PublicIcon from '@mui/icons-material/Public';
 
 import React from 'react'
 import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import { Link } from 'react-router-dom';
-import ListItemText from '@material-ui/core/ListItemText/ListItemText';
+import ListItemText from '@mui/material/ListItemText';
 import { format } from 'date-fns';
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
-import Fab from "@material-ui/core/Fab";
+import Fab from "@mui/material/Fab";
 import AddIcon from '@mui/icons-material/Add';
-import {createStyles, makeStyles, Theme} from "@material-ui/core";
+import { createStyles, makeStyles } from "@mui/styles";
+import { Theme } from "@mui/material/styles";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

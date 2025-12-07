@@ -1,5 +1,6 @@
 import React, {ReactNode} from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import {
   AppBar,
   Toolbar,
@@ -7,7 +8,7 @@ import {
   Link,
   BottomNavigation,
   BottomNavigationAction
-} from '@material-ui/core';
+} from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import EventIcon from '@mui/icons-material/Event';
 import {

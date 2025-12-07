@@ -1,7 +1,8 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import { onError } from '@apollo/client/link/error';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { CircularProgress } from '@material-ui/core';
+import { createStyles, makeStyles, ThemeProvider as StylesThemeProvider } from '@mui/styles';
+import { Theme, createTheme, ThemeProvider } from '@mui/material/styles';
+import { CircularProgress } from '@mui/material';
 
 import {
   ApolloClient,
@@ -66,9 +67,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+// Create a theme instance for MUI v5
+const theme = createTheme();
+
 initI18n();
 
-function AppShell({
+function AppShellInner({
   apolloClient,
   children,
 }: {
@@ -123,6 +127,24 @@ function AppShell({
         </div>
       )}
     </>
+  );
+}
+
+function AppShell({
+  apolloClient,
+  children,
+}: {
+  apolloClient?: ApolloClient<NormalizedCacheObject>;
+  children: ReactNode;
+}) {
+  return (
+    <ThemeProvider theme={theme}>
+      <StylesThemeProvider theme={theme}>
+        <AppShellInner apolloClient={apolloClient}>
+          {children}
+        </AppShellInner>
+      </StylesThemeProvider>
+    </ThemeProvider>
   );
 }
 

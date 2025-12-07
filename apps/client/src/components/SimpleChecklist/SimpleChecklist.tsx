@@ -1,13 +1,12 @@
 import {
-  createStyles,
   Dialog,
   DialogTitle,
   List,
   ListItem,
   ListItemText,
-  makeStyles,
-  Theme,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import React from 'react';
 
 interface Props {

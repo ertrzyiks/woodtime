@@ -1,14 +1,13 @@
 import {
   Box,
-  createStyles,
   Fab,
   Grid,
   GridSpacing,
-  makeStyles,
   Paper,
-  Theme,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import React, {useContext} from 'react';
 import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
