@@ -1,8 +1,10 @@
 import React, {useCallback, useState, useEffect} from 'react'
 import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel'
 import {OrienteeringEvent} from "../../types/OrienteeringEvent";
-import {Fab, makeStyles, createStyles, Theme} from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import { Fab } from "@mui/material";
+import { makeStyles, createStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
 
 interface VirtualChallenge {
   id: number

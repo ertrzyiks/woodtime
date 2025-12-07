@@ -1,11 +1,7 @@
-import {
-  createStyles,
-  IconButton,
-  Theme,
-  makeStyles,
-  Typography,
-} from '@material-ui/core';
-import ClearIcon from '@material-ui/icons/Clear';
+import { IconButton, Typography } from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
+import ClearIcon from '@mui/icons-material/Clear';
 import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
 

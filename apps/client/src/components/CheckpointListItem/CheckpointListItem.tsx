@@ -3,13 +3,12 @@ import { Checkpoint } from '../../types/Checkpoint';
 import {
   Button,
   Checkbox,
-  createStyles,
   ListItem,
   ListItemIcon,
   ListItemText,
-  makeStyles,
-  Theme,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { CreateCheckpointDocument } from '../../queries/createCheckpoint';

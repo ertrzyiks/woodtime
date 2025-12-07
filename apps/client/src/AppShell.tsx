@@ -1,7 +1,8 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import { onError } from '@apollo/client/link/error';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { CircularProgress } from '@material-ui/core';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
+import { CircularProgress } from '@mui/material';
 
 import {
   ApolloClient,

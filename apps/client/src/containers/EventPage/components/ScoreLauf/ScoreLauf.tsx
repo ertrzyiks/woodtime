@@ -1,19 +1,18 @@
 import {
   Box,
-  createStyles,
   Fab,
   Grid,
   GridSpacing,
-  makeStyles,
   Paper,
-  Theme,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import React, {useContext} from 'react';
 import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
@@ -98,7 +97,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       {checkpoints.length > 0 && (
         <Grid container className={classes.root} spacing={2}>
           <Grid item xs={12}>
-            <Grid container justify="flex-start" spacing={spacing}>
+            <Grid container justifyContent="flex-start" spacing={spacing}>
               {checkpoints.map((checkpoint) => (
                 <Grid key={checkpoint.cp_id} item className={[classes.item].concat(checkpoint.pending ? [classes.pendingItem] : []).join(' ')}>
                   <Paper className={classes.paper}>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -9,13 +8,13 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  makeStyles,
   Radio,
   RadioGroup,
   TextField,
-  Theme,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { Field, Form } from 'react-final-form';
 import { useMutation } from '@apollo/client';

@@ -1,10 +1,10 @@
 import React from 'react'
 import { Field, Form } from 'react-final-form'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
 import {useMutation} from "@apollo/client";
 import {SignInDocument} from "./data/signIn";
-import {Box} from "@material-ui/core";
+import {Box} from "@mui/material";
 import {useHistory} from "react-router-dom";
 
 interface Values {
