@@ -4,11 +4,11 @@
 
 1. Install dependencies
 ```
-yarn install
+pnpm install
 ```
 
 2. Run the website
 
 ```
-yarn client start
+pnpm client start
 ```
