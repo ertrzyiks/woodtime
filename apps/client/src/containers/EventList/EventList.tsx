@@ -11,10 +11,10 @@ import {
   Theme,
   Typography,
 } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
-import ClearIcon from '@material-ui/icons/Clear';
-import EventIcon from '@material-ui/icons/Event';
-import ListIcon from '@material-ui/icons/List';
+import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from '@mui/icons-material/Clear';
+import EventIcon from '@mui/icons-material/Event';
+import ListIcon from '@mui/icons-material/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useMutation, useQuery } from '@apollo/client';

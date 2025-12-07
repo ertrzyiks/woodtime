@@ -13,7 +13,7 @@ import React, {useContext} from 'react';
 import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 
-import AddIcon from '@material-ui/icons/Add';
+import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';

@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -60,7 +61,7 @@ export type CreateEventResult = {
 };
 
 export type CreateVirtualChallengeInput = {
-  checkpoints?: Maybe<Array<Maybe<CoordinatesInput>>>;
+  checkpoints?: InputMaybe<Array<InputMaybe<CoordinatesInput>>>;
   name: Scalars['String'];
 };
 
@@ -157,11 +158,11 @@ export type MutationCheckInVirtualCheckpointArgs = {
 
 
 export type MutationCreateCheckpointArgs = {
-  cp_code?: Maybe<Scalars['String']>;
+  cp_code?: InputMaybe<Scalars['String']>;
   cp_id: Scalars['Int'];
   event_id: Scalars['Int'];
-  skip_reason?: Maybe<Scalars['String']>;
-  skipped?: Maybe<Scalars['Boolean']>;
+  skip_reason?: InputMaybe<Scalars['String']>;
+  skipped?: InputMaybe<Scalars['Boolean']>;
 };
 
 

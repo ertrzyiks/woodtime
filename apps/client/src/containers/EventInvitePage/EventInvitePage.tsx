@@ -2,7 +2,7 @@ import React, {ReactNode} from 'react'
 import {useTranslation} from "react-i18next";
 import {Link as RouterLink, useParams} from "react-router-dom";
 import {Box, Breadcrumbs, Link, Typography} from "@material-ui/core";
-import EventIcon from "@material-ui/icons/Event";
+import EventIcon from "@mui/icons-material/Event";
 import {useMutation, useQuery} from "@apollo/client";
 import {GetEventDocument} from "../EventPage/data/getEvent";
 import {GetFriendsDocument} from "./data/getFriends";
@@ -11,7 +11,7 @@ import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import ContentLoader from "react-content-loader";
 import IconButton from "@material-ui/core/IconButton";
-import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import Button from "@material-ui/core/Button";
 
