@@ -3,6 +3,9 @@ packages:
 
 onlyBuiltDependencies:
   - '@apollo/protobufjs'
+  - '@firebase/util'
   - core-js-pure
   - esbuild
+  - protobufjs
+  - rxdb
   - sqlite3
