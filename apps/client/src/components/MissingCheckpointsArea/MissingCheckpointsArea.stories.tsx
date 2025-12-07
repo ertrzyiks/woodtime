@@ -1,4 +1,6 @@
 import React from 'react';
+import AppShell from '../../AppShell';
+import { MemoryRouter } from "react-router-dom";
 
 import MissingCheckpointsArea from './MissingCheckpointsArea';
 
@@ -12,7 +14,7 @@ interface Args {
   max: number
 }
 
-export const Default = (args: Args) => <MissingCheckpointsArea {...args} />
+export const Default = (args: Args) =>  <MemoryRouter initialEntries={['/events/99/invite']} initialIndex={0}><AppShell><MissingCheckpointsArea {...args} /></AppShell></MemoryRouter>
 
 Default.args = {
   scoredIds: [2, 3, 4],
