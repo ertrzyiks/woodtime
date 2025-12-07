@@ -22,7 +22,7 @@
     "knex": "0.95.15",
     "prettier": "3.7.4",
     "sqlite3": "5.1.7",
-    "uuid": "8.3.2"
+    "uuid": "13.0.0"
   },
   "devDependencies": {
     "selfsigned": "1.10.14"
