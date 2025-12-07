@@ -1,7 +1,7 @@
 import React from 'react'
-import IconButton from "@material-ui/core/IconButton";
-import Box from "@material-ui/core/Box";
-import Chip from "@material-ui/core/Chip";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
 import {Link as RouterLink} from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 

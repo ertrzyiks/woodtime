@@ -1,6 +1,6 @@
 import {CheckpointsStateContext} from "./CheckpointsService";
 import {useContext, useEffect, useState} from "react";
-import {Snackbar} from "@material-ui/core";
+import {Snackbar} from "@mui/material";
 
 const ErrorReporter = () => {
   const { errored } = useContext(CheckpointsStateContext)

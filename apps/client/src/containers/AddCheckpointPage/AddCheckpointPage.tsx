@@ -1,9 +1,10 @@
 import React, {useContext} from 'react';
 import { Form, Field } from 'react-final-form';
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Box, Button, TextField } from '@material-ui/core';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import { makeStyles, createStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
+import { Box, Button, TextField } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { useHistory, useParams } from 'react-router-dom';
 import {CheckpointsDispatchContext} from "../../components/CheckpointsService/CheckpointsService";
 

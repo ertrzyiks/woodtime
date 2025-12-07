@@ -1,8 +1,5 @@
-import {
-  createStyles,
-  makeStyles,
-  Theme,
-} from '@material-ui/core';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 
 export const useBreadcrumbStyles = makeStyles((theme: Theme) =>
   createStyles({

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
-import { Button, Slider } from '@material-ui/core'
+import { Button, Slider } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
 
 import Map from './Map'
