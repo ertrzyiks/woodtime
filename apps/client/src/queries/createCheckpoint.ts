@@ -1,13 +1,13 @@
 /* eslint-disable */
-import * as Types from '../graphql/types.js';
+import * as Types from '../graphql/types';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type CreateCheckpointMutationVariables = Types.Exact<{
   eventId: Types.Scalars['Int'];
   cpId: Types.Scalars['Int'];
-  cpCode: Types.Maybe<Types.Scalars['String']>;
-  skipped: Types.Maybe<Types.Scalars['Boolean']>;
-  skipReason: Types.Maybe<Types.Scalars['String']>;
+  cpCode: Types.InputMaybe<Types.Scalars['String']>;
+  skipped: Types.InputMaybe<Types.Scalars['Boolean']>;
+  skipReason: Types.InputMaybe<Types.Scalars['String']>;
 }>;
 
 
