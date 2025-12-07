@@ -163,8 +163,8 @@ importers:
         specifier: 17.0.2
         version: 17.0.2
       react-content-loader:
-        specifier: 6.2.1
-        version: 6.2.1(react@17.0.2)
+        specifier: 7.1.1
+        version: 7.1.1(react@17.0.2)
       react-dom:
         specifier: 17.0.2
         version: 17.0.2(react@17.0.2)
@@ -4612,8 +4612,8 @@ packages:
     resolution: {integrity: sha512-y3bGgqKj3QBdxLbLkomlohkvsA8gdAiUQlSBJnBhfn+BPxg4bc62d8TcBW15wavDfgexCgccckhcZvywyQYPOw==}
     hasBin: true
 
-  react-content-loader@6.2.1:
-    resolution: {integrity: sha512-6ONbFX+Hi3SHuP66JB8CPvJn372pj+qwltJV0J8z/8MFrq98I1cbFdZuhDWeQXu3CFxiiDTXJn7DFxx2ZvrO7g==}
+  react-content-loader@7.1.1:
+    resolution: {integrity: sha512-yNkqtd+15wXRLfDKZb5nTqDV2fPTG2kpUgeGRb+WBz43bU0j4DSGXETF0bnFr44fAoTPpm0Dya0WGdhpHSvtYA==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16.0.0'
@@ -11134,7 +11134,7 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-content-loader@6.2.1(react@17.0.2):
+  react-content-loader@7.1.1(react@17.0.2):
     dependencies:
       react: 17.0.2
 
