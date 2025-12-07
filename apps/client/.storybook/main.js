@@ -18,6 +18,14 @@ module.exports = {
 
     // Handle GraphQL schema files
     config.define = config.define || {};
+    
+    // Ensure .graphql files are treated as assets for ?raw imports
+    config.assetsInclude = config.assetsInclude || [];
+    if (Array.isArray(config.assetsInclude)) {
+      config.assetsInclude.push(/\.graphql$/);
+    } else {
+      config.assetsInclude = [config.assetsInclude, /\.graphql$/];
+    }
 
     return config;
   },
