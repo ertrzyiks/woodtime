@@ -4,13 +4,13 @@ import {useHistory, useParams } from "react-router-dom"
 import {GetVirtualChallengeDocument} from "../../queries/getVirtualChallenge";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";
 import { Link as RouterLink } from 'react-router-dom';
-import Box from '@material-ui/core/Box';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import PublicIcon from '@mui/icons-material/Public';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
-import Button from '@material-ui/core/Button';
+import Button from '@mui/material/Button';
 import {EnrollVirtualChallengeDocument} from "../../queries/enrollVirtualChallenge";
 import {GetEventsDocument} from "../../queries/getEvents";
 

@@ -1,16 +1,15 @@
 import {
   Box,
   Breadcrumbs,
-  createStyles,
   Fab,
   IconButton,
   List,
   ListItem,
   ListItemText,
-  makeStyles,
-  Theme,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import EventIcon from '@mui/icons-material/Event';
