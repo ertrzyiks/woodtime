@@ -1,29 +1,23 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createRequire } from 'module';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { createRequire } from "module";
+import { app, server as apolloServer } from "./src/app";
 
-const require = createRequire(import.meta.url);
-
-describe('API E2E Tests', () => {
+describe("API E2E Tests", () => {
   let server;
-  let apolloServer;
   let port;
 
   beforeAll(async () => {
-    // Import the app and server
-    const { app, server: appServer } = require('./src/app');
-    apolloServer = appServer;
-
     // Start the Apollo server
     await apolloServer.start();
-    
+
     // Apply middleware
     apolloServer.applyMiddleware({
       app,
-      path: '/woodtime',
+      path: "/woodtime",
       cors: {
         origin: true,
-        credentials: true
-      }
+        credentials: true,
+      },
     });
 
     // Start the HTTP server
@@ -46,28 +40,28 @@ describe('API E2E Tests', () => {
     }
   });
 
-  it('should return 200 for GraphQL endpoint', async () => {
+  it("should return 200 for GraphQL endpoint", async () => {
     const response = await fetch(`http://localhost:${port}/woodtime`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: '{ __typename }',
+        query: "{ __typename }",
       }),
     });
 
     expect(response.status).toBe(200);
   });
 
-  it('should respond to introspection query', async () => {
+  it("should respond to introspection query", async () => {
     const response = await fetch(`http://localhost:${port}/woodtime`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: '{ __schema { types { name } } }',
+        query: "{ __schema { types { name } } }",
       }),
     });
 
@@ -77,14 +71,14 @@ describe('API E2E Tests', () => {
     expect(data.data.__schema).toBeDefined();
   });
 
-  it('should return 200 for me query (unauthenticated)', async () => {
+  it("should return 200 for me query (unauthenticated)", async () => {
     const response = await fetch(`http://localhost:${port}/woodtime`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: '{ me { id name } }',
+        query: "{ me { id name } }",
       }),
     });
 
