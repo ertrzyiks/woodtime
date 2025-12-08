@@ -251,7 +251,7 @@ importers:
         specifier: 5.0.6
         version: 5.0.6(encoding@0.1.13)(graphql@16.12.0)
       '@playwright/test':
-        specifier: ^1.57.0
+        specifier: 1.57.0
         version: 1.57.0
       '@storybook/react':
         specifier: 10.1.4
