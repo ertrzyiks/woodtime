@@ -1,5 +1,5 @@
 import React, {ReactNode} from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
@@ -25,13 +25,16 @@ const UpdaterProvider = ({ children }: { children: ReactNode }) => {
   )
 }
 
-ReactDOM.render(
+const container = document.getElementById('root');
+if (!container) throw new Error('Failed to find the root element');
+const root = createRoot(container);
+
+root.render(
   <React.StrictMode>
     <UpdaterProvider>
       <App />
     </UpdaterProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
