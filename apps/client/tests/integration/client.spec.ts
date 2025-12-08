@@ -5,6 +5,22 @@ test.describe('Client Integration Tests', () => {
     // Accept self-signed certificate
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
+    // First, sign in using the real server story
+    await page.goto('http://localhost:6006/iframe.html?id=pages-signin--real-server&viewMode=story');
+    await page.waitForLoadState('networkidle');
+    
+    // Wait for sign in form
+    await page.waitForSelector('text=Sign In', { timeout: 5000 });
+    
+    // Fill in name
+    await page.locator('input[id="standard-basic"]').fill('Test User');
+    
+    // Click sign in button
+    await page.click('button:has-text("Sign In")');
+    
+    // Wait a moment for sign in to complete
+    await page.waitForTimeout(2000);
+
     // Navigate to the EventList story with real server
     await page.goto('http://localhost:6006/iframe.html?id=pages-eventlist--real-server&viewMode=story');
 
@@ -27,10 +43,14 @@ test.describe('Client Integration Tests', () => {
     // Wait for the dialog to appear
     await page.waitForSelector('text=Create a new event', { timeout: 5000 });
 
-    // Fill in the event form
+    // Fill in the event form using MUI TextField selectors
     const eventName = `Test Event ${Date.now()}`;
-    await page.fill('input[label="Name"]', eventName);
-    await page.fill('input[label="Points"]', '10');
+    
+    // Fill Name field - find input with label "Name"
+    await page.locator('input[id="standard-basic"]').first().fill(eventName);
+    
+    // Fill Points field - find the second input with same id
+    await page.locator('input[id="standard-basic"]').nth(1).fill('10');
 
     // Click the Create button
     await page.click('button:has-text("Create")');
