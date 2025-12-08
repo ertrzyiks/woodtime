@@ -22,7 +22,7 @@
     "@types/react-router-dom": "5.3.3",
     "apollo3-cache-persist": "0.9.1",
     "chromatic": "13.3.4",
-    "date-fns": "2.30.0",
+    "date-fns": "4.1.0",
     "eslint-config-react-app": "6.0.0",
     "final-form": "4.20.10",
     "graphql": "16.12.0",
