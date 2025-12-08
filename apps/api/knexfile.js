@@ -5,6 +5,15 @@ module.exports = {
       filename: ".dev.sqlite3",
     },
   },
+  test: {
+    client: "sqlite3",
+    connection: {
+      filename: ".test.sqlite3",
+    },
+    seeds: {
+      directory: "./seeds"
+    }
+  },
   production: {
     client: "sqlite3",
     connection: {
