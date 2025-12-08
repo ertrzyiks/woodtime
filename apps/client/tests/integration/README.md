@@ -16,7 +16,7 @@ The integration tests verify the end-to-end functionality of the client applicat
 Before running the integration tests, make sure you have:
 
 1. Installed all dependencies: `pnpm install` (from the root directory)
-2. Playwright browsers installed (done automatically when installing dependencies)
+2. Installed Playwright browsers: `pnpm exec playwright install` (from `apps/client` directory)
 
 ## Running the Tests
 
