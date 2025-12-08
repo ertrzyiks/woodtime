@@ -4,7 +4,8 @@
   "scripts": {
     "start:prod": "knex migrate:latest && node src/index.js",
     "start": "node src/development.js",
-    "test": "vitest"
+    "test": "vitest",
+    "start:test": "NODE_ENV=test knex migrate:latest && NODE_ENV=test knex seed:run && NODE_ENV=test node src/test.js"
   },
   "dependencies": {
     "@graphql-tools/schema": "8.5.1",
