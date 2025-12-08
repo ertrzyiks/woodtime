@@ -3,8 +3,8 @@ import * as Types from '../../../graphql/types';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type InviteToEventMutationVariables = Types.Exact<{
-  eventId: Types.Scalars['String'];
-  friendId: Types.Scalars['String'];
+  eventId: Types.Scalars['String']['input'];
+  friendId: Types.Scalars['String']['input'];
 }>;
 
 
