@@ -28,8 +28,8 @@ test.describe('Client Integration Tests', () => {
     // Wait for the page to load
     await page.waitForLoadState('networkidle');
 
-    // Wait for initial content to load - look for the "Add" button (Fab with AddIcon)
-    await page.waitForSelector('button[aria-label="add"]', { timeout: 10000 });
+    // Wait for initial content to load - look for the "Add" button/link (Fab with AddIcon)
+    await page.waitForSelector('[aria-label="add"]', { timeout: 10000 });
 
     // Take initial screenshot
     await page.screenshot({ path: '/tmp/test-before-create.png' });
@@ -38,8 +38,8 @@ test.describe('Client Integration Tests', () => {
     const initialEventItems = await page.locator('ul > div').count();
     console.log(`Initial events count: ${initialEventItems}`);
 
-    // Click the "Add Event" button
-    await page.click('button[aria-label="add"]');
+    // Click the "Add Event" button/link
+    await page.click('[aria-label="add"]');
 
     // Wait for the dialog to appear
     await page.waitForSelector('text=Create a new event', { timeout: 5000 });
@@ -69,7 +69,7 @@ test.describe('Client Integration Tests', () => {
     await page.waitForLoadState('networkidle');
 
     // Wait for the list to load
-    await page.waitForSelector('button[aria-label="add"]', { timeout: 10000 });
+    await page.waitForSelector('[aria-label="add"]', { timeout: 10000 });
 
     // Take screenshot after creation
     await page.screenshot({ path: '/tmp/test-after-create.png' });
