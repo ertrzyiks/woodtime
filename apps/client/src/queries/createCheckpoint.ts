@@ -3,11 +3,11 @@ import * as Types from '../graphql/types';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type CreateCheckpointMutationVariables = Types.Exact<{
-  eventId: Types.Scalars['Int'];
-  cpId: Types.Scalars['Int'];
-  cpCode: Types.InputMaybe<Types.Scalars['String']>;
-  skipped: Types.InputMaybe<Types.Scalars['Boolean']>;
-  skipReason: Types.InputMaybe<Types.Scalars['String']>;
+  eventId: Types.Scalars['Int']['input'];
+  cpId: Types.Scalars['Int']['input'];
+  cpCode: Types.InputMaybe<Types.Scalars['String']['input']>;
+  skipped: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
+  skipReason: Types.InputMaybe<Types.Scalars['String']['input']>;
 }>;
 
 

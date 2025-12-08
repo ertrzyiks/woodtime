@@ -78,11 +78,11 @@
     ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "2.16.5",
-    "@graphql-codegen/near-operation-file-preset": "2.5.0",
-    "@graphql-codegen/typed-document-node": "2.3.13",
-    "@graphql-codegen/typescript": "2.8.8",
-    "@graphql-codegen/typescript-operations": "2.5.13",
+    "@graphql-codegen/cli": "6.1.0",
+    "@graphql-codegen/near-operation-file-preset": "4.0.0",
+    "@graphql-codegen/typed-document-node": "6.1.4",
+    "@graphql-codegen/typescript": "5.0.6",
+    "@graphql-codegen/typescript-operations": "5.0.6",
     "@storybook/react": "10.1.4",
     "@storybook/react-vite": "10.1.4",
     "@testing-library/jest-dom": "6.9.1",

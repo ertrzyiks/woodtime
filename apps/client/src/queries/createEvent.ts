@@ -3,9 +3,9 @@ import * as Types from '../graphql/types';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type CreateEventMutationVariables = Types.Exact<{
-  name: Types.Scalars['String'];
-  checkpointCount: Types.Scalars['Int'];
-  type: Types.Scalars['Int'];
+  name: Types.Scalars['String']['input'];
+  checkpointCount: Types.Scalars['Int']['input'];
+  type: Types.Scalars['Int']['input'];
 }>;
 
 
