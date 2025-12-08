@@ -26,7 +26,7 @@ const UpdaterProvider = ({ children }: { children: ReactNode }) => {
 }
 
 const container = document.getElementById('root');
-if (!container) throw new Error('Failed to find the root element');
+if (!container) throw new Error('Failed to find the root element. Ensure your HTML has a <div id="root"></div> element.');
 const root = createRoot(container);
 
 root.render(
