@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2),
     },
     addCheckpointButton: {
-      position: 'fixed',
+      position: 'absolute',
       right: '1em',
       bottom: '1em',
     },

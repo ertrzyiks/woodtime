@@ -22,7 +22,7 @@ import { Theme } from "@mui/material/styles";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     addChallengeButton: {
-      position: 'fixed',
+      position: 'absolute',
       right: '1em',
       bottom: '5em',
     },

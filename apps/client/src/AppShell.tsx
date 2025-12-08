@@ -1,7 +1,7 @@
 import React, { useEffect, useState, ReactNode } from 'react';
 import { onError } from '@apollo/client/link/error';
 import { createStyles, makeStyles, ThemeProvider as StylesThemeProvider } from '@mui/styles';
-import { Theme, createTheme, ThemeProvider } from '@mui/material/styles';
+import { Theme, createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
 
 import {
@@ -138,13 +138,15 @@ function AppShell({
   children: ReactNode;
 }) {
   return (
-    <ThemeProvider theme={theme}>
-      <StylesThemeProvider theme={theme}>
-        <AppShellInner apolloClient={apolloClient}>
-          {children}
-        </AppShellInner>
-      </StylesThemeProvider>
-    </ThemeProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <StylesThemeProvider theme={theme}>
+          <AppShellInner apolloClient={apolloClient}>
+            {children}
+          </AppShellInner>
+        </StylesThemeProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 }
 
