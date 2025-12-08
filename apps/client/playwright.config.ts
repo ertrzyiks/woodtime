@@ -8,7 +8,7 @@ export default defineConfig({
   workers: 1,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:6006',
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     ignoreHTTPSErrors: true,
   },
@@ -29,8 +29,8 @@ export default defineConfig({
       timeout: 120 * 1000,
     },
     {
-      command: 'pnpm storybook',
-      url: 'http://localhost:6006',
+      command: 'pnpm vite --port 3000',
+      url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },

@@ -5,24 +5,25 @@ test.describe('Client Integration Tests', () => {
     // Accept self-signed certificate
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
-    // First, sign in using the real server story
-    await page.goto('http://localhost:6006/iframe.html?id=pages-signin--real-server&viewMode=story');
+    // First, sign in
+    await page.goto('http://localhost:3000/sign-in');
     await page.waitForLoadState('networkidle');
     
     // Wait for sign in form
-    await page.waitForSelector('text=Sign In', { timeout: 5000 });
+    await page.waitForSelector('text=Sign In', { timeout: 10000 });
     
-    // Fill in name
-    await page.locator('input[id="standard-basic"]').fill('Test User');
+    // Fill in name - the TextField has an input inside it
+    const signInInput = page.locator('input[id="standard-basic"]');
+    await signInInput.waitFor({ state: 'visible' });
+    await signInInput.fill('Test User');
     
-    // Click sign in button
-    await page.click('button:has-text("Sign In")');
+    // Click the submit button (Create button in sign in form)
+    const submitBtn = page.locator('button[type="submit"]');
+    await submitBtn.waitFor({ state: 'visible' });
+    await submitBtn.click();
     
-    // Wait a moment for sign in to complete
-    await page.waitForTimeout(2000);
-
-    // Navigate to the EventList story with real server
-    await page.goto('http://localhost:6006/iframe.html?id=pages-eventlist--real-server&viewMode=story');
+    // Wait for redirect to home page (event list)
+    await page.waitForURL('http://localhost:3000/', { timeout: 5000 });
 
     // Wait for the page to load
     await page.waitForLoadState('networkidle');
@@ -46,23 +47,25 @@ test.describe('Client Integration Tests', () => {
     // Fill in the event form using MUI TextField selectors
     const eventName = `Test Event ${Date.now()}`;
     
-    // Fill Name field - find input with label "Name"
-    await page.locator('input[id="standard-basic"]').first().fill(eventName);
+    // Wait a bit for the dialog to fully render
+    await page.waitForTimeout(500);
+    
+    // Fill Name field - find input with label "Name" inside the dialog
+    const nameInput = page.locator('input[id="standard-basic"]').first();
+    await nameInput.fill(eventName);
     
     // Fill Points field - find the second input with same id
-    await page.locator('input[id="standard-basic"]').nth(1).fill('10');
+    const pointsInput = page.locator('input[id="standard-basic"]').nth(1);
+    await pointsInput.fill('10');
 
-    // Click the Create button
+    // Click the Create button in the dialog
     await page.click('button:has-text("Create")');
 
-    // Wait for the dialog to close and the new event to appear
-    await page.waitForSelector('text=Create a new event', { state: 'hidden', timeout: 5000 });
-
-    // Wait a bit for the list to update
-    await page.waitForTimeout(2000);
+    // Wait for navigation to the event page
+    await page.waitForURL(/\/events\/\d+/, { timeout: 5000 });
 
     // Navigate back to the event list
-    await page.goto('http://localhost:6006/iframe.html?id=pages-eventlist--real-server&viewMode=story');
+    await page.goto('http://localhost:3000/');
     await page.waitForLoadState('networkidle');
 
     // Wait for the list to load
