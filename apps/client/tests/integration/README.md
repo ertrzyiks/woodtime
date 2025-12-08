@@ -79,10 +79,12 @@ The test database is located at `apps/api/.test.sqlite3` and is automatically:
 
 To add new integration tests:
 
-1. Create a new `.spec.ts` file in `apps/client/tests/integration/`
+1. Create a new `.pw.spec.ts` file in `apps/client/tests/integration/`
 2. Import the test utilities: `import { test, expect } from '@playwright/test';`
 3. Write your test following the existing pattern
 4. Use the base URL from the config: `http://localhost:3000`
+
+**Note**: Playwright tests use the `.pw.spec.ts` suffix to avoid being picked up by vitest.
 
 Example:
 
@@ -102,10 +104,13 @@ test.describe('My Feature', () => {
 The Playwright configuration is in `apps/client/playwright.config.ts`. Key settings:
 
 - **testDir**: `./tests/integration` - where test files are located
+- **testMatch**: `**/*.pw.spec.ts` - pattern for Playwright test files
 - **baseURL**: `http://localhost:3000` - the client application URL
 - **webServer**: Configuration for starting API and client servers automatically
 - **retries**: Tests are retried 2 times in CI, 0 times locally
 - **workers**: 1 worker to avoid database conflicts
+
+The vitest configuration excludes `*.pw.spec.ts` and `*.pw.spec.tsx` files to prevent conflicts.
 
 ## Troubleshooting
 
