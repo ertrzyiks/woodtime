@@ -126,10 +126,9 @@ const EventInvitePage = () => {
       <LoadingIndicator active={loading} />
 
       <Box>
-        <IconButton aria-label="add" onClick={handleClick}>
-          <PersonAddIcon />
-        </IconButton>
-        {t('event.actions.invite')}
+        <Button onClick={handleClick} startIcon={<PersonAddIcon />}>
+          {t('event.actions.invite')}
+        </Button>
       </Box>
 
       <Box p={2}>
