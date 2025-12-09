@@ -27,7 +27,7 @@
     "uuid": "13.0.0"
   },
   "devDependencies": {
-    "selfsigned": "1.10.14",
+    "selfsigned": "5.2.0",
     "vitest": "4.0.15"
   }
 }
