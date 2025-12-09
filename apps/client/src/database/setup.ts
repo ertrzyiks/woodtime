@@ -4,7 +4,7 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
-import { RxDBReplicationGraphQLPlugin } from 'rxdb/plugins/replication-graphql';
+import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 
 // Add plugins
 if (process.env.NODE_ENV === 'development') {
@@ -13,7 +13,6 @@ if (process.env.NODE_ENV === 'development') {
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBLeaderElectionPlugin);
 addRxPlugin(RxDBUpdatePlugin);
-addRxPlugin(RxDBReplicationGraphQLPlugin);
 
 export async function createDatabase() {
   const db = await createRxDatabase({

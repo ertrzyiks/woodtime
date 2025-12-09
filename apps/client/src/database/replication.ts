@@ -285,6 +285,7 @@ const pushVirtualChallengesQueryBuilder = (docs: any[]) => {
 export function setupReplication(db: RxDatabase) {
   // Replicate events collection
   const eventsReplication = replicateGraphQL({
+    replicationIdentifier: 'events-replication',
     collection: db.events,
     url: {
       http: GRAPHQL_ENDPOINT,
@@ -317,6 +318,7 @@ export function setupReplication(db: RxDatabase) {
 
   // Replicate checkpoints collection
   const checkpointsReplication = replicateGraphQL({
+    replicationIdentifier: 'checkpoints-replication',
     collection: db.checkpoints,
     url: {
       http: GRAPHQL_ENDPOINT,
@@ -347,6 +349,7 @@ export function setupReplication(db: RxDatabase) {
 
   // Replicate virtual challenges collection
   const virtualChallengesReplication = replicateGraphQL({
+    replicationIdentifier: 'virtualchallenges-replication',
     collection: db.virtualchallenges,
     url: {
       http: GRAPHQL_ENDPOINT,
