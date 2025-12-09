@@ -3,25 +3,14 @@ import fs from "fs";
 import path from "path";
 import { app, server } from "./app.js";
 import https from "https";
+import { dir } from "console";
+
+const dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const getPems = async () => {
   try {
-    const key = fs
-      .readFileSync(
-        path.join(
-          path.dirname(new URL(import.meta.url).pathname),
-          "../tmp/key",
-        ),
-      )
-      .toString();
-    const cert = fs
-      .readFileSync(
-        path.join(
-          path.dirname(new URL(import.meta.url).pathname),
-          "../tmp/cert",
-        ),
-      )
-      .toString();
+    const key = fs.readFileSync(path.join(dirname, "../tmp/key")).toString();
+    const cert = fs.readFileSync(path.join(dirname, "../tmp/cert")).toString();
 
     return {
       key,
@@ -92,9 +81,9 @@ const getPems = async () => {
       ],
     });
 
-    fs.mkdirSync(path.join(__dirname, "../tmp/"), { recursive: true });
-    fs.writeFileSync(path.join(__dirname, "../tmp/key"), pems.private);
-    fs.writeFileSync(path.join(__dirname, "../tmp/cert"), pems.cert);
+    fs.mkdirSync(path.join(dirname, "../tmp/"), { recursive: true });
+    fs.writeFileSync(path.join(dirname, "../tmp/key"), pems.private);
+    fs.writeFileSync(path.join(dirname, "../tmp/cert"), pems.cert);
 
     return {
       key: pems.private,
