@@ -65,7 +65,13 @@ pnpm exec playwright show-report
    - Creating events
    - Verifying the event list is updated
 
-4. **Cleanup**: After tests complete, the servers are automatically shut down
+4. **Video Recording**: Tests are configured to record videos on failure:
+   - Videos are saved to `test-results/` directory
+   - Videos are only retained when tests fail (`retain-on-failure` mode)
+   - On CI, failed test videos are automatically uploaded as artifacts for 30 days
+   - Videos can be downloaded from the GitHub Actions workflow run page
+
+5. **Cleanup**: After tests complete, the servers are automatically shut down
 
 ## Test Database
 
@@ -106,6 +112,7 @@ The Playwright configuration is in `apps/client/playwright.config.ts`. Key setti
 - **testDir**: `./tests/integration` - where test files are located
 - **testMatch**: `**/*.pw.spec.ts` - pattern for Playwright test files
 - **baseURL**: `http://localhost:3000` - the client application URL
+- **video**: `'retain-on-failure'` - records videos only for failed tests
 - **webServer**: Configuration for starting API and client servers automatically
 - **retries**: Tests are retried 2 times in CI, 0 times locally
 - **workers**: 1 worker to avoid database conflicts
