@@ -66,6 +66,14 @@ jobs:
           path: apps/client/playwright-report/
           retention-days: 30
 
+      - name: Upload test videos
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-videos
+          path: apps/client/test-results/
+          retention-days: 30
+
   build:
     name: "Build"
     runs-on: ubuntu-latest
