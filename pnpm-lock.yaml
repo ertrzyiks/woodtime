@@ -103,8 +103,8 @@ importers:
         specifier: 7.3.6
         version: 7.3.6(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
       '@mui/styles':
-        specifier: 6.4.8
-        version: 6.4.8(@types/react@19.2.7)(react@19.2.1)
+        specifier: 6.5.0
+        version: 6.5.0(@types/react@19.2.7)(react@19.2.1)
       '@testing-library/dom':
         specifier: 10.4.1
         version: 10.4.1
@@ -1570,10 +1570,9 @@ packages:
       '@emotion/styled':
         optional: true
 
-  '@mui/styles@6.4.8':
-    resolution: {integrity: sha512-1q5ZAidCBqnEaGNv/GgJfi8LeCDdEuZNJ/cQRJW1GEVKY1rSUNqceSIWW12aUcDswm5nsGlq3fdc89vypAEIcw==}
+  '@mui/styles@6.5.0':
+    resolution: {integrity: sha512-DeE/S/l6adnMpKfgx6l7UaQwYuf+gD4FCp6En3Vdg2Er+CTArj4DcHNFVzb8HZ2nNqACwmSm16/P08m1vAxv2w==}
     engines: {node: '>=14.0.0'}
-    deprecated: Deprecated, check the migration instruction in https://mui.com/material-ui/migration/migrating-from-jss/
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -7836,7 +7835,7 @@ snapshots:
       '@emotion/react': 11.14.0(@types/react@19.2.7)(react@19.2.1)
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.1))(@types/react@19.2.7)(react@19.2.1)
 
-  '@mui/styles@6.4.8(@types/react@19.2.7)(react@19.2.1)':
+  '@mui/styles@6.5.0(@types/react@19.2.7)(react@19.2.1)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@emotion/hash': 0.9.2
