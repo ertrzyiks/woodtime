@@ -257,6 +257,8 @@ class Database extends DataSource {
         _modified: event._modified,
       };
 
+      let actualId = event.id;
+
       if (existing) {
         // Update existing event
         await knex('events').where({ id: event.id }).update(eventData);
@@ -265,7 +267,7 @@ class Database extends DataSource {
         if (event.id < 0) {
           // Generate new ID for temporary IDs
           const [newId] = await knex('events').insert(eventData);
-          event.id = newId;
+          actualId = newId;
         } else {
           await knex('events').insert({ id: event.id, ...eventData });
         }
@@ -285,7 +287,7 @@ class Database extends DataSource {
           '_modified'
         )
         .from('events')
-        .where({ id: event.id })
+        .where({ id: actualId })
         .first();
 
       results.push({
@@ -359,6 +361,8 @@ class Database extends DataSource {
         _modified: checkpoint._modified,
       };
 
+      let actualId = checkpoint.id;
+
       if (existing) {
         // Update existing checkpoint
         await knex('checkpoints')
@@ -369,7 +373,7 @@ class Database extends DataSource {
         if (checkpoint.id < 0) {
           // Generate new ID for temporary IDs
           const [newId] = await knex('checkpoints').insert(checkpointData);
-          checkpoint.id = newId;
+          actualId = newId;
         } else {
           await knex('checkpoints').insert({
             id: checkpoint.id,
@@ -393,7 +397,7 @@ class Database extends DataSource {
           '_modified'
         )
         .from('checkpoints')
-        .where({ id: checkpoint.id })
+        .where({ id: actualId })
         .first();
 
       results.push({
@@ -461,6 +465,8 @@ class Database extends DataSource {
         _modified: challenge._modified,
       };
 
+      let actualId = challenge.id;
+
       if (existing) {
         // Update existing challenge
         await knex('virtual_challenges')
@@ -473,7 +479,7 @@ class Database extends DataSource {
           const [newId] = await knex('virtual_challenges').insert(
             challengeData
           );
-          challenge.id = newId;
+          actualId = newId;
         } else {
           await knex('virtual_challenges').insert({
             id: challenge.id,
@@ -494,7 +500,7 @@ class Database extends DataSource {
           '_modified'
         )
         .from('virtual_challenges')
-        .where({ id: challenge.id })
+        .where({ id: actualId })
         .first();
 
       results.push({
