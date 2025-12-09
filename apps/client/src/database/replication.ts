@@ -5,8 +5,16 @@ const GRAPHQL_ENDPOINT =
   import.meta.env.VITE_GRAPHQL_ENDPOINT ||
   'https://localhost:8080/woodtime';
 
+// Type definitions for replication
+interface ReplicationCheckpoint {
+  lastModified: number;
+}
+
 // Pull query for events
-const pullEventsQueryBuilder = (checkpoint: any, limit: number) => {
+const pullEventsQueryBuilder = (
+  checkpoint: ReplicationCheckpoint | null | undefined,
+  limit: number
+) => {
   if (!checkpoint) {
     // First pull - get all events
     return {
@@ -67,7 +75,7 @@ const pullEventsQueryBuilder = (checkpoint: any, limit: number) => {
 };
 
 // Push query for creating/updating events
-const pushEventsQueryBuilder = (docs: any[]) => {
+const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
   return {
     query: `
       mutation PushEvents($events: [EventInput!]!) {
@@ -101,7 +109,10 @@ const pushEventsQueryBuilder = (docs: any[]) => {
 };
 
 // Pull query for checkpoints
-const pullCheckpointsQueryBuilder = (checkpoint: any, limit: number) => {
+const pullCheckpointsQueryBuilder = (
+  checkpoint: ReplicationCheckpoint | null | undefined,
+  limit: number
+) => {
   if (!checkpoint) {
     return {
       query: `
@@ -162,7 +173,7 @@ const pullCheckpointsQueryBuilder = (checkpoint: any, limit: number) => {
 };
 
 // Push query for checkpoints
-const pushCheckpointsQueryBuilder = (docs: any[]) => {
+const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
   return {
     query: `
       mutation PushCheckpoints($checkpoints: [CheckpointInput!]!) {
@@ -198,7 +209,10 @@ const pushCheckpointsQueryBuilder = (docs: any[]) => {
 };
 
 // Pull query for virtual challenges
-const pullVirtualChallengesQueryBuilder = (checkpoint: any, limit: number) => {
+const pullVirtualChallengesQueryBuilder = (
+  checkpoint: ReplicationCheckpoint | null | undefined,
+  limit: number
+) => {
   if (!checkpoint) {
     return {
       query: `
@@ -253,7 +267,9 @@ const pullVirtualChallengesQueryBuilder = (checkpoint: any, limit: number) => {
 };
 
 // Push query for virtual challenges
-const pushVirtualChallengesQueryBuilder = (docs: any[]) => {
+const pushVirtualChallengesQueryBuilder = (
+  docs: Array<Record<string, any>>
+) => {
   return {
     query: `
       mutation PushVirtualChallenges($challenges: [VirtualChallengeInput!]!) {
@@ -292,11 +308,9 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullEventsQueryBuilder,
-      modifier: (doc: any) => doc, // Optional: transform data
     },
     push: {
       queryBuilder: pushEventsQueryBuilder,
-      modifier: (doc: any) => doc, // Optional: transform data before push
     },
     deletedField: 'deleted',
     live: true, // Enable continuous replication
@@ -325,11 +339,9 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullCheckpointsQueryBuilder,
-      modifier: (doc: any) => doc,
     },
     push: {
       queryBuilder: pushCheckpointsQueryBuilder,
-      modifier: (doc: any) => doc,
     },
     deletedField: 'deleted',
     live: true,
@@ -356,11 +368,9 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullVirtualChallengesQueryBuilder,
-      modifier: (doc: any) => doc,
     },
     push: {
       queryBuilder: pushVirtualChallengesQueryBuilder,
-      modifier: (doc: any) => doc,
     },
     deletedField: 'deleted',
     live: true,

@@ -4,7 +4,6 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election';
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
-import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 
 // Add plugins
 if (process.env.NODE_ENV === 'development') {

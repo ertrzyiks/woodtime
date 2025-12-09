@@ -101,6 +101,7 @@ exports.up = async function (knex) {
   );
 
   // Add deleted and _modified columns to users table
+  // Note: User replication will be implemented in a future phase
   await knex.schema.alterTable('users', (table) => {
     table.integer('deleted').defaultTo(0).notNullable();
     table.bigInteger('_modified').defaultTo(0).notNullable();
