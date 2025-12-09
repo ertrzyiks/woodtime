@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { onError } from '@apollo/client/link/error';
 import { createStyles, makeStyles, ThemeProvider as StylesThemeProvider } from '@mui/styles';
 import { Theme, createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';

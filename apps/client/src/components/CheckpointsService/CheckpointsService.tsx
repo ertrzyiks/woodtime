@@ -1,4 +1,4 @@
-import React, {Dispatch, ReactNode, useEffect, useReducer} from 'react'
+import { createContext, Dispatch, ReactNode, useEffect, useReducer } from 'react';
 
 export interface Checkpoint {
   cpId: number
@@ -37,8 +37,8 @@ interface State {
   errored: ErroredQueueItem[]
 }
 
-export const CheckpointsStateContext = React.createContext<State>({ queue: [], errored: [] })
-export const CheckpointsDispatchContext = React.createContext<Dispatch<Action>>(() => {})
+export const CheckpointsStateContext = createContext<State>({ queue: [], errored: [] })
+export const CheckpointsDispatchContext = createContext<Dispatch<Action>>(() => {})
 
 const reducer = (state: State, action: Action): State => {
   switch(action.type) {

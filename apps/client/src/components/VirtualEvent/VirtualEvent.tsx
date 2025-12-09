@@ -1,4 +1,4 @@
-import React, {useCallback, useState, useEffect} from 'react'
+import { useCallback, useState, useEffect } from 'react';
 import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel'
 import {OrienteeringEvent} from "../../types/OrienteeringEvent";
 import { Fab } from "@mui/material";

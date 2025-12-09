@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"

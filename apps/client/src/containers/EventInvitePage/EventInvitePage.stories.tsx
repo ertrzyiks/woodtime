@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import EventInvitePage from './EventInvitePage';
 import { MemoryRouter, Route } from "react-router-dom";

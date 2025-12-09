@@ -1,4 +1,3 @@
-import React from 'react'
 import {addMocksToSchema, createMockStore} from "@graphql-tools/mock";
 import schema from "../../graphql/schema";
 import {ApolloClient, InMemoryCache} from "@apollo/client";

@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 import Participants from './Participants';
 import {MemoryRouter} from "react-router-dom";

@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
+import * as React from 'react';
 import { MemoryRouter } from "react-router-dom";
 
 import SignIn from './SignIn';

@@ -1,5 +1,4 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react';
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
 import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel';
