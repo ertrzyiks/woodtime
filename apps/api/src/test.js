@@ -1,13 +1,26 @@
-const selfsigned = require("selfsigned");
-const fs = require("fs");
-const path = require("path");
-const { app, server } = require("./app");
+import selfsigned from "selfsigned";
+import fs from "fs";
+import path from "path";
+import { app, server } from "./app.js";
+import https from "https";
 
 const getPems = async () => {
   try {
-    const key = fs.readFileSync(path.join(__dirname, "../tmp/key")).toString();
+    const key = fs
+      .readFileSync(
+        path.join(
+          path.dirname(new URL(import.meta.url).pathname),
+          "../tmp/key",
+        ),
+      )
+      .toString();
     const cert = fs
-      .readFileSync(path.join(__dirname, "../tmp/cert"))
+      .readFileSync(
+        path.join(
+          path.dirname(new URL(import.meta.url).pathname),
+          "../tmp/cert",
+        ),
+      )
       .toString();
 
     return {
@@ -90,7 +103,7 @@ const getPems = async () => {
   }
 };
 
-const pems = getPems();
+const pems = await getPems();
 
 async function init() {
   await server.start();
@@ -107,7 +120,6 @@ async function init() {
     },
   });
 
-  const https = require("https");
   https
     .createServer(
       {
