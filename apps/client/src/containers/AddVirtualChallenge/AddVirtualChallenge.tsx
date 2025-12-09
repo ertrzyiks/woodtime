@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Slider } from '@mui/material'
 import { useLazyQuery, useMutation } from '@apollo/client'
 

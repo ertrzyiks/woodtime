@@ -5,7 +5,6 @@ import {
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import ClearIcon from '@mui/icons-material/Clear';
-import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
 
 interface Props {

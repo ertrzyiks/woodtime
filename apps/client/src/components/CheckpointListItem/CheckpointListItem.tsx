@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
 import {
   Button,

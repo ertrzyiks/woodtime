@@ -1,5 +1,3 @@
-import React from 'react';
-
 import CheckpointCard from './CheckpointCard';
 
 export default {

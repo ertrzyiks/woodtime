@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import { Fragment, useContext, useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
@@ -61,17 +61,17 @@ const PwaUpdateNotification = () => {
       onClose={handleClose}
       message="A new version of the app is available!"
       action={
-        <React.Fragment>
+        <Fragment>
           <Button color="secondary" size="small" onClick={handleReload} disabled={loading}>
             RELOAD
           </Button>
           <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
             <CloseIcon fontSize="small" />
           </IconButton>
-        </React.Fragment>
+        </Fragment>
       }
     />
-  )
+  );
 }
 
 export default PwaUpdateNotification

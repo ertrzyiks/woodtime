@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
-import React, {useContext} from 'react';
+import { useState, useContext } from 'react';
 import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 
@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
   const checkpoints = event.checkpoints;
 
-  const [spacing] = React.useState<GridSpacing>(2);
+  const [spacing] = useState<GridSpacing>(2);
 
   const classes = useStyles();
 

@@ -4,7 +4,6 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import PublicIcon from '@mui/icons-material/Public';
 
-import React from 'react'
 import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";

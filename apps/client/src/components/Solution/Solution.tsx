@@ -1,5 +1,4 @@
 import { Box, Typography } from '@mui/material';
-import React from 'react';
 import { Checkpoint } from '../../types/Checkpoint';
 import {useTranslation} from "react-i18next";
 

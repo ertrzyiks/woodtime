@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react'
+import { ReactNode } from 'react';
 import {useTranslation} from "react-i18next";
 import {Link as RouterLink, useParams} from "react-router-dom";
 import {Box, Breadcrumbs, Link, Typography} from "@mui/material";

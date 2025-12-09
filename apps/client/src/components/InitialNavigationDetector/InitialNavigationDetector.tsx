@@ -1,7 +1,7 @@
-import React, {ReactNode, useEffect, useState} from 'react'
+import { createContext, ReactNode, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom'
 
-export const InitialNavigationContext = React.createContext(false)
+export const InitialNavigationContext = createContext(false)
 
 interface Props {
   children: ReactNode

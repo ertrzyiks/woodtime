@@ -1,5 +1,3 @@
-import React from 'react';
-
 import LinearProgressWithLabel from './LinearProgressWithLabel';
 
 export default {

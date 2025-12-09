@@ -7,7 +7,6 @@ import {
 } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
-import React from 'react';
 
 interface Props {
   handleClose: () => void;

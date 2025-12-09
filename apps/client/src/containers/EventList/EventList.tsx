@@ -20,7 +20,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { GetEventsDocument } from '../../queries/getEvents';
 import { DeleteEventDocument } from '../../queries/deleteEvent';
 import SimpleChecklist from '../../components/SimpleChecklist/SimpleChecklist';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
@@ -116,7 +116,7 @@ const EventList = () => {
       {error && <p>Error :(</p>}
 
       <List>
-        {[...data?.events ?? []]
+        {[...(data?.events ?? [])]
           .sort((a: { id: number }, b: { id: number }) => b.id - a.id)
           // TODO: generate types
           .map(
