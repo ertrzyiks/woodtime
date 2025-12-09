@@ -141,7 +141,7 @@ jobs:
           path: dist
 
       - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.7.5
+        uses: JamesIves/github-pages-deploy-action@v4.7.6
         with:
           branch: gh-pages
           folder: dist
