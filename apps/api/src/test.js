@@ -1,22 +1,23 @@
-const selfsigned = require('selfsigned')
-const fs = require('fs')
-const path = require('path')
-const {app, server} = require('./app')
+const selfsigned = require("selfsigned");
+const fs = require("fs");
+const path = require("path");
+const { app, server } = require("./app");
 
-const getPems = () => {
+const getPems = async () => {
   try {
-    const key = fs.readFileSync(path.join(__dirname, '../tmp/key')).toString()
-    const cert = fs.readFileSync(path.join(__dirname, '../tmp/cert')).toString()
+    const key = fs.readFileSync(path.join(__dirname, "../tmp/key")).toString();
+    const cert = fs
+      .readFileSync(path.join(__dirname, "../tmp/cert"))
+      .toString();
 
     return {
       key,
-      cert
-    }
-  }
-  catch {
-    const attrs = [{ name: 'commonName', value: 'localhost' }]
+      cert,
+    };
+  } catch {
+    const attrs = [{ name: "commonName", value: "localhost" }];
 
-    const pems = selfsigned.generate(attrs, {
+    const pems = await selfsigned.generate(attrs, {
       algorithm: "sha256",
       days: 30,
       keySize: 2048,
@@ -76,39 +77,48 @@ const getPems = () => {
           ],
         },
       ],
-    })
+    });
 
-    fs.mkdirSync(path.join(__dirname, '../tmp/'), { recursive: true })
-    fs.writeFileSync(path.join(__dirname, '../tmp/key'), pems.private)
-    fs.writeFileSync(path.join(__dirname, '../tmp/cert'), pems.cert)
+    fs.mkdirSync(path.join(__dirname, "../tmp/"), { recursive: true });
+    fs.writeFileSync(path.join(__dirname, "../tmp/key"), pems.private);
+    fs.writeFileSync(path.join(__dirname, "../tmp/cert"), pems.cert);
 
     return {
       key: pems.private,
-      cert: pems.cert
-    }
+      cert: pems.cert,
+    };
   }
-}
+};
 
-const pems = getPems()
+const pems = getPems();
 
 async function init() {
-  await server.start()
+  await server.start();
   server.applyMiddleware({
     app,
-    path: '/woodtime',
+    path: "/woodtime",
     cors: {
-      origin: ['https://studio.apollographql.com', 'http://localhost:3000', 'http://localhost:6006'],
-      credentials: true
-    }
+      origin: [
+        "https://studio.apollographql.com",
+        "http://localhost:3000",
+        "http://localhost:6006",
+      ],
+      credentials: true,
+    },
   });
 
-  const https = require('https')
-  https.createServer({
-    key: pems.key,
-    cert: pems.cert
-  }, app).listen(process.env.PORT || 8080, () => {
-    console.log(`🚀  Test server ready at https://localhost:8080/woodtime`);
-  })
+  const https = require("https");
+  https
+    .createServer(
+      {
+        key: pems.key,
+        cert: pems.cert,
+      },
+      app,
+    )
+    .listen(process.env.PORT || 8080, () => {
+      console.log(`🚀  Test server ready at https://localhost:8080/woodtime`);
+    });
 }
 
-init()
+init();
