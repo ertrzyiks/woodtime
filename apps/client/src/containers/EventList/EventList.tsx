@@ -102,8 +102,7 @@ const EventList = () => {
       // Soft delete - will be synced via replication
       await event.update({
         $set: {
-          deleted: true,
-          _modified: Date.now()
+          deleted: true
         }
       });
     }

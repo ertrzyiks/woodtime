@@ -20,6 +20,16 @@ type EventDocType = {
 type EventDocument = RxDocument<EventDocType>;
 type EventCollection = RxCollection<EventDocType>;
 
+// Middleware to automatically set _modified timestamp
+const addModifiedTimestamp = {
+  preInsert: function(this: any, docData: any) {
+    docData._modified = Date.now();
+  },
+  preSave: function(this: any, docData: any) {
+    docData._modified = Date.now();
+  }
+};
+
 export const collections = {
   events: {
     schema: eventSchema,
@@ -41,15 +51,23 @@ export const collections = {
           sort: [{ created_at: 'desc' }]
         });
       }
-    }
+    },
+    migrationStrategies: {},
+    ...addModifiedTimestamp
   },
   checkpoints: {
-    schema: checkpointSchema
+    schema: checkpointSchema,
+    migrationStrategies: {},
+    ...addModifiedTimestamp
   },
   users: {
-    schema: userSchema
+    schema: userSchema,
+    migrationStrategies: {},
+    ...addModifiedTimestamp
   },
   virtualchallenges: {
-    schema: virtualChallengeSchema
+    schema: virtualChallengeSchema,
+    migrationStrategies: {},
+    ...addModifiedTimestamp
   }
 };

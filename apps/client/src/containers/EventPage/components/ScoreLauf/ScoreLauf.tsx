@@ -82,8 +82,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
     if (checkpointDoc) {
       await checkpointDoc.update({
         $set: {
-          deleted: true,
-          _modified: Date.now()
+          deleted: true
         }
       });
     }

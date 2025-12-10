@@ -59,8 +59,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
         if (checkpointDoc) {
           await checkpointDoc.update({
             $set: {
-              deleted: true,
-              _modified: Date.now()
+              deleted: true
             }
           });
         }
@@ -76,8 +75,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
           skip_reason: null,
           created_at: now,
           updated_at: now,
-          deleted: false,
-          _modified: Date.now()
+          deleted: false
         });
         
         history.push(`/events/${eventId}`);
@@ -112,8 +110,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
         skip_reason: null,
         created_at: now,
         updated_at: now,
-        deleted: false,
-        _modified: Date.now()
+        deleted: false
       });
       
       history.push(`/events/${eventId}`);

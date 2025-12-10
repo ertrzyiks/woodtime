@@ -68,8 +68,7 @@ const AddEvent = () => {
       type: eventTypeId,
       created_at: now,
       updated_at: now,
-      deleted: false,
-      _modified: Date.now()
+      deleted: false
     });
     
     // Navigate to the new event (using temporary ID)

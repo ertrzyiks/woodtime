@@ -26,8 +26,7 @@ const Executor = () => {
           skip_reason: firstQueueElement.checkpoint.skipReason ?? null,
           created_at: now,
           updated_at: now,
-          deleted: false,
-          _modified: Date.now()
+          deleted: false
         };
         
         await db.checkpoints.insert(checkpoint);

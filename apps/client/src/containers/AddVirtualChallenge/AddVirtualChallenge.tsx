@@ -64,8 +64,7 @@ const AddVirtualChallenge = () => {
         totalCount: points.length,
         points: points.map(point => ({ lat: point.lat, lng: point.lng }))
       },
-      deleted: false,
-      _modified: Date.now()
+      deleted: false
     });
   }, [points, db])
 
