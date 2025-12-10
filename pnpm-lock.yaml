@@ -196,8 +196,8 @@ importers:
         specifier: 4.0.15
         version: 4.0.15(@types/node@12.20.55)(jiti@2.6.1)(jsdom@27.3.0(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.2)
       web-vitals:
-        specifier: 1.1.2
-        version: 1.1.2
+        specifier: 5.1.0
+        version: 5.1.0
       workbox-background-sync:
         specifier: 5.1.4
         version: 5.1.4
@@ -5863,11 +5863,11 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
-  web-vitals@1.1.2:
-    resolution: {integrity: sha512-PFMKIY+bRSXlMxVAQ+m2aw9c/ioUYfDgrYot0YUa+/xa0sakubWhSDyxAKwzymvXVdF4CZI71g06W+mqhzu6ig==}
-
   web-vitals@4.2.4:
     resolution: {integrity: sha512-r4DIlprAGwJ7YM11VZp4R884m0Vmgr6EAKe3P+kO0PPj3Unqyvv59rczf6UiGcb9Z8QxZVcqKNwv/g0WNdWwsw==}
+
+  web-vitals@5.1.0:
+    resolution: {integrity: sha512-ArI3kx5jI0atlTtmV0fWU3fjpLmq/nD3Zr1iFFlJLaqa5wLBkUSzINwBPySCX/8jRyjlmy1Volw1kz1g9XE4Jg==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -12872,9 +12872,9 @@ snapshots:
 
   web-streams-polyfill@3.3.3: {}
 
-  web-vitals@1.1.2: {}
-
   web-vitals@4.2.4: {}
+
+  web-vitals@5.1.0: {}
 
   webidl-conversions@3.0.1: {}
 
