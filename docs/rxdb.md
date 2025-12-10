@@ -1186,6 +1186,44 @@ pnpm remove @graphql-codegen/cli @graphql-codegen/typed-document-node
 3. Add troubleshooting guide
 4. Update Storybook mocks to use RxDB
 
+### Phase 7: Future Optimizations (Post-Migration)
+
+This phase captures optimization opportunities identified during the migration that should be considered after the initial RxDB adoption is complete and stable.
+
+#### Optimization 7.1: Consolidate Timestamp Fields
+
+**Current State:**
+- Both `updated_at` (string, ISO format) and `_modified` (numeric, milliseconds) fields exist
+- `updated_at` is manually maintained by application code
+- `_modified` is automatically maintained by database triggers for replication
+
+**Proposed Optimization:**
+1. Remove the `updated_at` column from all database tables
+2. Use `_modified` as the single source of truth for modification timestamps
+3. Add computed fields in GraphQL resolvers to convert `_modified` → ISO string format when needed
+4. Update all application code that currently sets `updated_at` manually (~15+ locations)
+5. Ensure triggers maintain `_modified` on any update operation
+
+**Benefits:**
+- Reduces storage overhead (eliminates redundant timestamp field)
+- Eliminates risk of timestamp inconsistency between fields
+- Simplifies code maintenance (one less field to manage)
+- Leverages automatic trigger maintenance for accuracy
+
+**Considerations:**
+- Requires changes across multiple layers (database, GraphQL, application)
+- Need to verify performance impact of converting numeric timestamps to ISO strings
+- Should be done after RxDB migration is stable and verified
+
+#### Optimization 7.2: Additional Performance Improvements
+
+**Ideas to Explore:**
+- Implement lazy loading for collection schemas
+- Add compound indexes for frequently-used query combinations
+- Optimize replication batch sizes based on network conditions
+- Implement data pruning strategies for old/deleted documents
+- Consider compression for large document fields
+
 ## Offline Behavior
 
 ### Current Behavior (Apollo Client)
@@ -1346,8 +1384,11 @@ const conflictHandlerWithMerging = (
 | Phase 4: Query Migration | Week 2-3 | All queries/mutations converted |
 | Phase 5: Testing & Parallel Run | Week 3 | Feature complete, both systems running |
 | Phase 6: Cleanup | Week 4 | Apollo Client removed, documentation updated |
+| Phase 7: Future Optimizations | Post-Migration | Identified optimization opportunities to pursue after migration is stable |
 
-**Total Estimated Time: 4 weeks**
+**Total Estimated Time: 4 weeks (Phases 1-6)**
+
+**Phase 7** is a living document of optimization ideas to be pursued incrementally after the core migration is complete and stable.
 
 ## Success Metrics
 
