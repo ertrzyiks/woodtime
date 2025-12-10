@@ -20,6 +20,7 @@ import Executor from './components/CheckpointsService/Executor';
 import ErrorReporter from './components/CheckpointsService/ErrorReporter';
 import { init as initI18n } from './i18n';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
+import { RxDBProvider } from './database/RxDBProvider';
 
 const errorLink = onError(({ graphQLErrors }) => {
   if (graphQLErrors) {
@@ -112,14 +113,16 @@ function AppShellInner({
 
       {client ? (
         <ApolloProvider client={client}>
-          <InitialNavigationDetector>
-            <CheckpointsService>
-              <Executor />
-              <ErrorReporter />
+          <RxDBProvider>
+            <InitialNavigationDetector>
+              <CheckpointsService>
+                <Executor />
+                <ErrorReporter />
 
-              {children}
-            </CheckpointsService>
-          </InitialNavigationDetector>
+                {children}
+              </CheckpointsService>
+            </InitialNavigationDetector>
+          </RxDBProvider>
         </ApolloProvider>
       ) : (
         <div className={classes.loaderWrapper}>
