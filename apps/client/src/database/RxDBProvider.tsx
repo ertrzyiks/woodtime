@@ -1,0 +1,64 @@
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { RxDatabase } from 'rxdb';
+import { createDatabase } from './setup';
+import { collections } from './collections';
+import { setupReplication } from './replication';
+
+interface RxDBContextType {
+  db: RxDatabase | null;
+  loading: boolean;
+}
+
+const RxDBContext = createContext<RxDBContextType>({
+  db: null,
+  loading: true
+});
+
+export const useRxDB = () => {
+  const context = useContext(RxDBContext);
+  if (!context) {
+    throw new Error('useRxDB must be used within RxDBProvider');
+  }
+  return context;
+};
+
+export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [db, setDb] = useState<RxDatabase | null>(null);
+  const [loading, setLoading] = useState(true);
+  const dbRef = useRef<RxDatabase | null>(null);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const database = await createDatabase();
+        
+        // Add collections
+        await database.addCollections(collections);
+        
+        // Setup replication
+        setupReplication(database);
+        
+        dbRef.current = database;
+        setDb(database);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to initialize RxDB:', error);
+        setLoading(false);
+      }
+    }
+
+    init();
+
+    return () => {
+      // Cleanup: destroy the database instance when component unmounts
+      // Note: RxDB databases are designed to be persistent and typically
+      // don't need explicit cleanup in React apps
+    };
+  }, []);
+
+  return (
+    <RxDBContext.Provider value={{ db, loading }}>
+      {children}
+    </RxDBContext.Provider>
+  );
+};

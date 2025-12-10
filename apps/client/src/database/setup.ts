@@ -12,6 +12,7 @@ if (process.env.NODE_ENV === 'development') {
 addRxPlugin(RxDBQueryBuilderPlugin);
 addRxPlugin(RxDBLeaderElectionPlugin);
 addRxPlugin(RxDBUpdatePlugin);
+// Note: GraphQL replication plugin doesn't need explicit registration
 
 export async function createDatabase() {
   const db = await createRxDatabase({
