@@ -35,6 +35,9 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await database.addCollections(collections);
         
         // Setup replication
+        // Note: Replication instances are returned but not stored for cleanup.
+        // RxDB handles replication lifecycle automatically, and the instances
+        // continue running until the database is destroyed.
         setupReplication(database);
         
         setDb(database);

@@ -2,6 +2,26 @@ import { useEffect, useState } from 'react';
 import { useRxDB } from '../RxDBProvider';
 import type { RxQuery, RxDatabase } from 'rxdb';
 
+/**
+ * Custom hook for reactive RxDB queries.
+ * 
+ * @param queryConstructor - Function that constructs an RxDB query. 
+ *                          Should be memoized with useCallback or useMemo
+ *                          to prevent unnecessary re-subscriptions.
+ * @returns Object with data, loading, and error states
+ * 
+ * @example
+ * ```tsx
+ * const query = useCallback(
+ *   (db) => db.events.find({
+ *     selector: { deleted: false },
+ *     sort: [{ created_at: 'desc' }]
+ *   }),
+ *   []
+ * );
+ * const { data, loading, error } = useRxQuery(query);
+ * ```
+ */
 export function useRxQuery<T>(
   queryConstructor: (db: RxDatabase) => RxQuery<T> | null
 ) {
