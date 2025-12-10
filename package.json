@@ -2,7 +2,7 @@
   "name": "woodtime",
   "private": true,
   "engines": {
-    "node": "22"
+    "node": "24"
   },
   "scripts": {
     "build": "pnpm run -r build",
