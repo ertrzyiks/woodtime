@@ -112,7 +112,7 @@ const EventList = () => {
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (loading && events.length === 0) {
+  if (loading && (!events || events.length === 0)) {
     return <p>Loading...</p>;
   }
 
@@ -136,7 +136,7 @@ const EventList = () => {
       {error && <p>Error :(</p>}
 
       <List>
-        {[...events]
+        {[...(events || [])]
           .sort((a: any, b: any) => b.id - a.id)
           .map((event: any) => (
               <div className={classes.wrapper} key={event.id}>

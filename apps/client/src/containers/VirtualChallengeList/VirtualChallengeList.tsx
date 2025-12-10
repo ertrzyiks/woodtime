@@ -47,7 +47,7 @@ const VirtualChallengeList = () => {
 
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (loading && challenges.length === 0) {
+  if (loading && (!challenges || challenges.length === 0)) {
     return (<div>Loading</div>)
   }
 
@@ -65,7 +65,7 @@ const VirtualChallengeList = () => {
       <LoadingIndicator active={loading} />
 
       <List>
-        {challenges.map((challenge: any) => (
+        {(challenges || []).map((challenge: any) => (
           <ListItem key={challenge.id} button component={Link} to={`/virtual-challenges/${challenge.id}`}>
             <ListItemText
               primary={challenge.name}
