@@ -83,7 +83,6 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
           id
           name
           type
-          invite_token
           checkpoint_count
           created_at
           updated_at
@@ -97,7 +96,6 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
         id: doc.id,
         name: doc.name,
         type: doc.type,
-        invite_token: doc.invite_token,
         checkpoint_count: doc.checkpoint_count,
         created_at: doc.created_at,
         updated_at: doc.updated_at,

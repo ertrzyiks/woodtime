@@ -249,7 +249,6 @@ class Database extends DataSource {
       const eventData = {
         name: event.name,
         type: event.type,
-        invite_token: event.invite_token,
         checkpoint_count: event.checkpoint_count,
         created_at: event.created_at,
         updated_at: event.updated_at,
