@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useRxDB } from '../RxDBProvider';
+import type { RxDocument } from 'rxdb';
+
+// Define valid collection names based on our collections
+type CollectionName = 'events' | 'checkpoints' | 'users' | 'virtualchallenges';
 
 export function useRxDocument<T>(
-  collection: string,
+  collection: CollectionName,
   id: string | number
 ) {
   const { db } = useRxDB();
@@ -22,8 +26,8 @@ export function useRxDocument<T>(
         }
       })
       .$.subscribe({
-        next: (doc: any) => {
-          setData(doc ? doc.toJSON() : null);
+        next: (doc: RxDocument<T> | null) => {
+          setData(doc ? doc.toJSON() as T : null);
           setLoading(false);
         },
         error: (err: Error) => {

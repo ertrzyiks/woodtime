@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRxDB } from '../RxDBProvider';
-import { RxQuery } from 'rxdb';
+import type { RxQuery, RxDatabase } from 'rxdb';
 
 export function useRxQuery<T>(
-  queryConstructor: (db: any) => RxQuery<T> | null
+  queryConstructor: (db: RxDatabase) => RxQuery<T> | null
 ) {
   const { db } = useRxDB();
   const [data, setData] = useState<T[]>([]);

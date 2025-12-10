@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { RxDatabase } from 'rxdb';
 import { createDatabase } from './setup';
 import { collections } from './collections';
@@ -25,7 +25,6 @@ export const useRxDB = () => {
 export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [db, setDb] = useState<RxDatabase | null>(null);
   const [loading, setLoading] = useState(true);
-  const dbRef = useRef<RxDatabase | null>(null);
 
   useEffect(() => {
     async function init() {
@@ -38,7 +37,6 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Setup replication
         setupReplication(database);
         
-        dbRef.current = database;
         setDb(database);
         setLoading(false);
       } catch (error) {
@@ -50,9 +48,9 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     init();
 
     return () => {
-      // Cleanup: destroy the database instance when component unmounts
-      // Note: RxDB databases are designed to be persistent and typically
-      // don't need explicit cleanup in React apps
+      // Cleanup: RxDB databases are designed to be persistent and typically
+      // don't need explicit cleanup in React apps. The database will be
+      // reused across page reloads via IndexedDB.
     };
   }, []);
 
