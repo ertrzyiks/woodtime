@@ -32,7 +32,27 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   </ContentLoader>
 )
 
-function mergeCheckpoints(event: any, checkpoints: any[], items: QueueItem['checkpoint'][]) {
+type EventData = {
+  id: number;
+  name: string;
+  type: number;
+  checkpoint_count: number;
+  invite_token?: string;
+  virtual_challenge?: { id: number } | null;
+  participants?: { id: string; name: string }[];
+  checkpoints?: any[];
+};
+
+type CheckpointData = {
+  id: number;
+  event_id: number;
+  cp_id: number;
+  cp_code: string | null;
+  skipped: boolean;
+  skip_reason: string | null;
+};
+
+function mergeCheckpoints(event: EventData | null, checkpoints: CheckpointData[], items: QueueItem['checkpoint'][]): EventData | null {
   if (!event) {
     return event
   }

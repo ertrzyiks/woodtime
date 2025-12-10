@@ -112,7 +112,7 @@ const EventList = () => {
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (loading && !events.length) {
+  if (loading && events.length === 0) {
     return <p>Loading...</p>;
   }
 

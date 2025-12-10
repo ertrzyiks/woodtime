@@ -54,6 +54,7 @@ const AddVirtualChallenge = () => {
     if (!db) return;
     
     const now = new Date().toISOString();
+    // TODO: Replace hardcoded name with user input from a form field
     await db.virtualchallenges.insert({
       id: generateTempId(),
       name: 'Test',

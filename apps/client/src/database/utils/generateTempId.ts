@@ -28,8 +28,8 @@ export function generateTempId(): number {
   
   // Combine timestamp, persistent clientId, and crypto random for collision resistance
   // Use smaller multipliers to stay within JavaScript's safe integer range (2^53 - 1)
-  // Date.now() returns ~1.7e12, so we use 1000 multiplier (1.7e15) which is well within safe range
+  // Date.now() returns ~1.7e12, so we use 100 multiplier (1.7e14) which is well within safe range
   // With timestamp (ms precision), persistent clientId (1M range), and 10-bit random,
   // collision risk is extremely low even across multiple clients
-  return -(Date.now() * 1000 + parseInt(clientId) + (randomBytes[0] % 1024));
+  return -(Date.now() * 100 + parseInt(clientId) + (randomBytes[0] % 1024));
 }

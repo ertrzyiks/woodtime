@@ -47,7 +47,7 @@ const VirtualChallengeList = () => {
 
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (!challenges.length && loading) {
+  if (loading && challenges.length === 0) {
     return (<div>Loading</div>)
   }
 
