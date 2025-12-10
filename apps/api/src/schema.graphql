@@ -74,6 +74,94 @@ type VirtualChallengeConnection {
     nodes: [VirtualChallenge!]!
 }
 
+type EventDocument {
+    id: Int!
+    name: String!
+    type: Int!
+    invite_token: String
+    checkpoint_count: Int!
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
+type CheckpointDocument {
+    id: Int!
+    event_id: Int!
+    cp_id: Int!
+    cp_code: String
+    skipped: Boolean!
+    skip_reason: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
+type VirtualChallengeDocument {
+    id: Int!
+    name: String!
+    checkpoints: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
+type ReplicationCheckpoint {
+    lastModified: Float!
+}
+
+type PullEventsResponse {
+    documents: [EventDocument!]!
+    checkpoint: ReplicationCheckpoint!
+}
+
+type PullCheckpointsResponse {
+    documents: [CheckpointDocument!]!
+    checkpoint: ReplicationCheckpoint!
+}
+
+type PullVirtualChallengesResponse {
+    documents: [VirtualChallengeDocument!]!
+    checkpoint: ReplicationCheckpoint!
+}
+
+input EventInput {
+    id: Int!
+    name: String!
+    type: Int!
+    checkpoint_count: Int!
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
+input CheckpointInput {
+    id: Int!
+    event_id: Int!
+    cp_id: Int!
+    cp_code: String
+    skipped: Boolean!
+    skip_reason: String
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
+input VirtualChallengeInput {
+    id: Int!
+    name: String!
+    checkpoints: String!
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted: Boolean!
+    _modified: Float!
+}
+
 type Query {
     me: Me
     events: [Event!]!
@@ -81,6 +169,9 @@ type Query {
     pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!
     virtualChallenges: VirtualChallengeConnection!
     virtualChallenge(id: Int!): VirtualChallenge
+    pullEvents(limit: Int!, minUpdatedAt: DateTime!): PullEventsResponse!
+    pullCheckpoints(limit: Int!, minUpdatedAt: DateTime!): PullCheckpointsResponse!
+    pullVirtualChallenges(limit: Int!, minUpdatedAt: DateTime!): PullVirtualChallengesResponse!
 }
 
 type SignInPayload {
@@ -178,4 +269,8 @@ type Mutation {
 
     createVirtualChallenge(input: CreateVirtualChallengeInput!): CreateVirtualChallengeResult!
     enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!
+
+    pushEvents(events: [EventInput!]!): [EventDocument!]!
+    pushCheckpoints(checkpoints: [CheckpointInput!]!): [CheckpointDocument!]!
+    pushVirtualChallenges(challenges: [VirtualChallengeInput!]!): [VirtualChallengeDocument!]!
 }

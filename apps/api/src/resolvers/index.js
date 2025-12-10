@@ -17,4 +17,10 @@ module.exports = {
   virtualChallenge: require("./virtualChallenge"),
   checkInVirtualCheckpoint: require("./checkInVirtualCheckpoint"),
   signIn: require("./signIn"),
+  pullEvents: require("./pullEvents"),
+  pullCheckpoints: require("./pullCheckpoints"),
+  pullVirtualChallenges: require("./pullVirtualChallenges"),
+  pushEvents: require("./pushEvents"),
+  pushCheckpoints: require("./pushCheckpoints"),
+  pushVirtualChallenges: require("./pushVirtualChallenges"),
 };
