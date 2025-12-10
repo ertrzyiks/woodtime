@@ -1215,7 +1215,39 @@ This phase captures optimization opportunities identified during the migration t
 - Need to verify performance impact of converting numeric timestamps to ISO strings
 - Should be done after RxDB migration is stable and verified
 
-#### Optimization 7.2: Additional Performance Improvements
+#### Optimization 7.2: Generate CollectionName Type from collections.ts
+
+**Current State:**
+- The `CollectionName` type in `useRxDocument.ts` is manually defined as a union type: `'events' | 'checkpoints' | 'users' | 'virtualchallenges'`
+- This type must be manually updated whenever collections are added or removed
+- Risk of type/runtime mismatch if collections change but the type isn't updated
+
+**Proposed Optimization:**
+1. Create a type utility that extracts collection names from the `collections` object in `collections.ts`
+2. Export this type from `collections.ts` for use in hooks
+3. Update `useRxDocument.ts` to import and use the generated type instead of the hardcoded union
+
+**Example Implementation:**
+```typescript
+// In collections.ts
+export type CollectionName = keyof typeof collections;
+
+// In useRxDocument.ts
+import type { CollectionName } from '../collections';
+```
+
+**Benefits:**
+- Eliminates manual type maintenance
+- Ensures type safety matches runtime collections exactly
+- Reduces risk of bugs when adding/removing collections
+- Single source of truth for collection names
+
+**Considerations:**
+- Simple change with minimal impact
+- Can be done anytime after Phase 3 is complete
+- Should be documented for future developers
+
+#### Optimization 7.3: Additional Performance Improvements
 
 **Ideas to Explore:**
 - Implement lazy loading for collection schemas
