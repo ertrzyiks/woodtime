@@ -1,54 +1,55 @@
 import {CheckpointsDispatchContext, CheckpointsStateContext} from "./CheckpointsService";
 import {useContext, useEffect} from "react";
-import {useMutation} from "@apollo/client";
-import {CreateCheckpointDocument} from "../../queries/createCheckpoint";
-import {GetEventDocument} from "../../containers/EventPage/data/getEvent";
+import {useRxDB} from "../../database/RxDBProvider";
+import {generateTempId} from "../../database/utils/generateTempId";
 
 const Executor = () => {
   const { queue } = useContext(CheckpointsStateContext)
   const dispatch = useContext(CheckpointsDispatchContext)
+  const { db } = useRxDB()
   const firstQueueElement = queue[0]
 
-  const [createCheckpoint] =
-    useMutation(CreateCheckpointDocument, {
-      awaitRefetchQueries: true,
-      onCompleted: (data) => {
-        if (!data.createCheckpoint.checkpoint) {
-          return
-        }
-
-        const { cp_id, event_id } = data.createCheckpoint.checkpoint
-        dispatch({
-          type: 'delete',
-          id: cp_id,
-          eventId: event_id
-        })
-      }
-    })
-
   useEffect(() => {
-    if (!firstQueueElement) {
+    if (!firstQueueElement || !db) {
       return
     }
 
-    createCheckpoint({
-      refetchQueries: [{ query: GetEventDocument, variables: { id: firstQueueElement.eventId } }],
-      variables: {
-        eventId: firstQueueElement.eventId,
-        cpId: firstQueueElement.checkpoint.cpId,
-        cpCode: firstQueueElement.checkpoint.cpCode ?? null,
-        skipped: firstQueueElement.checkpoint.skipped,
-        skipReason: firstQueueElement.checkpoint.skipReason ?? null
+    const createCheckpoint = async () => {
+      try {
+        const now = new Date().toISOString();
+        const checkpoint = {
+          id: generateTempId(),
+          event_id: firstQueueElement.eventId,
+          cp_id: firstQueueElement.checkpoint.cpId,
+          cp_code: firstQueueElement.checkpoint.cpCode ?? null,
+          skipped: firstQueueElement.checkpoint.skipped,
+          skip_reason: firstQueueElement.checkpoint.skipReason ?? null,
+          created_at: now,
+          updated_at: now,
+          deleted: false,
+          _modified: Date.now()
+        };
+        
+        await db.checkpoints.insert(checkpoint);
+        
+        // Remove from queue on success
+        dispatch({
+          type: 'delete',
+          id: firstQueueElement.checkpoint.cpId,
+          eventId: firstQueueElement.eventId
+        })
+      } catch (err) {
+        dispatch({
+          type: 'errored',
+          checkpoint: firstQueueElement.checkpoint,
+          eventId: firstQueueElement.eventId,
+          error: err
+        })
       }
-    }).catch(err => {
-      dispatch({
-        type: 'errored',
-        checkpoint: firstQueueElement.checkpoint,
-        eventId: firstQueueElement.eventId,
-        error: err
-      })
-    })
-  }, [firstQueueElement, dispatch, createCheckpoint])
+    };
+
+    createCheckpoint();
+  }, [firstQueueElement, dispatch, db])
 
   return null
 }

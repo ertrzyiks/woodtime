@@ -1,11 +1,10 @@
-import { ReactNode } from 'react';
-import { useQuery } from '@apollo/client';
+import { ReactNode, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';
 import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
-import {GetEventDocument, GetEventQuery} from './data/getEvent';
-import { useInitialNavigation } from '../../hooks/useInitialNavigation';
+import { useRxDocument } from '../../database/hooks/useRxDocument';
+import { useRxQuery } from '../../database/hooks/useRxQuery';
 import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
 import EventIcon from '@mui/icons-material/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
@@ -33,7 +32,7 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   </ContentLoader>
 )
 
-function mergeCheckpoints(event: GetEventQuery['event'] | undefined, items: QueueItem['checkpoint'][]) {
+function mergeCheckpoints(event: any, checkpoints: any[], items: QueueItem['checkpoint'][]) {
   if (!event) {
     return event
   }
@@ -41,11 +40,12 @@ function mergeCheckpoints(event: GetEventQuery['event'] | undefined, items: Queu
   return {
     ...event,
     checkpoints: [
-      ...event.checkpoints,
+      ...checkpoints,
       ...items.map(item => ({
         id: 0,
         cp_id: item.cpId,
         cp_code: item.cpCode ?? null,
+        event_id: event.id,
         skipped: item.skipped,
         skip_reason: item.skipReason ?? null,
         pending: true,
@@ -61,17 +61,30 @@ const EventPage = () => {
   const items = useEventQueue(parseInt(id, 10))
 
   const classes = useBreadcrumbStyles();
-  const isInitialNavigation = useInitialNavigation();
 
-  const { loading, error, data } = useQuery(GetEventDocument, {
-    variables: { id: parseInt(id, 10) },
-    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  })
+  const { data: eventData, loading: eventLoading, error: eventError } = useRxDocument('events', parseInt(id, 10));
+  
+  const checkpointsQuery = useCallback(
+    (db: any) => {
+      if (!db) return null;
+      return db.checkpoints.find({
+        selector: {
+          event_id: parseInt(id, 10),
+          deleted: false
+        },
+        sort: [{ cp_id: 'asc' }]
+      });
+    },
+    [id]
+  );
+  
+  const { data: checkpoints, loading: checkpointsLoading } = useRxQuery(checkpointsQuery);
 
-  const event = mergeCheckpoints(data?.event, items)
+  const loading = eventLoading || checkpointsLoading;
+  const error = eventError;
+  const event = mergeCheckpoints(eventData, checkpoints, items)
 
-  if (loading && !data) {
+  if (loading && !eventData) {
     return (
       <div>
         <Box px={1} py={2}>

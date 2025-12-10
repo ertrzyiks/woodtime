@@ -18,10 +18,9 @@ import MissingCheckpointsArea from '../../../../components/MissingCheckpointsAre
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
 import Solution from '../../../../components/Solution/Solution';
 import {CheckpointsDispatchContext} from "../../../../components/CheckpointsService/CheckpointsService";
-import {useMutation} from "@apollo/client";
 import {Checkpoint} from "../../../../types/Checkpoint";
-import {DeleteCheckpointDocument} from "../../../../queries/deleteCheckpoint";
 import Participants from "../../../../components/Participants/Participants";
+import {useRxDB} from "../../../../database/RxDBProvider";
 
 
 interface Props {
@@ -63,12 +62,9 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
   const classes = useStyles();
 
   const dispatch = useContext(CheckpointsDispatchContext)
-  const [deleteCheckpoint] = useMutation(DeleteCheckpointDocument, {
-    refetchQueries: ['getEvent'],
-    awaitRefetchQueries: true,
-  });
+  const { db } = useRxDB();
 
-  const handleDeleteClick = (checkpoint: Checkpoint) => {
+  const handleDeleteClick = async (checkpoint: Checkpoint) => {
     if (checkpoint.pending) {
       return dispatch({
         type: 'delete',
@@ -77,7 +73,20 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
       })
     }
 
-    return deleteCheckpoint({ variables: { id: checkpoint.id } });
+    if (!db) return;
+    
+    const checkpointDoc = await db.checkpoints.findOne({
+      selector: { id: checkpoint.id }
+    }).exec();
+    
+    if (checkpointDoc) {
+      await checkpointDoc.update({
+        $set: {
+          deleted: true,
+          _modified: Date.now()
+        }
+      });
+    }
   };
 
   return (
