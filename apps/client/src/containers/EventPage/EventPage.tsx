@@ -83,21 +83,20 @@ const EventPage = () => {
   const classes = useBreadcrumbStyles();
 
   const { data: eventData, loading: eventLoading, error: eventError } = useRxDocument('events', parseInt(id, 10));
-  
+
   const checkpointsQuery = useCallback(
     (db: any) => {
       if (!db) return null;
       return db.checkpoints.find({
         selector: {
-          event_id: parseInt(id, 10),
-          deleted: false
+          event_id: id,
         },
         sort: [{ cp_id: 'asc' }]
       });
     },
     [id]
   );
-  
+
   const { data: checkpoints, loading: checkpointsLoading } = useRxQuery(checkpointsQuery);
 
   const loading = eventLoading || checkpointsLoading;

@@ -75,7 +75,7 @@ type VirtualChallengeConnection {
 }
 
 type EventDocument {
-  id: Int!
+  id: String!
   name: String!
   type: Int!
   invite_token: String
@@ -86,8 +86,8 @@ type EventDocument {
 }
 
 type CheckpointDocument {
-  id: Int!
-  event_id: Int!
+  id: String!
+  event_id: String!
   cp_id: Int!
   cp_code: String
   skipped: Boolean!
@@ -98,7 +98,7 @@ type CheckpointDocument {
 }
 
 type VirtualChallengeDocument {
-  id: Int!
+  id: String!
   name: String!
   checkpoints: String!
   created_at: DateTime!
@@ -126,7 +126,7 @@ type PullVirtualChallengesResponse {
 }
 
 input EventInput {
-  id: Int!
+  id: String!
   name: String!
   type: Int!
   checkpoint_count: Int!
@@ -136,8 +136,8 @@ input EventInput {
 }
 
 input CheckpointInput {
-  id: Int!
-  event_id: Int!
+  id: String!
+  event_id: String!
   cp_id: Int!
   cp_code: String
   skipped: Boolean!
@@ -148,7 +148,7 @@ input CheckpointInput {
 }
 
 input VirtualChallengeInput {
-  id: Int!
+  id: String!
   name: String!
   checkpoints: String!
   created_at: DateTime!

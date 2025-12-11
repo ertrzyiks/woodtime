@@ -34,15 +34,12 @@ const VirtualChallengeList = () => {
     (db: any) => {
       if (!db) return null;
       return db.virtualchallenges.find({
-        selector: {
-          deleted: false
-        },
         sort: [{ created_at: 'desc' }]
       });
     },
     []
   );
-  
+
   const { data: challenges, loading } = useRxQuery(challengesQuery);
 
   const breadcrumbClasses = useBreadcrumbStyles();

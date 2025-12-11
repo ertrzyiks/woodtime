@@ -39,8 +39,8 @@ export type CheckpointDocument = {
   cp_id: Scalars['Int']['output'];
   created_at: Scalars['DateTime']['output'];
   deleted: Scalars['Boolean']['output'];
-  event_id: Scalars['Int']['output'];
-  id: Scalars['Int']['output'];
+  event_id: Scalars['String']['output'];
+  id: Scalars['String']['output'];
   skip_reason?: Maybe<Scalars['String']['output']>;
   skipped: Scalars['Boolean']['output'];
   updated_at: Scalars['DateTime']['output'];
@@ -51,8 +51,8 @@ export type CheckpointInput = {
   cp_id: Scalars['Int']['input'];
   created_at: Scalars['DateTime']['input'];
   deleted: Scalars['Boolean']['input'];
-  event_id: Scalars['Int']['input'];
-  id: Scalars['Int']['input'];
+  event_id: Scalars['String']['input'];
+  id: Scalars['String']['input'];
   skip_reason?: InputMaybe<Scalars['String']['input']>;
   skipped: Scalars['Boolean']['input'];
   updated_at: Scalars['DateTime']['input'];
@@ -135,7 +135,7 @@ export type EventDocument = {
   checkpoint_count: Scalars['Int']['output'];
   created_at: Scalars['DateTime']['output'];
   deleted: Scalars['Boolean']['output'];
-  id: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
   invite_token?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   type: Scalars['Int']['output'];
@@ -146,7 +146,7 @@ export type EventInput = {
   checkpoint_count: Scalars['Int']['input'];
   created_at: Scalars['DateTime']['input'];
   deleted: Scalars['Boolean']['input'];
-  id: Scalars['Int']['input'];
+  id: Scalars['String']['input'];
   name: Scalars['String']['input'];
   type: Scalars['Int']['input'];
   updated_at: Scalars['DateTime']['input'];
@@ -391,7 +391,7 @@ export type VirtualChallengeDocument = {
   checkpoints: Scalars['String']['output'];
   created_at: Scalars['DateTime']['output'];
   deleted: Scalars['Boolean']['output'];
-  id: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
   name: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
 };
@@ -400,7 +400,7 @@ export type VirtualChallengeInput = {
   checkpoints: Scalars['String']['input'];
   created_at: Scalars['DateTime']['input'];
   deleted: Scalars['Boolean']['input'];
-  id: Scalars['Int']['input'];
+  id: Scalars['String']['input'];
   name: Scalars['String']['input'];
   updated_at: Scalars['DateTime']['input'];
 };

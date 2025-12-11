@@ -18,7 +18,10 @@ export const checkpointSchema: RxJsonSchema<any> = {
       type: 'number'
     },
     cp_code: {
-      type: 'string'
+      oneOf: [
+        { type: 'string' },
+        { type: 'null' }
+      ]
     },
     skipped: {
       type: 'boolean'

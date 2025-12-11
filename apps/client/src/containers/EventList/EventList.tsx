@@ -65,21 +65,18 @@ const useStyles = makeStyles((theme: Theme) =>
 const EventList = () => {
   const { t } = useTranslation()
   const { db } = useRxDB();
-  
+
   // Memoize query constructor to prevent unnecessary re-subscriptions
   const eventsQuery = useCallback(
     (db: any) => {
       if (!db) return null;
       return db.events.find({
-        selector: {
-          deleted: false
-        },
         sort: [{ created_at: 'desc' }]
       });
     },
     []
   );
-  
+
   const { data: events, loading, error } = useRxQuery(eventsQuery);
   const [showChecklist, setShowChecklist] = useState(false);
 
@@ -93,11 +90,11 @@ const EventList = () => {
 
   const handleDeleteClick = async (eventId: number) => {
     if (!db) return;
-    
+
     const event = await db.events.findOne({
       selector: { id: eventId }
     }).exec();
-    
+
     if (event) {
       // Soft delete - will be synced via replication
       await event.update({
