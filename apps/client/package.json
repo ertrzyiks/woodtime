@@ -86,13 +86,13 @@
     "@graphql-codegen/typescript": "5.0.6",
     "@graphql-codegen/typescript-operations": "5.0.6",
     "@playwright/test": "1.57.0",
-    "@storybook/react": "10.1.6",
-    "@storybook/react-vite": "10.1.6",
+    "@storybook/react": "10.1.7",
+    "@storybook/react-vite": "10.1.7",
     "@testing-library/jest-dom": "6.9.1",
     "@vitejs/plugin-react": "5.1.2",
     "concurrently": "9.2.1",
     "jsdom": "27.3.0",
-    "storybook": "10.1.6",
+    "storybook": "10.1.7",
     "vite": "7.2.7"
   }
 }
