@@ -1,6 +1,5 @@
 import type { RxJsonSchema } from 'rxdb';
-
-const MAX_EVENT_ID = 999999999; // Maximum event ID supported by the system
+import { ID_MAX_LENGTH } from './constants';
 
 export const userSchema: RxJsonSchema<any> = {
   version: 0,
@@ -9,7 +8,7 @@ export const userSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: MAX_EVENT_ID.toString().length
+      maxLength: ID_MAX_LENGTH
     },
     name: {
       type: 'string'

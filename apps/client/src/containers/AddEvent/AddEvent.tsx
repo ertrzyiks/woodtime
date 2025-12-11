@@ -56,11 +56,11 @@ const AddEvent = () => {
 
   const handleSubmit = async () => {
     if (!db) return;
-    
+
     const eventTypeId = type === 'score' ? 1 : 2;
     const now = new Date().toISOString();
     const eventId = generateTempId();
-    
+
     await db.events.insert({
       id: eventId,
       name,
@@ -68,9 +68,8 @@ const AddEvent = () => {
       type: eventTypeId,
       created_at: now,
       updated_at: now,
-      deleted: false
     });
-    
+
     // Navigate to the new event (using temporary ID)
     history.push(`/events/${eventId}`);
   };

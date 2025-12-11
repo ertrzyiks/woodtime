@@ -1,6 +1,6 @@
 import type { RxJsonSchema } from 'rxdb';
+import { ID_MAX_LENGTH } from './constants';
 
-const MAX_EVENT_ID = 999999999; // Maximum event ID supported by the system
 export const checkpointSchema: RxJsonSchema<any> = {
   version: 0,
   primaryKey: 'id',
@@ -8,11 +8,11 @@ export const checkpointSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: MAX_EVENT_ID.toString().length
+      maxLength: ID_MAX_LENGTH
     },
     event_id: {
       type: 'string',
-      maxLength: MAX_EVENT_ID.toString().length
+      maxLength: ID_MAX_LENGTH
     },
     cp_id: {
       type: 'number'
