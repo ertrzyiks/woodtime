@@ -52,8 +52,11 @@ const {
   checkInVirtualCheckpoint,
   signIn,
   pullCheckpoints,
+  pushCheckpoints,
   pullEvents,
+  pushEvents,
   pullVirtualChallenges,
+  pushVirtualChallenges,
 } = require("./resolvers");
 
 const app = express();
@@ -96,6 +99,9 @@ const resolvers = {
     createVirtualChallenge,
     enrollVirtualChallenge,
     checkInVirtualCheckpoint,
+    pushCheckpoints,
+    pushEvents,
+    pushVirtualChallenges,
   },
 };
 

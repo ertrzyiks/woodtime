@@ -75,6 +75,7 @@ const pullEventsQueryBuilder = (
 
 // Push query for creating/updating events
 const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
+  console.log('Pushing events:', docs);
   return {
     query: `
       mutation PushEvents($events: [EventInput!]!) {
@@ -90,14 +91,14 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
       }
     `,
     variables: {
-      events: docs.map((doc) => ({
-        id: doc.id,
-        name: doc.name,
-        type: doc.type,
-        checkpoint_count: doc.checkpoint_count,
-        created_at: doc.created_at,
-        updated_at: doc.updated_at,
-        deleted: doc.deleted,
+      events: docs.map(({ newDocumentState }) => ({
+        id: newDocumentState.id,
+        name: newDocumentState.name,
+        type: newDocumentState.type,
+        checkpoint_count: newDocumentState.checkpoint_count,
+        created_at: newDocumentState.created_at,
+        updated_at: newDocumentState.updated_at,
+        deleted: newDocumentState.deleted,
       })),
     },
   };

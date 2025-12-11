@@ -17,6 +17,12 @@ export const eventSchema: RxJsonSchema<any> = {
       type: 'number'
     },
     invite_token: {
+      oneOf: [
+        { type: 'string' },
+        { type: 'null' }
+      ]
+    },
+    checkpoint_count: {
       type: 'string'
     },
     checkpoint_count: {

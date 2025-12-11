@@ -52,25 +52,16 @@ type CheckpointData = {
   skip_reason: string | null;
 };
 
-function mergeCheckpoints(event: EventData | null, checkpoints: CheckpointData[], items: QueueItem['checkpoint'][]): EventData | null {
+function mergeCheckpoints(event: EventData | null, checkpoints: CheckpointData[]): EventData | null {
   if (!event) {
     return event
   }
 
   return {
     ...event,
+    participants: event.participants || [],
     checkpoints: [
       ...checkpoints,
-      ...items.map(item => ({
-        id: 0,
-        cp_id: item.cpId,
-        cp_code: item.cpCode ?? null,
-        event_id: event.id,
-        skipped: item.skipped,
-        skip_reason: item.skipReason ?? null,
-        pending: true,
-        error: item.error
-      }))
     ]
   }
 }
@@ -78,11 +69,11 @@ function mergeCheckpoints(event: EventData | null, checkpoints: CheckpointData[]
 const EventPage = () => {
   const { t } = useTranslation()
   const { id } = useParams<{ id: string }>();
-  const items = useEventQueue(parseInt(id, 10))
+  // const items = useEventQueue(parseInt(id, 10))
 
   const classes = useBreadcrumbStyles();
 
-  const { data: eventData, loading: eventLoading, error: eventError } = useRxDocument('events', parseInt(id, 10));
+  const { data: eventData, loading: eventLoading, error: eventError } = useRxDocument('events', id);
 
   const checkpointsQuery = useCallback(
     (db: any) => {
@@ -101,7 +92,7 @@ const EventPage = () => {
 
   const loading = eventLoading || checkpointsLoading;
   const error = eventError;
-  const event = mergeCheckpoints(eventData, checkpoints, items)
+  const event = mergeCheckpoints(eventData, checkpoints)
 
   if (loading && !eventData) {
     return (

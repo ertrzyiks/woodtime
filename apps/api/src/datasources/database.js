@@ -268,8 +268,8 @@ class Database extends DataSource {
         name: event.name,
         type: event.type,
         checkpoint_count: event.checkpoint_count,
-        created_at: event.created_at,
-        updated_at: event.updated_at,
+        created_at: new Date(event.created_at).toISOString(),
+        updated_at: new Date(event.updated_at).toISOString(),
         deleted: event.deleted ? 1 : 0,
       };
 
@@ -307,7 +307,7 @@ class Database extends DataSource {
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         deleted: Boolean(updated.deleted),
       });
     }
@@ -416,7 +416,7 @@ class Database extends DataSource {
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         skipped: Boolean(updated.skipped),
         deleted: Boolean(updated.deleted),
       });
@@ -517,7 +517,7 @@ class Database extends DataSource {
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         deleted: Boolean(updated.deleted),
       });
     }
