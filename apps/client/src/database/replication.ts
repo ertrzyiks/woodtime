@@ -30,7 +30,6 @@ const pullEventsQueryBuilder = (
               created_at
               updated_at
               deleted
-              _modified
             }
             checkpoint {
               lastModified
@@ -59,7 +58,7 @@ const pullEventsQueryBuilder = (
             created_at
             updated_at
             deleted
-            _modified
+
           }
           checkpoint {
             lastModified
@@ -87,7 +86,6 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
           created_at
           updated_at
           deleted
-          _modified
         }
       }
     `,
@@ -100,7 +98,6 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
         created_at: doc.created_at,
         updated_at: doc.updated_at,
         deleted: doc.deleted,
-        _modified: doc._modified,
       })),
     },
   };
@@ -126,7 +123,7 @@ const pullCheckpointsQueryBuilder = (
               created_at
               updated_at
               deleted
-              _modified
+
             }
             checkpoint {
               lastModified
@@ -155,7 +152,6 @@ const pullCheckpointsQueryBuilder = (
             created_at
             updated_at
             deleted
-            _modified
           }
           checkpoint {
             lastModified
@@ -185,7 +181,6 @@ const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
           created_at
           updated_at
           deleted
-          _modified
         }
       }
     `,
@@ -200,7 +195,6 @@ const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
         created_at: doc.created_at,
         updated_at: doc.updated_at,
         deleted: doc.deleted,
-        _modified: doc._modified,
       })),
     },
   };
@@ -223,7 +217,6 @@ const pullVirtualChallengesQueryBuilder = (
               created_at
               updated_at
               deleted
-              _modified
             }
             checkpoint {
               lastModified
@@ -249,7 +242,7 @@ const pullVirtualChallengesQueryBuilder = (
             created_at
             updated_at
             deleted
-            _modified
+
           }
           checkpoint {
             lastModified
@@ -278,7 +271,7 @@ const pushVirtualChallengesQueryBuilder = (
           created_at
           updated_at
           deleted
-          _modified
+
         }
       }
     `,
@@ -290,7 +283,6 @@ const pushVirtualChallengesQueryBuilder = (
         created_at: doc.created_at,
         updated_at: doc.updated_at,
         deleted: doc.deleted,
-        _modified: doc._modified,
       })),
     },
   };

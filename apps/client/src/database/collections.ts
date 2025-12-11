@@ -13,22 +13,10 @@ type EventDocType = {
   checkpoint_count: number;
   created_at: string;
   updated_at: string;
-  deleted: boolean;
-  _modified: number;
 };
 
 type EventDocument = RxDocument<EventDocType>;
 type EventCollection = RxCollection<EventDocType>;
-
-// Middleware to automatically set _modified timestamp
-const addModifiedTimestamp = {
-  preInsert: function(this: any, docData: any) {
-    docData._modified = Date.now();
-  },
-  preSave: function(this: any, docData: any) {
-    docData._modified = Date.now();
-  }
-};
 
 export const collections = {
   events: {
@@ -53,21 +41,17 @@ export const collections = {
       }
     },
     migrationStrategies: {},
-    ...addModifiedTimestamp
   },
   checkpoints: {
     schema: checkpointSchema,
     migrationStrategies: {},
-    ...addModifiedTimestamp
   },
   users: {
     schema: userSchema,
     migrationStrategies: {},
-    ...addModifiedTimestamp
   },
   virtualchallenges: {
     schema: virtualChallengeSchema,
     migrationStrategies: {},
-    ...addModifiedTimestamp
   }
 };

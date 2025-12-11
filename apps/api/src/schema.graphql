@@ -1,276 +1,280 @@
 scalar DateTime
 
 type Checkpoint {
-    id: Int!
-    event_id: Int!
-    cp_id: Int!
-    cp_code: String
-    skipped: Boolean!
-    skip_reason: String
-    created_at: DateTime!
-    updated_at: DateTime!
+  id: Int!
+  event_id: Int!
+  cp_id: Int!
+  cp_code: String
+  skipped: Boolean!
+  skip_reason: String
+  created_at: DateTime!
+  updated_at: DateTime!
 }
 
 type Event {
-    id: Int!
-    name: String!
-    type: Int!
-    invite_token: String
-    checkpoint_count: Int!
-    checkpoints: [Checkpoint!]!
-    created_at: DateTime!
-    updated_at: DateTime!
-    participants: [User!]!
-    virtual_challenge: EventVirtualChallenge
+  id: Int!
+  name: String!
+  type: Int!
+  invite_token: String
+  checkpoint_count: Int!
+  checkpoints: [Checkpoint!]!
+  created_at: DateTime!
+  updated_at: DateTime!
+  participants: [User!]!
+  virtual_challenge: EventVirtualChallenge
 }
 
 type User {
-    id: String!
-    name: String!
+  id: String!
+  name: String!
 }
 
 type Me {
-    id: String!
-    name: String!
-    friends: [User!]!
+  id: String!
+  name: String!
+  friends: [User!]!
 }
 
 type Coordinates {
-    lat: String!
-    lng: String!
+  lat: String!
+  lng: String!
 }
 
 type CoordinatesConnection {
-    points: [Coordinates!]!
-    totalCount: Int!
+  points: [Coordinates!]!
+  totalCount: Int!
 }
 
 input CoordinatesInput {
-    lat: String!
-    lng: String!
+  lat: String!
+  lng: String!
 }
 
 input PointsNearbyInput {
-    start: CoordinatesInput!
-    radius: Int!
-    count: Int!
+  start: CoordinatesInput!
+  radius: Int!
+  count: Int!
 }
 
 type EventVirtualChallenge {
-    id: Int!
+  id: Int!
 }
 
 type VirtualChallenge {
-    id: Int!
-    name: String!
-    checkpoints: CoordinatesConnection!
-    radius: Int!
-    created_at: DateTime!
-    updated_at: DateTime!
+  id: Int!
+  name: String!
+  checkpoints: CoordinatesConnection!
+  radius: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
 }
 
 type VirtualChallengeConnection {
-    totalCount: Int!
-    nodes: [VirtualChallenge!]!
+  totalCount: Int!
+  nodes: [VirtualChallenge!]!
 }
 
 type EventDocument {
-    id: Int!
-    name: String!
-    type: Int!
-    invite_token: String
-    checkpoint_count: Int!
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  name: String!
+  type: Int!
+  invite_token: String
+  checkpoint_count: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 type CheckpointDocument {
-    id: Int!
-    event_id: Int!
-    cp_id: Int!
-    cp_code: String
-    skipped: Boolean!
-    skip_reason: String
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  event_id: Int!
+  cp_id: Int!
+  cp_code: String
+  skipped: Boolean!
+  skip_reason: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 type VirtualChallengeDocument {
-    id: Int!
-    name: String!
-    checkpoints: String!
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  name: String!
+  checkpoints: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 type ReplicationCheckpoint {
-    lastModified: Float!
+  lastModified: Float!
 }
 
 type PullEventsResponse {
-    documents: [EventDocument!]!
-    checkpoint: ReplicationCheckpoint!
+  documents: [EventDocument!]!
+  checkpoint: ReplicationCheckpoint!
 }
 
 type PullCheckpointsResponse {
-    documents: [CheckpointDocument!]!
-    checkpoint: ReplicationCheckpoint!
+  documents: [CheckpointDocument!]!
+  checkpoint: ReplicationCheckpoint!
 }
 
 type PullVirtualChallengesResponse {
-    documents: [VirtualChallengeDocument!]!
-    checkpoint: ReplicationCheckpoint!
+  documents: [VirtualChallengeDocument!]!
+  checkpoint: ReplicationCheckpoint!
 }
 
 input EventInput {
-    id: Int!
-    name: String!
-    type: Int!
-    checkpoint_count: Int!
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  name: String!
+  type: Int!
+  checkpoint_count: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 input CheckpointInput {
-    id: Int!
-    event_id: Int!
-    cp_id: Int!
-    cp_code: String
-    skipped: Boolean!
-    skip_reason: String
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  event_id: Int!
+  cp_id: Int!
+  cp_code: String
+  skipped: Boolean!
+  skip_reason: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 input VirtualChallengeInput {
-    id: Int!
-    name: String!
-    checkpoints: String!
-    created_at: DateTime!
-    updated_at: DateTime!
-    deleted: Boolean!
-    _modified: Float!
+  id: Int!
+  name: String!
+  checkpoints: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
 }
 
 type Query {
-    me: Me
-    events: [Event!]!
-    event(id: Int!): Event
-    pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!
-    virtualChallenges: VirtualChallengeConnection!
-    virtualChallenge(id: Int!): VirtualChallenge
-    pullEvents(limit: Int!, minUpdatedAt: DateTime!): PullEventsResponse!
-    pullCheckpoints(limit: Int!, minUpdatedAt: DateTime!): PullCheckpointsResponse!
-    pullVirtualChallenges(limit: Int!, minUpdatedAt: DateTime!): PullVirtualChallengesResponse!
+  me: Me
+  events: [Event!]!
+  event(id: Int!): Event
+  pointsNearby(input: PointsNearbyInput!): CoordinatesConnection!
+  virtualChallenges: VirtualChallengeConnection!
+  virtualChallenge(id: Int!): VirtualChallenge
+  pullEvents(limit: Int!, minUpdatedAt: DateTime!): PullEventsResponse!
+  pullCheckpoints(
+    limit: Int!
+    minUpdatedAt: DateTime!
+  ): PullCheckpointsResponse!
+  pullVirtualChallenges(
+    limit: Int!
+    minUpdatedAt: DateTime!
+  ): PullVirtualChallengesResponse!
 }
 
 type SignInPayload {
-    success: Boolean!
-    user: User
-    accessToken: String
-    refreshToken: String
+  success: Boolean!
+  user: User
+  accessToken: String
+  refreshToken: String
 }
 
 type LoginPayload {
-    success: Boolean!
-    user: User
-    accessToken: String
-    refreshToken: String
+  success: Boolean!
+  user: User
+  accessToken: String
+  refreshToken: String
 }
 
 type JoinEventPayload {
-    success: Boolean!
-    event: Event
+  success: Boolean!
+  event: Event
 }
 
 type InviteToEventPayload {
-    success: Boolean!
-    event: Event
+  success: Boolean!
+  event: Event
 }
 
 type CreateEventResult {
-    success: Boolean!
-    event: Event!
+  success: Boolean!
+  event: Event!
 }
 
 type DeleteEventResult {
-    success: Boolean!
-    id: Int!
+  success: Boolean!
+  id: Int!
 }
 
 type CreateCheckpointResult {
-    success: Boolean!
-    checkpoint: Checkpoint
+  success: Boolean!
+  checkpoint: Checkpoint
 }
 
 type DeleteCheckpointResult {
-    success: Boolean!
-    id: Int!
+  success: Boolean!
+  id: Int!
 }
 
 input CreateVirtualChallengeInput {
-    name: String!
-    checkpoints: [CoordinatesInput]
+  name: String!
+  checkpoints: [CoordinatesInput]
 }
 
 type CreateVirtualChallengeResult {
-    success: Boolean!
-    virtualChallenge: VirtualChallenge
+  success: Boolean!
+  virtualChallenge: VirtualChallenge
 }
 
 type EnrollVirtualChallengeResult {
-    success: Boolean!
-    event: Event
+  success: Boolean!
+  event: Event
 }
 
 type CheckInViertualCheckpointResult {
-    success: Boolean!
-    checkpoint: Checkpoint
+  success: Boolean!
+  checkpoint: Checkpoint
 }
 
 type Mutation {
-    signIn(name: String!): SignInPayload
-    login(token: String!): LoginPayload
-    joinEvent(id: Int!, token: String!): JoinEventPayload
-    inviteToEvent(id: String!, friendId: String!): InviteToEventPayload
+  signIn(name: String!): SignInPayload
+  login(token: String!): LoginPayload
+  joinEvent(id: Int!, token: String!): JoinEventPayload
+  inviteToEvent(id: String!, friendId: String!): InviteToEventPayload
 
-    createEvent(
-        name: String!
-        checkpointCount: Int!
-        type: Int!
-    ): CreateEventResult
+  createEvent(
+    name: String!
+    checkpointCount: Int!
+    type: Int!
+  ): CreateEventResult
 
-    deleteEvent(id: Int!): DeleteEventResult
+  deleteEvent(id: Int!): DeleteEventResult
 
-    createCheckpoint(
-        event_id: Int!
-        cp_id: Int!
-        cp_code: String
-        skipped: Boolean
-        skip_reason: String
-    ): CreateCheckpointResult!
+  createCheckpoint(
+    event_id: Int!
+    cp_id: Int!
+    cp_code: String
+    skipped: Boolean
+    skip_reason: String
+  ): CreateCheckpointResult!
 
-    checkInVirtualCheckpoint(
-        event_id: Int!
-        position: CoordinatesInput!
-    ): CheckInViertualCheckpointResult!
+  checkInVirtualCheckpoint(
+    event_id: Int!
+    position: CoordinatesInput!
+  ): CheckInViertualCheckpointResult!
 
-    deleteCheckpoint(id: Int!): DeleteCheckpointResult!
+  deleteCheckpoint(id: Int!): DeleteCheckpointResult!
 
-    createVirtualChallenge(input: CreateVirtualChallengeInput!): CreateVirtualChallengeResult!
-    enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!
+  createVirtualChallenge(
+    input: CreateVirtualChallengeInput!
+  ): CreateVirtualChallengeResult!
+  enrollVirtualChallenge(id: Int!): EnrollVirtualChallengeResult!
 
-    pushEvents(events: [EventInput!]!): [EventDocument!]!
-    pushCheckpoints(checkpoints: [CheckpointInput!]!): [CheckpointDocument!]!
-    pushVirtualChallenges(challenges: [VirtualChallengeInput!]!): [VirtualChallengeDocument!]!
+  pushEvents(events: [EventInput!]!): [EventDocument!]!
+  pushCheckpoints(checkpoints: [CheckpointInput!]!): [CheckpointDocument!]!
+  pushVirtualChallenges(
+    challenges: [VirtualChallengeInput!]!
+  ): [VirtualChallengeDocument!]!
 }

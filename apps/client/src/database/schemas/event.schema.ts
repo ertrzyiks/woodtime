@@ -9,9 +9,8 @@ export const eventSchema: RxJsonSchema<any> = {
   type: 'object',
   properties: {
     id: {
-      type: 'number',
-      minimum: 0,
-      maximum: MAX_EVENT_ID
+      type: 'string',
+      maxLength: MAX_EVENT_ID.toString().length
     },
     name: {
       type: 'string'
@@ -27,20 +26,14 @@ export const eventSchema: RxJsonSchema<any> = {
     },
     created_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
     updated_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
-    // GraphQL replication fields
-    deleted: {
-      type: 'boolean',
-      default: false
-    },
-    _modified: {
-      type: 'number'
-    }
   },
   required: ['id', 'name', 'type', 'checkpoint_count', 'created_at', 'updated_at'],
   indexes: ['created_at', 'updated_at']
