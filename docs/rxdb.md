@@ -2,7 +2,7 @@
 
 ## 📊 Migration Status: ~60% Complete
 
-**Last Updated:** December 2024
+**Last Updated:** December 12, 2024
 
 ### Quick Status Overview
 
@@ -346,17 +346,14 @@ export const collections = {
 
 #### Step 2.1: Setup GraphQL Replication Plugin ✅ DONE
 
-The GraphQL replication functionality is included in the main RxDB package but requires explicit plugin registration:
+The GraphQL replication functionality is included in the main RxDB package and doesn't require explicit plugin registration.
 
 ```typescript
-import { addRxPlugin } from 'rxdb';
-import { RxDBReplicationGraphQLPlugin } from 'rxdb/plugins/replication-graphql';
-
-// Register the GraphQL replication plugin
-addRxPlugin(RxDBReplicationGraphQLPlugin);
+// Import replicateGraphQL directly - no plugin registration needed
+import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 ```
 
-**Note**: While the replication code is bundled with RxDB, you must explicitly import and register the plugin before using `replicateGraphQL()` in your application.
+**Implementation Note**: Unlike some RxDB plugins, the GraphQL replication plugin doesn't need to be registered with `addRxPlugin()`. You can import and use `replicateGraphQL()` directly. See `src/database/replication.ts` for the actual implementation.
 
 #### Step 2.2: Configure GraphQL Replication ✅ DONE
 
@@ -1486,9 +1483,21 @@ const conflictHandlerWithMerging = (
 
 **Current Approach (No Feature Flags):**
 1. Revert specific component changes that use RxDB hooks back to Apollo hooks
-2. Components are migrated individually, so rollback can be selective
+2. Components can be rolled back individually or all at once
 3. Apollo Client remains in codebase and will work immediately
 4. Deploy hotfix with reverted components
+
+**Components Currently Using RxDB (can be reverted individually):**
+- `src/containers/EventList/EventList.tsx` - Uses `useRxQuery` for events
+- `src/containers/EventPage/EventPage.tsx` - Uses `useRxDocument` and `useRxQuery`
+- `src/containers/VirtualChallengeList/VirtualChallengeList.tsx` - Uses `useRxQuery`
+- `src/containers/VirtualChallenge/VirtualChallenge.tsx` - Uses `useRxDocument` (but still has Apollo mutation)
+
+**Rollback Process:**
+1. Restore `.graphql` query files for the component
+2. Change imports from `useRxQuery`/`useRxDocument` back to `useQuery` from `@apollo/client`
+3. Update query syntax to Apollo format
+4. Test and deploy
 
 **Note:** The original plan suggested feature flags (`VITE_USE_RXDB`), but the actual implementation uses direct component migration, so rollback requires reverting specific component code changes.
 
