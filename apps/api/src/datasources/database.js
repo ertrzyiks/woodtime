@@ -246,7 +246,7 @@ class Database extends DataSource {
     }));
   }
 
-  async pushEvents(events, user) {
+  async pushEvents(events, userId) {
     const results = [];
 
     for (const event of events) {
@@ -256,6 +256,20 @@ class Database extends DataSource {
         .from("events")
         .where({ id: event.id })
         .first();
+
+      // For existing events, verify user is a participant
+      if (existing) {
+        const participant = await knex
+          .select("id")
+          .from("participants")
+          .where({ user_id: userId, event_id: event.id })
+          .first();
+
+        if (!participant) {
+          // Skip events where user is not a participant
+          continue;
+        }
+      }
 
       const eventData = {
         name: event.name,
@@ -277,12 +291,26 @@ class Database extends DataSource {
           // Generate new ID for temporary IDs
           const [newId] = await knex("events").insert(eventData);
           actualId = newId;
+          // Add user as participant for new events
+          await knex("participants").insert({
+            user_id: userId,
+            event_id: actualId,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
         } else {
           await knex("events").insert({ id: event.id, ...eventData });
+          // Add user as participant for new events
+          await knex("participants").insert({
+            user_id: userId,
+            event_id: event.id,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
         }
 
         await this.createParticipant({
-          userId: user.id,
+          userId,
           eventId: actualId,
         });
       }
@@ -355,10 +383,22 @@ class Database extends DataSource {
     };
   }
 
-  async pushCheckpoints(checkpoints) {
+  async pushCheckpoints(checkpoints, userId) {
     const results = [];
 
     for (const checkpoint of checkpoints) {
+      // Verify user is a participant in the event
+      const participant = await knex
+        .select("id")
+        .from("participants")
+        .where({ user_id: userId, event_id: checkpoint.event_id })
+        .first();
+
+      if (!participant) {
+        // Skip checkpoints where user is not a participant in the event
+        continue;
+      }
+
       // Check if checkpoint exists
       const existing = await knex
         .select("id")
