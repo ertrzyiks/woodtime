@@ -1,5 +1,5 @@
 import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
-import type { RxDatabase } from 'rxdb';
+import type { RxDatabase, RxError } from 'rxdb';
 
 const GRAPHQL_ENDPOINT =
   import.meta.env.VITE_GRAPHQL_ENDPOINT ||
@@ -289,6 +289,23 @@ const pushVirtualChallengesQueryBuilder = (
   };
 };
 
+function handleUnauthenticated(err: RxError) {
+  const { parameters } = err;
+
+  if (!parameters || !parameters.errors) {
+    return;
+  }
+
+  if (window.location.pathname.startsWith('/sign-in')) {
+    return;
+  }
+
+  if (parameters.errors.find((e: any) => e.extensions?.code === 'UNAUTHENTICATED')) {
+    window.location.href =
+      '/sign-in?redirect_url=' + encodeURIComponent(window.location.href);
+  }
+}
+
 export function setupReplication(db: RxDatabase) {
   // Replicate events collection
   const eventsReplication = replicateGraphQL({
@@ -320,6 +337,7 @@ export function setupReplication(db: RxDatabase) {
   // Handle replication errors
   eventsReplication.error$.subscribe((err) => {
     console.error('Events replication error:', err);
+    handleUnauthenticated(err)
   });
 
   // Replicate checkpoints collection
@@ -349,6 +367,7 @@ export function setupReplication(db: RxDatabase) {
   });
 
   checkpointsReplication.error$.subscribe((err) => {
+    handleUnauthenticated(err);
     console.error('Checkpoints replication error:', err);
   });
 
@@ -380,6 +399,7 @@ export function setupReplication(db: RxDatabase) {
 
   virtualChallengesReplication.error$.subscribe((err) => {
     console.error('Virtual challenges replication error:', err);
+    handleUnauthenticated(err);
   });
 
   return {
