@@ -108,3 +108,10 @@ dist
 
 # TernJS port file
 .tern-port
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+.dev.sqlite3
+.test.sqlite3
