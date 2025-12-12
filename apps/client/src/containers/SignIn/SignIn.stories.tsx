@@ -54,5 +54,6 @@ export const RealServer = ({ onNavigate }: Args) => {
 }
 
 RealServer.parameters = {
-  chromatic: { disableSnapshot: true }
+  chromatic: { disableSnapshot: true },
+  msw: { handlers: [] },
 }

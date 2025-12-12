@@ -15,17 +15,20 @@ addRxPlugin(RxDBLeaderElectionPlugin);
 addRxPlugin(RxDBUpdatePlugin);
 // Note: GraphQL replication plugin doesn't need explicit registration
 
-export async function createDatabase() {
-  // Wrap storage with z-schema validator in development mode to catch schema errors early
-  const storage = process.env.NODE_ENV === 'development'
+export const storage =
+  process.env.NODE_ENV === 'development'
     ? wrappedValidateZSchemaStorage({ storage: getRxStorageDexie() })
     : getRxStorageDexie();
+
+export async function createDatabase() {
+  // Wrap storage with z-schema validator in development mode to catch schema errors early
 
   const db = await createRxDatabase({
     name: 'woodtime',
     storage, // Use validated storage in dev mode
     multiInstance: true, // For multi-tab support
     eventReduce: true, // Performance optimization
+    closeDuplicates: process.env.NODE_ENV === 'development',
   });
 
   return db;

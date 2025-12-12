@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { RxDatabase } from 'rxdb';
 import { createDatabase } from './setup';
 import { collections } from './collections';
@@ -11,7 +17,7 @@ interface RxDBContextType {
 
 const RxDBContext = createContext<RxDBContextType>({
   db: null,
-  loading: true
+  loading: true,
 });
 
 export const useRxDB = () => {
@@ -22,7 +28,9 @@ export const useRxDB = () => {
   return context;
 };
 
-export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [db, setDb] = useState<RxDatabase | null>(null);
   const [loading, setLoading] = useState(true);
   const initRef = useRef<boolean>(false);
@@ -33,9 +41,7 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     initRef.current = true;
 
-      async function init() {
-
-
+    async function init() {
       try {
         const database = await createDatabase();
 

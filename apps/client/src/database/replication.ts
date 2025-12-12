@@ -2,8 +2,7 @@ import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 import type { RxDatabase, RxError } from 'rxdb';
 
 const GRAPHQL_ENDPOINT =
-  import.meta.env.VITE_GRAPHQL_ENDPOINT ||
-  'https://localhost:8080/woodtime';
+  import.meta.env.VITE_GRAPHQL_ENDPOINT || 'https://localhost:8080/woodtime';
 
 // Type definitions for replication
 interface ReplicationCheckpoint {
@@ -13,11 +12,12 @@ interface ReplicationCheckpoint {
 // Pull query for events
 const pullEventsQueryBuilder = (
   checkpoint: ReplicationCheckpoint | null | undefined,
-  limit: number
+  limit: number,
 ) => {
   if (!checkpoint) {
     // First pull - get all events
     return {
+      operationName: 'PullEvents',
       query: `
         query PullEvents($limit: Int!, $minUpdatedAt: DateTime!) {
           pullEvents(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -46,6 +46,7 @@ const pullEventsQueryBuilder = (
 
   // Subsequent pulls - get only updated events
   return {
+    operationName: 'PullEvents',
     query: `
       query PullEvents($limit: Int!, $minUpdatedAt: DateTime!) {
         pullEvents(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -75,8 +76,8 @@ const pullEventsQueryBuilder = (
 
 // Push query for creating/updating events
 const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
-  console.log('Pushing events:', docs);
   return {
+    operationName: 'PushEvents',
     query: `
       mutation PushEvents($events: [EventInput!]!) {
         pushEvents(events: $events) {
@@ -107,10 +108,11 @@ const pushEventsQueryBuilder = (docs: Array<Record<string, any>>) => {
 // Pull query for checkpoints
 const pullCheckpointsQueryBuilder = (
   checkpoint: ReplicationCheckpoint | null | undefined,
-  limit: number
+  limit: number,
 ) => {
   if (!checkpoint) {
     return {
+      operationName: 'PullCheckpoints',
       query: `
         query PullCheckpoints($limit: Int!, $minUpdatedAt: DateTime!) {
           pullCheckpoints(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -140,6 +142,7 @@ const pullCheckpointsQueryBuilder = (
   }
 
   return {
+    operationName: 'PullCheckpoints',
     query: `
       query PullCheckpoints($limit: Int!, $minUpdatedAt: DateTime!) {
         pullCheckpoints(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -170,6 +173,7 @@ const pullCheckpointsQueryBuilder = (
 // Push query for checkpoints
 const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
   return {
+    operationName: 'PushCheckpoints',
     query: `
       mutation PushCheckpoints($checkpoints: [CheckpointInput!]!) {
         pushCheckpoints(checkpoints: $checkpoints) {
@@ -204,10 +208,11 @@ const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
 // Pull query for virtual challenges
 const pullVirtualChallengesQueryBuilder = (
   checkpoint: ReplicationCheckpoint | null | undefined,
-  limit: number
+  limit: number,
 ) => {
   if (!checkpoint) {
     return {
+      operationName: 'PullVirtualChallenges',
       query: `
         query PullVirtualChallenges($limit: Int!, $minUpdatedAt: DateTime!) {
           pullVirtualChallenges(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -233,6 +238,7 @@ const pullVirtualChallengesQueryBuilder = (
   }
 
   return {
+    operationName: 'PullVirtualChallenges',
     query: `
       query PullVirtualChallenges($limit: Int!, $minUpdatedAt: DateTime!) {
         pullVirtualChallenges(limit: $limit, minUpdatedAt: $minUpdatedAt) {
@@ -260,9 +266,10 @@ const pullVirtualChallengesQueryBuilder = (
 
 // Push query for virtual challenges
 const pushVirtualChallengesQueryBuilder = (
-  docs: Array<Record<string, any>>
+  docs: Array<Record<string, any>>,
 ) => {
   return {
+    operationName: 'PushVirtualChallenges',
     query: `
       mutation PushVirtualChallenges($challenges: [VirtualChallengeInput!]!) {
         pushVirtualChallenges(challenges: $challenges) {
@@ -300,7 +307,9 @@ function handleUnauthenticated(err: RxError) {
     return;
   }
 
-  if (parameters.errors.find((e: any) => e.extensions?.code === 'UNAUTHENTICATED')) {
+  if (
+    parameters.errors.find((e: any) => e.extensions?.code === 'UNAUTHENTICATED')
+  ) {
     window.location.href =
       '/sign-in?redirect_url=' + encodeURIComponent(window.location.href);
   }
@@ -316,10 +325,10 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullEventsQueryBuilder,
-      batchSize: 20
+      batchSize: 20,
     },
     push: {
-      queryBuilder: pushEventsQueryBuilder
+      queryBuilder: pushEventsQueryBuilder,
     },
     deletedField: 'deleted',
     live: true, // Enable continuous replication
@@ -337,7 +346,7 @@ export function setupReplication(db: RxDatabase) {
   // Handle replication errors
   eventsReplication.error$.subscribe((err) => {
     console.error('Events replication error:', err);
-    handleUnauthenticated(err)
+    handleUnauthenticated(err);
   });
 
   // Replicate checkpoints collection
@@ -349,7 +358,7 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullCheckpointsQueryBuilder,
-      batchSize: 20
+      batchSize: 20,
     },
     push: {
       queryBuilder: pushCheckpointsQueryBuilder,
@@ -380,7 +389,7 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullVirtualChallengesQueryBuilder,
-      batchSize: 20
+      batchSize: 20,
     },
     push: {
       queryBuilder: pushVirtualChallengesQueryBuilder,
