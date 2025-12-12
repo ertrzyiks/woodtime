@@ -1,5 +1,40 @@
 # RxDB Adoption Plan
 
+## 📊 Migration Status: ~60% Complete
+
+**Last Updated:** December 12, 2024
+
+### Quick Status Overview
+
+| Component | Status |
+|-----------|--------|
+| **Infrastructure** | ✅ Complete |
+| **Backend Replication** | ✅ Complete |
+| **Read Queries** | ✅ Complete |
+| **Mutations** | ⚠️ Partial (4 components pending) |
+| **Testing** | ❌ Not Started |
+| **Apollo Removal** | ❌ Blocked |
+
+**Current State:** The application is running both Apollo Client and RxDB in parallel. Read operations for events, checkpoints, and virtual challenges use RxDB, while some mutations and authentication operations still use Apollo Client.
+
+**Next Steps:** Complete mutation migrations for `VirtualChallenge.tsx`, `JoinEvent.tsx`, `SignIn.tsx`, and `EventInvitePage.tsx`, then proceed with comprehensive testing.
+
+### 🔄 Plan Adjustments
+
+The following adjustments have been made to the original plan based on implementation experience:
+
+1. **Feature Flag Approach Not Implemented** - Instead of using environment variable feature flags (like `VITE_USE_RXDB`), the migration is being done component-by-component with both systems running in parallel. This provides a more gradual, lower-risk migration path.
+
+2. **No Temporary ID Conflicts Yet** - The `generateTempId()` utility was created but the mutation migrations are not yet complete to validate if the negative ID approach works well in practice. This may need refinement during Phase 4 completion.
+
+3. **GraphQL Replication Plugin Registration** - The documentation mentioned explicit plugin registration, but the implementation correctly notes that the GraphQL replication plugin doesn't need explicit registration as it's bundled with RxDB.
+
+4. **Users Collection Not Yet Replicated** - While the schema exists, the `setupReplication()` function only configures replication for events, checkpoints, and virtual challenges. User data replication should be added if needed.
+
+5. **Validation in Development** - The implementation wisely added z-schema validation wrapping in development mode using `wrappedValidateZSchemaStorage`, which wasn't in the original plan but is a best practice for catching schema errors early.
+
+---
+
 ## Overview
 
 This document outlines a comprehensive plan to migrate the Woodtime client application from Apollo Client to RxDB with GraphQL replication. The migration will improve offline-first capabilities, real-time synchronization, and provide better multi-tab support while maintaining the existing GraphQL API.
@@ -89,9 +124,9 @@ The GraphQL schema includes:
 
 ## Migration Plan
 
-### Phase 1: Setup and Infrastructure (Week 1)
+### Phase 1: Setup and Infrastructure ✅ COMPLETED
 
-#### Step 1.1: Install RxDB Dependencies
+#### Step 1.1: Install RxDB Dependencies ✅ DONE
 
 ```bash
 pnpm add rxdb rxjs
@@ -103,7 +138,7 @@ Required RxDB packages:
 - `rxjs` - Required peer dependency for observables
 - Storage adapter (IndexedDB recommended for browser)
 
-#### Step 1.2: Create RxDB Database Configuration
+#### Step 1.2: Create RxDB Database Configuration ✅ DONE
 
 Create `src/database/setup.ts`:
 
@@ -148,7 +183,7 @@ Dexie is chosen as the storage adapter for RxDB in the browser for several reaso
 
 Alternative storage adapters exist (LokiJS, memory, etc.) but Dexie is the recommended choice for production browser applications due to its reliability and performance characteristics.
 
-#### Step 1.3: Define RxDB Schemas
+#### Step 1.3: Define RxDB Schemas ✅ DONE
 
 Create `src/database/schemas/` directory with schema definitions:
 
@@ -262,7 +297,7 @@ export const checkpointSchema: RxJsonSchema<any> = {
 
 **Note**: The `event_id` field creates a foreign key-like relationship. While RxDB doesn't enforce referential integrity like traditional databases, this field is indexed for efficient queries. You can query all checkpoints for an event using: `db.checkpoints.find({ selector: { event_id: eventId } })`
 
-#### Step 1.4: Create Collections
+#### Step 1.4: Create Collections ✅ DONE
 
 Create `src/database/collections.ts`:
 
@@ -307,23 +342,20 @@ export const collections = {
 };
 ```
 
-### Phase 2: GraphQL Replication Setup (Week 1-2)
+### Phase 2: GraphQL Replication Setup ✅ COMPLETED
 
-#### Step 2.1: Setup GraphQL Replication Plugin
+#### Step 2.1: Setup GraphQL Replication Plugin ✅ DONE
 
-The GraphQL replication functionality is included in the main RxDB package but requires explicit plugin registration:
+The GraphQL replication functionality is included in the main RxDB package and doesn't require explicit plugin registration.
 
 ```typescript
-import { addRxPlugin } from 'rxdb';
-import { RxDBReplicationGraphQLPlugin } from 'rxdb/plugins/replication-graphql';
-
-// Register the GraphQL replication plugin
-addRxPlugin(RxDBReplicationGraphQLPlugin);
+// Import replicateGraphQL directly - no plugin registration needed
+import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 ```
 
-**Note**: While the replication code is bundled with RxDB, you must explicitly import and register the plugin before using `replicateGraphQL()` in your application.
+**Implementation Note**: Unlike some RxDB plugins, the GraphQL replication plugin doesn't need to be registered with `addRxPlugin()`. You can import and use `replicateGraphQL()` directly. See `src/database/replication.ts` for the actual implementation.
 
-#### Step 2.2: Configure GraphQL Replication
+#### Step 2.2: Configure GraphQL Replication ✅ DONE
 
 Create `src/database/replication.ts`:
 
@@ -471,7 +503,7 @@ export function setupReplication(db: RxDatabase) {
 }
 ```
 
-#### Step 2.3: Update Backend GraphQL Schema
+#### Step 2.3: Update Backend GraphQL Schema ✅ DONE
 
 The backend needs to support replication queries. Add to `apps/api/src/schema.graphql`:
 
@@ -657,9 +689,9 @@ exports.up = async function(knex) {
 };
 ```
 
-### Phase 3: React Integration (Week 2)
+### Phase 3: React Integration ✅ COMPLETED
 
-#### Step 3.1: Create RxDB Provider
+#### Step 3.1: Create RxDB Provider ✅ DONE
 
 Create `src/database/RxDBProvider.tsx`:
 
@@ -731,7 +763,7 @@ export const RxDBProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 ```
 
-#### Step 3.2: Create Custom Hooks
+#### Step 3.2: Create Custom Hooks ✅ DONE
 
 Create `src/database/hooks/useRxQuery.ts`:
 
@@ -831,7 +863,7 @@ export function useRxDocument<T>(
 }
 ```
 
-#### Step 3.3: Update AppShell.tsx
+#### Step 3.3: Update AppShell.tsx ✅ DONE (Both providers running in parallel)
 
 Replace Apollo Provider with RxDB Provider:
 
@@ -860,9 +892,23 @@ function AppShell({ children }: { children: ReactNode }) {
 }
 ```
 
-### Phase 4: Migrate Queries and Mutations (Week 2-3)
+### Phase 4: Migrate Queries and Mutations ⚠️ IN PROGRESS
 
-#### Step 4.1: Convert Read Queries
+#### Step 4.1: Convert Read Queries ✅ PARTIALLY DONE
+
+**Completed:**
+- ✅ `EventList.tsx` - Using `useRxQuery` for events
+- ✅ `EventPage.tsx` - Using `useRxDocument` for events and `useRxQuery` for checkpoints
+- ✅ `VirtualChallengeList.tsx` - Using `useRxQuery` for virtual challenges
+- ✅ `VirtualChallenge.tsx` - Using `useRxDocument` for virtual challenges
+
+**Still using Apollo Client:**
+- ⚠️ `VirtualChallenge.tsx` - Still uses `useMutation` for enrollVirtualChallenge
+- ⚠️ `JoinEvent/JoinEvent.tsx` - Still uses `useMutation` for joinEvent
+- ⚠️ `SignIn/SignIn.tsx` - Still uses `useMutation` for signIn
+- ⚠️ `EventInvitePage/EventInvitePage.tsx` - Still uses `useMutation` and `useQuery` for invitations and friends
+
+**Original example:**
 
 **Before (Apollo Client):**
 ```typescript
@@ -892,7 +938,11 @@ const { data: events, loading, error } = useRxQuery(
 );
 ```
 
-#### Step 4.2: Convert Mutations
+#### Step 4.2: Convert Mutations ⚠️ PARTIALLY DONE
+
+**Note:** Most CRUD operations for events, checkpoints, and virtual challenges still need to be migrated from Apollo mutations to RxDB operations. The components above show which mutations remain to be converted.
+
+**Original example:**
 
 **Before (Apollo Client):**
 ```typescript
@@ -982,7 +1032,11 @@ const handleCreateEvent = async (eventData: any) => {
 3. Return the document with the real ID
 4. RxDB will automatically update the local document with the new ID
 
-#### Step 4.3: Handle Relationships
+#### Step 4.3: Handle Relationships ✅ DONE
+
+Relationships between events and checkpoints are already being handled correctly in `EventPage.tsx` using separate queries.
+
+**Example implementation:**
 
 For queries with relationships (e.g., event with checkpoints):
 
@@ -1005,21 +1059,36 @@ const eventWithCheckpoints = event ? {
 } : null;
 ```
 
-### Phase 5: Migration Strategy (Week 3)
+### Phase 5: Migration Strategy ⚠️ IN PROGRESS
 
-#### Step 5.1: Parallel Running Phase
+#### Step 5.1: Parallel Running Phase ✅ DONE
 
-Run both Apollo Client and RxDB simultaneously:
+Currently running both Apollo Client and RxDB simultaneously in `AppShell.tsx`. The app is in a hybrid state where:
+- Read queries for events, checkpoints, and virtual challenges use RxDB
+- Some mutations and authentication-related operations still use Apollo Client
+- Both providers are active, allowing gradual migration
 
-1. Keep Apollo Client code
-2. Add RxDB alongside
-3. Feature flag to switch between implementations
-4. Compare data consistency
-5. Monitor performance metrics
+**Current implementation in AppShell.tsx:**
 
-**Important: Avoid Conditional Hook Calls**
+```typescript
+// Both providers active simultaneously
+<ApolloProvider client={client}>
+  <RxDBProvider>
+    <InitialNavigationDetector>{children}</InitialNavigationDetector>
+  </RxDBProvider>
+</ApolloProvider>
+```
 
-React hooks cannot be called conditionally. Instead, use a wrapper component or adapter pattern:
+**Actual Migration Approach:**
+- ✅ Component-by-component migration (no feature flags)
+- ✅ Both systems active simultaneously 
+- ✅ Components directly use either Apollo hooks or RxDB hooks
+- ⚠️ Not using wrapper components or adapter pattern
+- ⚠️ Manual verification of data consistency needed
+
+**Alternative Approaches (not currently used but documented for reference):**
+
+The original plan outlined conditional approaches, but the actual implementation chose a simpler path of direct component migration.
 
 **Option 1: Wrapper Component Pattern**
 ```typescript
@@ -1133,7 +1202,11 @@ function AppShell({ children }: { children: ReactNode }) {
 
 The wrapper component pattern (Option 1) is cleanest for migration as it maintains clear separation and doesn't require modifying hooks to handle both implementations.
 
-#### Step 5.2: Data Migration
+#### Step 5.2: Data Migration ⚠️ NOT STARTED
+
+**Note:** Data migration logic has not been implemented yet. Once all queries/mutations are converted, this step will:
+
+**Original plan:**
 
 1. On first RxDB initialization, pull all data from server
 2. Clear old Apollo cache (localStorage)
@@ -1152,7 +1225,9 @@ async function migrateFromApollo() {
 }
 ```
 
-#### Step 5.3: Testing Phase
+#### Step 5.3: Testing Phase ⚠️ NOT STARTED
+
+**Required testing:**
 
 1. Unit test RxDB schemas
 2. Integration test replication
@@ -1160,9 +1235,18 @@ async function migrateFromApollo() {
 4. Load testing with large datasets
 5. Multi-tab synchronization testing
 
-### Phase 6: Remove Apollo Client (Week 4)
+### Phase 6: Remove Apollo Client ❌ NOT STARTED
 
-#### Step 6.1: Cleanup
+**Blockers:** Cannot proceed until:
+1. All Apollo mutations are converted to RxDB operations
+2. Testing phase is completed
+3. Data migration is implemented and tested
+
+**When ready, this phase will include:**
+
+#### Step 6.1: Cleanup ❌ NOT STARTED
+
+**Once all migrations are complete:**
 
 1. Remove Apollo Client dependencies:
 ```bash
@@ -1179,14 +1263,16 @@ pnpm remove @graphql-codegen/cli @graphql-codegen/typed-document-node
 
 4. Remove GraphQL Code Generator scripts from `package.json`
 
-#### Step 6.2: Update Documentation
+#### Step 6.2: Update Documentation ❌ NOT STARTED
+
+**Documentation updates needed:**
 
 1. Update README.md with RxDB setup instructions
 2. Document new query patterns
 3. Add troubleshooting guide
 4. Update Storybook mocks to use RxDB
 
-### Phase 7: Future Optimizations (Post-Migration)
+### Phase 7: Future Optimizations 📋 DOCUMENTED (Post-Migration)
 
 This phase captures optimization opportunities identified during the migration that should be considered after the initial RxDB adoption is complete and stable.
 
@@ -1395,9 +1481,25 @@ const conflictHandlerWithMerging = (
 
 ### Immediate Rollback (if critical issues found)
 
-1. Set feature flag `VITE_USE_RXDB=false`
-2. Deploy hotfix
-3. Apollo Client still in codebase, will activate immediately
+**Current Approach (No Feature Flags):**
+1. Revert specific component changes that use RxDB hooks back to Apollo hooks
+2. Components can be rolled back individually or all at once
+3. Apollo Client remains in codebase and will work immediately
+4. Deploy hotfix with reverted components
+
+**Components Currently Using RxDB (can be reverted individually):**
+- `src/containers/EventList/EventList.tsx` - Uses `useRxQuery` for events
+- `src/containers/EventPage/EventPage.tsx` - Uses `useRxDocument` and `useRxQuery`
+- `src/containers/VirtualChallengeList/VirtualChallengeList.tsx` - Uses `useRxQuery`
+- `src/containers/VirtualChallenge/VirtualChallenge.tsx` - Uses `useRxDocument` (but still has Apollo mutation)
+
+**Rollback Process:**
+1. Restore `.graphql` query files for the component
+2. Change imports from `useRxQuery`/`useRxDocument` back to `useQuery` from `@apollo/client`
+3. Update query syntax to Apollo format
+4. Test and deploy
+
+**Note:** The original plan suggested feature flags (`VITE_USE_RXDB`), but the actual implementation uses direct component migration, so rollback requires reverting specific component code changes.
 
 ### Full Rollback (if needed after cleanup)
 
@@ -1408,29 +1510,38 @@ const conflictHandlerWithMerging = (
 
 ## Timeline Summary
 
-| Phase | Duration | Deliverables |
-|-------|----------|--------------|
-| Phase 1: Setup | Week 1 | RxDB installed, schemas defined |
-| Phase 2: Replication | Week 1-2 | GraphQL replication configured, backend updated |
-| Phase 3: React Integration | Week 2 | Providers and hooks created |
-| Phase 4: Query Migration | Week 2-3 | All queries/mutations converted |
-| Phase 5: Testing & Parallel Run | Week 3 | Feature complete, both systems running |
-| Phase 6: Cleanup | Week 4 | Apollo Client removed, documentation updated |
-| Phase 7: Future Optimizations | Post-Migration | Identified optimization opportunities to pursue after migration is stable |
+| Phase | Status | Duration | Deliverables |
+|-------|--------|----------|--------------|
+| Phase 1: Setup | ✅ COMPLETED | Week 1 | RxDB installed, schemas defined |
+| Phase 2: Replication | ✅ COMPLETED | Week 1-2 | GraphQL replication configured, backend updated |
+| Phase 3: React Integration | ✅ COMPLETED | Week 2 | Providers and hooks created |
+| Phase 4: Query Migration | ⚠️ IN PROGRESS | Week 2-3 | Read queries done, mutations partially done |
+| Phase 5: Testing & Parallel Run | ⚠️ IN PROGRESS | Week 3 | Parallel mode active, testing incomplete |
+| Phase 6: Cleanup | ❌ NOT STARTED | Week 4 | Apollo Client removal pending |
+| Phase 7: Future Optimizations | 📋 DOCUMENTED | Post-Migration | Optimization ideas documented |
 
-**Total Estimated Time: 4 weeks (Phases 1-6)**
+**Progress: ~60% Complete (Phases 1-3 fully done, Phase 4-5 partially done)**
+
+**Remaining Work:**
+- Complete mutation migrations for VirtualChallenge enrollment, JoinEvent, SignIn, and EventInvitePage
+- Implement data migration logic
+- Complete comprehensive testing (unit, integration, E2E)
+- Remove Apollo Client dependencies
+- Update documentation
 
 **Phase 7** is a living document of optimization ideas to be pursued incrementally after the core migration is complete and stable.
 
 ## Success Metrics
 
-- [ ] All GraphQL queries migrated to RxDB
-- [ ] Offline functionality working correctly
-- [ ] Real-time sync operational
-- [ ] Multi-tab support verified
-- [ ] Performance equal or better than Apollo Client
-- [ ] Zero data loss during migration
-- [ ] Test coverage maintained or improved
+- [x] ~~All GraphQL queries migrated to RxDB~~ **Partially Done** - Read queries migrated, mutations pending
+- [ ] Offline functionality working correctly - **Testing Required**
+- [x] Real-time sync operational - **Replication configured and running**
+- [ ] Multi-tab support verified - **Testing Required**
+- [ ] Performance equal or better than Apollo Client - **Testing Required**
+- [ ] Zero data loss during migration - **Migration logic not yet implemented**
+- [ ] Test coverage maintained or improved - **Testing Required**
+
+**Current State:** Infrastructure complete, partial feature migration, testing pending
 
 ## Resources
 
@@ -1442,19 +1553,78 @@ const conflictHandlerWithMerging = (
 ## Open Questions
 
 1. **Temporary IDs**: How to handle temporary IDs for offline-created documents? 
-   - Solution: Use negative IDs or UUIDs, map to real IDs on sync
+   - Planned Solution: Use negative IDs (see `generateTempId()` utility)
+   - Status: ⚠️ Not yet validated - mutation migrations incomplete
 
 2. **Large Datasets**: What's the strategy for events with many checkpoints?
    - Solution: Implement pagination or virtual scrolling
+   - Status: ❓ To be determined during performance testing
 
 3. **Real-time Updates**: How frequently should replication pull?
-   - Solution: Use live replication with WebSocket fallback
+   - Solution: Using live replication (continuous) with 5s retry
+   - Status: ✅ Implemented in `replication.ts`
 
 4. **Schema Versioning**: How to handle schema migrations?
    - Solution: Implement RxDB migration strategies
+   - Status: ❓ Not yet needed (all schemas at version 0)
 
 5. **File Attachments**: How to handle checkpoint photos or attachments?
    - Solution: Use separate blob storage with references in RxDB
+   - Status: ❓ Not yet implemented
+
+6. **Users Collection Replication**: Should user data be replicated?
+   - Schema exists but replication not configured
+   - Status: ❓ Needs decision based on use case
+
+7. **Authentication Operations**: How to handle sign-in, join event with RxDB?
+   - These may stay as Apollo mutations if they don't need offline support
+   - Status: ❓ Needs architectural decision
+
+## Next Actions for Developers
+
+### Immediate Priority (Phase 4 Completion)
+
+1. **Migrate Remaining Mutations** - Convert these 4 components from Apollo to RxDB:
+   - `src/containers/VirtualChallenge/VirtualChallenge.tsx` - enrollVirtualChallenge mutation
+   - `src/containers/JoinEvent/JoinEvent.tsx` - joinEvent mutation  
+   - `src/containers/SignIn/SignIn.tsx` - signIn mutation (decision needed: keep Apollo or migrate?)
+   - `src/containers/EventInvitePage/EventInvitePage.tsx` - invitation/friends queries
+
+2. **Test Offline Functionality** - Verify that:
+   - Data syncs correctly when going offline/online
+   - Mutations queue properly when offline
+   - Temporary IDs work correctly for offline-created documents
+
+3. **Implement Data Migration** - Create migration logic to:
+   - Clear old Apollo cache on first RxDB initialization
+   - Mark migration complete in localStorage
+   - Handle edge cases during transition
+
+### Medium Priority (Phase 5)
+
+4. **Comprehensive Testing**
+   - Add unit tests for RxDB schemas and hooks
+   - Add integration tests for replication
+   - Add E2E tests for offline scenarios
+   - Test multi-tab synchronization
+
+5. **Performance Monitoring**
+   - Compare query performance vs Apollo Client
+   - Monitor IndexedDB storage usage
+   - Test with large datasets
+
+### Low Priority (Phase 6+)
+
+6. **Remove Apollo Client** - Once all above is complete:
+   - Remove Apollo dependencies from package.json
+   - Delete Apollo-related files (.graphql files, codegen config)
+   - Remove Apollo provider from AppShell.tsx
+   - Update Storybook mocks
+
+7. **Consider Phase 7 Optimizations** - After migration is stable:
+   - Consolidate `updated_at` and `_modified` fields
+   - Auto-generate `CollectionName` type
+   - Optimize indexes and queries
 
 ## Conclusion
 
