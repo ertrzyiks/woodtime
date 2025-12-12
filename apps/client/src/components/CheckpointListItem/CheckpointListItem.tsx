@@ -37,17 +37,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
   const labelId = `checkbox-list-label-${id}`;
-  const [creationLoading, setCreationLoading] = React.useState(false);
-  const [creationError, setCreationError] = React.useState<Error | null>(null);
 
   const history = useHistory();
   const { db } = useRxDB();
 
   const handleToggle = async (value: number) => {
     if (!db) return;
-
-    setCreationLoading(true);
-    setCreationError(null);
 
     try {
       if (checkpoint) {
@@ -74,10 +69,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
 
         history.push(`/events/${eventId}`);
       }
-      setCreationLoading(false);
     } catch (err) {
-      setCreationError(err as Error);
-      setCreationLoading(false);
       throw err;
     }
   };
@@ -90,41 +82,23 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
 
     if (!db) return;
 
-    setCreationLoading(true);
-    setCreationError(null);
+    const now = new Date().toISOString();
+    await db.checkpoints.insert({
+      id: generateTempId(),
+      event_id: eventId,
+      cp_id: checkpointId,
+      cp_code: null,
+      skipped: true,
+      skip_reason: null,
+      created_at: now,
+      updated_at: now,
+    });
 
-    try {
-      const now = new Date().toISOString();
-      await db.checkpoints.insert({
-        id: generateTempId(),
-        event_id: eventId,
-        cp_id: checkpointId,
-        cp_code: null,
-        skipped: true,
-        skip_reason: null,
-        created_at: now,
-        updated_at: now,
-        deleted: false
-      });
+    history.push(`/events/${eventId}`);
 
-      history.push(`/events/${eventId}`);
-      setCreationLoading(false);
-    } catch (err) {
-      setCreationError(err as Error);
-      setCreationLoading(false);
-      throw err;
-    }
   };
 
   const classes = useStyles();
-
-  if (creationLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (creationError) {
-    return <p>Error :(</p>;
-  }
 
   const skipButton = !checkpoint && (
     <Button variant="contained" onClick={(e) => handleSkipClick(e, id)}>

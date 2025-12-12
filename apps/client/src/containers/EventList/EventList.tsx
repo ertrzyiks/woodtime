@@ -96,12 +96,7 @@ const EventList = () => {
     }).exec();
 
     if (event) {
-      // Soft delete - will be synced via replication
-      await event.update({
-        $set: {
-          deleted: true
-        }
-      });
+      await event.remove()
     }
   };
 
