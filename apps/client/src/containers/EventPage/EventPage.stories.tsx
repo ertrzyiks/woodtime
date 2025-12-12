@@ -34,15 +34,19 @@ interface MockEventArgs {
 }
 
 const MockTemplate: Story<MockEventArgs> = ({ store, ...args }: any) => {
-  console.log('STOR', store);
-
-  console.log('------ Setting up event with args:', args);
   store.set('Event', '1', { id: '1', ...args });
   store.set('EventDocument', '1', {
     id: '1',
     name: args.name,
     type: args.type,
     checkpoint_count: args.checkpoint_count,
+  });
+
+  args.checkpoints.forEach((cp: any, index: number) => {
+    store.set('CheckpointDocument', `${index + 1}`, {
+      event_id: '1',
+      ...cp,
+    });
   });
 
   return (

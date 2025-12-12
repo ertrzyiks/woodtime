@@ -11,6 +11,10 @@ export default function getMockedApolloClient() {
         deleted: false,
         checkpoint_count: 12,
       }),
+      CheckpointDocument: () => ({
+        skipped: false,
+        deleted: false,
+      }),
       DateTime: () => '2021-11-12T12:36:06.235Z',
       Checkpoint: () => {
         return {
@@ -52,6 +56,23 @@ export default function getMockedApolloClient() {
     documents: [{ id: '1' }, { id: '2' }],
   });
 
+  store.set('PullCheckpointsResponse', 'ROOT', {
+    documents: [
+      { id: '1' },
+      { id: '2' },
+      { id: '3' },
+      { id: '4' },
+      { id: '5' },
+      { id: '6' },
+      { id: '7' },
+      { id: '8' },
+      { id: '9' },
+      { id: '10' },
+      { id: '11' },
+      { id: '12' },
+    ],
+  });
+
   const schemaWithMocks = addMocksToSchema({
     schema,
     store,
@@ -60,6 +81,9 @@ export default function getMockedApolloClient() {
         event: (_, { id }) => store.get('Event', id),
         pullEvents: (_, { since }) => {
           return store.get('PullEventsResponse', 'ROOT');
+        },
+        pullCheckpoints: (_, { since }) => {
+          return store.get('PullCheckpointsResponse', 'ROOT');
         },
       },
     }),
@@ -70,13 +94,6 @@ export default function getMockedApolloClient() {
     link: new SchemaLink({
       schema: schemaWithMocks,
     }),
-  });
-
-  store.set('EventDocument', '1', {
-    id: '1',
-    name: 'Harpus',
-    type: 2,
-    checkpoint_count: 12,
   });
 
   return { client, store, schemaWithMocks };
