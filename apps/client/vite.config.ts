@@ -13,7 +13,10 @@ export default defineConfig({
       apply: 'build',
       closeBundle() {
         const fs = require('fs');
-        fs.copyFileSync('dist/index.html', 'dist/404.html');
+        const path = require('path');
+        const indexPath = path.resolve('dist', 'index.html');
+        const notFoundPath = path.resolve('dist', '404.html');
+        fs.copyFileSync(indexPath, notFoundPath);
       },
     },
   ],
