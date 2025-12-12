@@ -1,28 +1,25 @@
-const { DataSource } = require('apollo-datasource')
-const knex = require("../../knex")
-const { v4: uuidv4 } = require('uuid')
+const { DataSource } = require("apollo-datasource");
+const knex = require("../../knex");
+const { v4: uuidv4 } = require("uuid");
 
 const resolveDates = (obj) => {
-  const { created_at, updated_at, ...rest } = obj
+  const { created_at, updated_at, ...rest } = obj;
   return {
     ...rest,
     created_at: new Date(created_at),
-    updated_at: new Date(updated_at)
-  }
-}
+    updated_at: new Date(updated_at),
+  };
+};
 
 class Database extends DataSource {
   initialize(config) {
-    this.context = config.context
+    this.context = config.context;
   }
 
   async findUserById(id) {
-    const user = await knex
-      .select('id', 'name')
-      .from('users')
-      .where({ id })
+    const user = await knex.select("id", "name").from("users").where({ id });
 
-    return user[0]
+    return user[0];
   }
 
   async findEventsForUser({ id }) {
@@ -34,34 +31,49 @@ class Database extends DataSource {
         "events.virtual_challenge_id",
         "events.checkpoint_count",
         "events.created_at",
-        "events.updated_at")
+        "events.updated_at",
+      )
       .from("events")
-      .join('participants', 'events.id', '=', 'participants.event_id')
-      .where('participants.user_id', id)
+      .join("participants", "events.id", "=", "participants.event_id")
+      .where("participants.user_id", id);
 
-    return events.map(event => resolveDates(event))
+    return events.map((event) => resolveDates(event));
   }
 
   async findEventById(id) {
     const rows = await knex
-      .select("id", "name", "type", "invite_token", "checkpoint_count","virtual_challenge_id", "created_at", "updated_at")
+      .select(
+        "id",
+        "name",
+        "type",
+        "invite_token",
+        "checkpoint_count",
+        "virtual_challenge_id",
+        "created_at",
+        "updated_at",
+      )
       .from("events")
-      .where({ id })
+      .where({ id });
 
     if (rows.length <= 0) {
-      return null
+      return null;
     }
 
-    const event = rows[0]
+    const event = rows[0];
 
-    return resolveDates(event)
+    return resolveDates(event);
   }
 
   deleteEventById(id) {
-    return knex('events').where({ id }).del();
+    return knex("events").where({ id }).del();
   }
 
-  async createEvent({ name, type, checkpointCount, virtualChallengeId = null}) {
+  async createEvent({
+    name,
+    type,
+    checkpointCount,
+    virtualChallengeId = null,
+  }) {
     const event = {
       name,
       type,
@@ -72,29 +84,29 @@ class Database extends DataSource {
       updated_at: new Date().toISOString(),
     };
 
-    const ids = await knex("events").insert(event)
+    const ids = await knex("events").insert(event);
 
     return {
       id: ids[0],
-      ...resolveDates(event)
-    }
+      ...resolveDates(event),
+    };
   }
 
   async findParticipant({ userId, eventId }) {
     const participants = await knex
       .select("id")
       .from("participants")
-      .where({ user_id: userId, event_id: eventId })
+      .where({ user_id: userId, event_id: eventId });
 
-    return participants[0]
+    return participants[0];
   }
 
   findParticipantsForEvent(id) {
     return knex
-      .select('users.id', 'users.name')
+      .select("users.id", "users.name")
       .from("participants")
-      .join('users', 'users.id', '=', 'participants.user_id')
-      .where({ event_id: id })
+      .join("users", "users.id", "=", "participants.user_id")
+      .where({ event_id: id });
   }
 
   async createParticipant({ userId, eventId }) {
@@ -103,13 +115,13 @@ class Database extends DataSource {
       event_id: eventId,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }
-    const ids = await knex('participants').insert(participant)
+    };
+    const ids = await knex("participants").insert(participant);
 
     return {
       id: ids[0],
-      ...participant
-    }
+      ...participant,
+    };
   }
 
   async createCheckpoint({ eventId, cpId, cpCode, skipped, skipReason }) {
@@ -121,32 +133,32 @@ class Database extends DataSource {
       skip_reason: skipReason || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }
+    };
 
-    const ids = await knex("checkpoints").insert(checkpoint)
+    const ids = await knex("checkpoints").insert(checkpoint);
 
     return {
       id: ids[0],
-      ...resolveDates(checkpoint)
-    }
+      ...resolveDates(checkpoint),
+    };
   }
 
   deleteCheckpoint(id) {
-    return knex("checkpoints").where({ id }).del()
+    return knex("checkpoints").where({ id }).del();
   }
 
   async findCheckpointById(id) {
     const rows = await knex
       .select("id", "event_id")
       .from("checkpoints")
-      .where({ id })
+      .where({ id });
 
     if (rows.length <= 0) {
-      return null
+      return null;
     }
 
-    const checkpoint = rows[0]
-    return resolveDates(checkpoint)
+    const checkpoint = rows[0];
+    return resolveDates(checkpoint);
   }
 
   async findCheckpointsForEvent(id) {
@@ -159,80 +171,79 @@ class Database extends DataSource {
         "skipped",
         "skip_reason",
         "created_at",
-        "updated_at"
+        "updated_at",
       )
       .from("checkpoints")
       .where({
         event_id: id,
-      })
+      });
 
-    return checkpoints.map(checkpoint => resolveDates(checkpoint))
+    return checkpoints.map((checkpoint) => resolveDates(checkpoint));
   }
 
   async findFriendForUser({ id }) {
-    const subquery = knex.select('event_id').from('participants').where({ user_id: id })
+    const subquery = knex
+      .select("event_id")
+      .from("participants")
+      .where({ user_id: id });
     const friends = await knex
-      .select('users.id', 'name')
-      .distinct('user_id')
-      .join('users', 'users.id', '=', 'participants.user_id')
-      .from('participants')
-      .where('event_id', 'in', subquery)
+      .select("users.id", "name")
+      .distinct("user_id")
+      .join("users", "users.id", "=", "participants.user_id")
+      .from("participants")
+      .where("event_id", "in", subquery)
       .andWhereNot({ user_id: id })
-      .limit(10)
+      .limit(10);
 
-    return friends
+    return friends;
   }
 
   async isFriendForUser({ id, friendId }) {
-    const subquery = knex.select('event_id').from('participants').where({ user_id: id })
+    const subquery = knex
+      .select("event_id")
+      .from("participants")
+      .where({ user_id: id });
 
     const friends = await knex
-      .select('users.id')
-      .join('users', 'users.id', '=', 'participants.user_id')
-      .from('participants')
-      .where('event_id', 'in', subquery)
-      .andWhere({ user_id: friendId })
+      .select("users.id")
+      .join("users", "users.id", "=", "participants.user_id")
+      .from("participants")
+      .where("event_id", "in", subquery)
+      .andWhere({ user_id: friendId });
 
-    return friends.length > 0
+    return friends.length > 0;
   }
 
   // RxDB Replication Methods
 
-  async pullEvents({ limit, minUpdatedAt }) {
+  async pullEvents({ limit, minUpdatedAt, userId }) {
     const minDate = new Date(minUpdatedAt).getTime();
-    const events = await knex
+
+    const query = knex
       .select(
-        'id',
-        'name',
-        'type',
-        'invite_token',
-        'checkpoint_count',
-        'created_at',
-        'updated_at',
-        'deleted',
-        '_modified'
+        "events.id",
+        "events.name",
+        "events.type",
+        "events.invite_token",
+        "events.checkpoint_count",
+        "events.created_at",
+        "events.updated_at",
+        "events.deleted",
+        "events._modified",
       )
-      .from('events')
-      .where('_modified', '>=', minDate)
-      .orderBy('_modified', 'asc')
+      .from("events")
+      .join("participants", "events.id", "=", "participants.event_id")
+      .andWhere("participants.user_id", userId)
+      .where("events._modified", ">", minDate)
+      .orderBy("events._modified", "asc")
       .limit(limit);
 
+    const events = await query;
+
     return events.map((event) => ({
-      ...event,
+      ...resolveDates(event),
       deleted: Boolean(event.deleted),
     }));
-  }
-
-  async getEventsCheckpoint() {
-    const result = await knex
-      .select('_modified')
-      .from('events')
-      .orderBy('_modified', 'desc')
-      .limit(1);
-
-    return {
-      lastModified: result.length > 0 ? result[0]._modified : 0,
-    };
   }
 
   async pushEvents(events) {
@@ -241,8 +252,8 @@ class Database extends DataSource {
     for (const event of events) {
       // Check if event exists
       const existing = await knex
-        .select('id')
-        .from('events')
+        .select("id")
+        .from("events")
         .where({ id: event.id })
         .first();
 
@@ -250,47 +261,46 @@ class Database extends DataSource {
         name: event.name,
         type: event.type,
         checkpoint_count: event.checkpoint_count,
-        created_at: event.created_at,
-        updated_at: event.updated_at,
+        created_at: new Date(event.created_at).toISOString(),
+        updated_at: new Date(event.updated_at).toISOString(),
         deleted: event.deleted ? 1 : 0,
-        _modified: event._modified,
       };
 
       let actualId = event.id;
 
       if (existing) {
         // Update existing event
-        await knex('events').where({ id: event.id }).update(eventData);
+        await knex("events").where({ id: event.id }).update(eventData);
       } else {
         // Insert new event (handle temporary IDs)
         if (event.id < 0) {
           // Generate new ID for temporary IDs
-          const [newId] = await knex('events').insert(eventData);
+          const [newId] = await knex("events").insert(eventData);
           actualId = newId;
         } else {
-          await knex('events').insert({ id: event.id, ...eventData });
+          await knex("events").insert({ id: event.id, ...eventData });
         }
       }
 
       // Fetch the updated/created event
       const updated = await knex
         .select(
-          'id',
-          'name',
-          'type',
-          'invite_token',
-          'checkpoint_count',
-          'created_at',
-          'updated_at',
-          'deleted',
-          '_modified'
+          "id",
+          "name",
+          "type",
+          "invite_token",
+          "checkpoint_count",
+          "created_at",
+          "updated_at",
+          "deleted",
+          "_modified",
         )
-        .from('events')
+        .from("events")
         .where({ id: actualId })
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         deleted: Boolean(updated.deleted),
       });
     }
@@ -302,24 +312,24 @@ class Database extends DataSource {
     const minDate = new Date(minUpdatedAt).getTime();
     const checkpoints = await knex
       .select(
-        'id',
-        'event_id',
-        'cp_id',
-        'cp_code',
-        'skipped',
-        'skip_reason',
-        'created_at',
-        'updated_at',
-        'deleted',
-        '_modified'
+        "id",
+        "event_id",
+        "cp_id",
+        "cp_code",
+        "skipped",
+        "skip_reason",
+        "created_at",
+        "updated_at",
+        "deleted",
+        "_modified",
       )
-      .from('checkpoints')
-      .where('_modified', '>=', minDate)
-      .orderBy('_modified', 'asc')
+      .from("checkpoints")
+      .where("_modified", ">=", minDate)
+      .orderBy("_modified", "asc")
       .limit(limit);
 
     return checkpoints.map((checkpoint) => ({
-      ...checkpoint,
+      ...resolveDates(checkpoint),
       skipped: Boolean(checkpoint.skipped),
       deleted: Boolean(checkpoint.deleted),
     }));
@@ -327,9 +337,9 @@ class Database extends DataSource {
 
   async getCheckpointsCheckpoint() {
     const result = await knex
-      .select('_modified')
-      .from('checkpoints')
-      .orderBy('_modified', 'desc')
+      .select("_modified")
+      .from("checkpoints")
+      .orderBy("_modified", "desc")
       .limit(1);
 
     return {
@@ -343,8 +353,8 @@ class Database extends DataSource {
     for (const checkpoint of checkpoints) {
       // Check if checkpoint exists
       const existing = await knex
-        .select('id')
-        .from('checkpoints')
+        .select("id")
+        .from("checkpoints")
         .where({ id: checkpoint.id })
         .first();
 
@@ -354,27 +364,26 @@ class Database extends DataSource {
         cp_code: checkpoint.cp_code,
         skipped: checkpoint.skipped ? 1 : 0,
         skip_reason: checkpoint.skip_reason,
-        created_at: checkpoint.created_at,
-        updated_at: checkpoint.updated_at,
+        created_at: new Date(checkpoint.created_at).toISOString(),
+        updated_at: new Date(checkpoint.updated_at).toISOString(),
         deleted: checkpoint.deleted ? 1 : 0,
-        _modified: checkpoint._modified,
       };
 
       let actualId = checkpoint.id;
 
       if (existing) {
         // Update existing checkpoint
-        await knex('checkpoints')
+        await knex("checkpoints")
           .where({ id: checkpoint.id })
           .update(checkpointData);
       } else {
         // Insert new checkpoint (handle temporary IDs)
         if (checkpoint.id < 0) {
           // Generate new ID for temporary IDs
-          const [newId] = await knex('checkpoints').insert(checkpointData);
+          const [newId] = await knex("checkpoints").insert(checkpointData);
           actualId = newId;
         } else {
-          await knex('checkpoints').insert({
+          await knex("checkpoints").insert({
             id: checkpoint.id,
             ...checkpointData,
           });
@@ -384,23 +393,23 @@ class Database extends DataSource {
       // Fetch the updated/created checkpoint
       const updated = await knex
         .select(
-          'id',
-          'event_id',
-          'cp_id',
-          'cp_code',
-          'skipped',
-          'skip_reason',
-          'created_at',
-          'updated_at',
-          'deleted',
-          '_modified'
+          "id",
+          "event_id",
+          "cp_id",
+          "cp_code",
+          "skipped",
+          "skip_reason",
+          "created_at",
+          "updated_at",
+          "deleted",
+          "_modified",
         )
-        .from('checkpoints')
+        .from("checkpoints")
         .where({ id: actualId })
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         skipped: Boolean(updated.skipped),
         deleted: Boolean(updated.deleted),
       });
@@ -413,30 +422,30 @@ class Database extends DataSource {
     const minDate = new Date(minUpdatedAt).getTime();
     const challenges = await knex
       .select(
-        'id',
-        'name',
-        'checkpoints',
-        'created_at',
-        'updated_at',
-        'deleted',
-        '_modified'
+        "id",
+        "name",
+        "checkpoints",
+        "created_at",
+        "updated_at",
+        "deleted",
+        "_modified",
       )
-      .from('virtual_challenges')
-      .where('_modified', '>=', minDate)
-      .orderBy('_modified', 'asc')
+      .from("virtual_challenges")
+      .where("_modified", ">=", minDate)
+      .orderBy("_modified", "asc")
       .limit(limit);
 
     return challenges.map((challenge) => ({
-      ...challenge,
+      ...resolveDates(challenge),
       deleted: Boolean(challenge.deleted),
     }));
   }
 
   async getVirtualChallengesCheckpoint() {
     const result = await knex
-      .select('_modified')
-      .from('virtual_challenges')
-      .orderBy('_modified', 'desc')
+      .select("_modified")
+      .from("virtual_challenges")
+      .orderBy("_modified", "desc")
       .limit(1);
 
     return {
@@ -450,8 +459,8 @@ class Database extends DataSource {
     for (const challenge of challenges) {
       // Check if challenge exists
       const existing = await knex
-        .select('id')
-        .from('virtual_challenges')
+        .select("id")
+        .from("virtual_challenges")
         .where({ id: challenge.id })
         .first();
 
@@ -461,26 +470,24 @@ class Database extends DataSource {
         created_at: challenge.created_at,
         updated_at: challenge.updated_at,
         deleted: challenge.deleted ? 1 : 0,
-        _modified: challenge._modified,
       };
 
       let actualId = challenge.id;
 
       if (existing) {
         // Update existing challenge
-        await knex('virtual_challenges')
+        await knex("virtual_challenges")
           .where({ id: challenge.id })
           .update(challengeData);
       } else {
         // Insert new challenge (handle temporary IDs)
         if (challenge.id < 0) {
           // Generate new ID for temporary IDs
-          const [newId] = await knex('virtual_challenges').insert(
-            challengeData
-          );
+          const [newId] =
+            await knex("virtual_challenges").insert(challengeData);
           actualId = newId;
         } else {
-          await knex('virtual_challenges').insert({
+          await knex("virtual_challenges").insert({
             id: challenge.id,
             ...challengeData,
           });
@@ -490,20 +497,20 @@ class Database extends DataSource {
       // Fetch the updated/created challenge
       const updated = await knex
         .select(
-          'id',
-          'name',
-          'checkpoints',
-          'created_at',
-          'updated_at',
-          'deleted',
-          '_modified'
+          "id",
+          "name",
+          "checkpoints",
+          "created_at",
+          "updated_at",
+          "deleted",
+          "_modified",
         )
-        .from('virtual_challenges')
+        .from("virtual_challenges")
         .where({ id: actualId })
         .first();
 
       results.push({
-        ...updated,
+        ...resolveDates(updated),
         deleted: Boolean(updated.deleted),
       });
     }
@@ -512,4 +519,4 @@ class Database extends DataSource {
   }
 }
 
-module.exports = Database
+module.exports = Database;

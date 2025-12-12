@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { Form, Field } from 'react-final-form';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
@@ -6,7 +5,6 @@ import { Box, Button, TextField } from '@mui/material';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { useHistory, useParams } from 'react-router-dom';
-import {CheckpointsDispatchContext} from "../../components/CheckpointsService/CheckpointsService";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,19 +26,9 @@ const AddCheckpointPage = () => {
   const { id: eventId } = useParams<{ id: string }>();
 
   const history = useHistory();
-  const dispatch = useContext(CheckpointsDispatchContext)
 
   const handleCheckpointSubmit = (checkpoint: any) => {
-      dispatch({
-        type: 'add',
-        eventId: parseInt(eventId, 10),
-        checkpoint: {
-          cpId: parseInt(checkpoint.cpId, 10),
-          cpCode: checkpoint.cpCode,
-          skipped: checkpoint.skipped,
-          skipReason: checkpoint.skipReason
-        }
-      });
+      // TODO: add checkpoint using rxdb
     history.push(`/events/${eventId}`)
   };
 

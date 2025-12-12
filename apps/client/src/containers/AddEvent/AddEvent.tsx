@@ -17,10 +17,8 @@ import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { Field, Form } from 'react-final-form';
-import { useMutation } from '@apollo/client';
-
-import {CreateEventDocument} from '../../queries/createEvent';
-import {GetEventsDocument} from '../../queries/getEvents';
+import { useRxDB } from '../../database/RxDBProvider';
+import { generateTempId } from '../../database/utils/generateTempId';
 
 interface Values {
   name: string;
@@ -48,16 +46,7 @@ const AddEvent = () => {
   const [type, setType] = useState('score');
 
   const history = useHistory();
-
-  const [createEvent] = useMutation(CreateEventDocument, {
-    refetchQueries: [{ query: GetEventsDocument }],
-    awaitRefetchQueries: true,
-    onCompleted: (data) => {
-      if (data.createEvent?.event) {
-        history.push(`/events/${data.createEvent.event.id}`);
-      }
-    },
-  });
+  const { db } = useRxDB();
 
   const classes = useStyles();
 
@@ -65,15 +54,24 @@ const AddEvent = () => {
     history.push('/');
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!db) return;
+
     const eventTypeId = type === 'score' ? 1 : 2;
-    return createEvent({
-      variables: {
-        name,
-        checkpointCount: parseInt(numCheckpoints, 10),
-        type: eventTypeId,
-      },
+    const now = new Date().toISOString();
+    const eventId = generateTempId();
+
+    await db.events.insert({
+      id: eventId,
+      name,
+      checkpoint_count: parseInt(numCheckpoints, 10),
+      type: eventTypeId,
+      created_at: now,
+      updated_at: now,
     });
+
+    // Navigate to the new event (using temporary ID)
+    history.push(`/events/${eventId}`);
   };
 
   return (

@@ -1,10 +1,9 @@
-import { useQuery } from '@apollo/client';
+import { useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import PublicIcon from '@mui/icons-material/Public';
 
-import {GetVirtualChallengesDocument} from "../../queries/getVirtualChallenges";
 import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
 import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
 import List from '@mui/material/List';
@@ -12,7 +11,7 @@ import ListItem from '@mui/material/ListItem';
 import { Link } from 'react-router-dom';
 import ListItemText from '@mui/material/ListItemText';
 import { format } from 'date-fns';
-import {useInitialNavigation} from "../../hooks/useInitialNavigation";
+import { useRxQuery } from '../../database/hooks/useRxQuery';
 import Fab from "@mui/material/Fab";
 import AddIcon from '@mui/icons-material/Add';
 import { createStyles, makeStyles } from "@mui/styles";
@@ -29,17 +28,23 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 const VirtualChallengeList = () => {
-  const isInitialNavigation = useInitialNavigation();
   const classes = useStyles()
 
-  const { data, loading } = useQuery(GetVirtualChallengesDocument, {
-    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  })
+  const challengesQuery = useCallback(
+    (db: any) => {
+      if (!db) return null;
+      return db.virtualchallenges.find({
+        sort: [{ created_at: 'desc' }]
+      });
+    },
+    []
+  );
+
+  const { data: challenges, loading } = useRxQuery(challengesQuery);
 
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (!data) {
+  if (loading && (!challenges || challenges.length === 0)) {
     return (<div>Loading</div>)
   }
 
@@ -57,11 +62,11 @@ const VirtualChallengeList = () => {
       <LoadingIndicator active={loading} />
 
       <List>
-        {(data?.virtualChallenges.nodes ?? []).map(challenge => (
+        {(challenges || []).map((challenge: any) => (
           <ListItem key={challenge.id} button component={Link} to={`/virtual-challenges/${challenge.id}`}>
             <ListItemText
               primary={challenge.name}
-              secondary={format(new Date(challenge.createdAt), 'dd/MM/yyyy')}
+              secondary={format(new Date(challenge.created_at), 'dd/MM/yyyy')}
             />
           </ListItem>
         ))}

@@ -1,4 +1,5 @@
 import type { RxJsonSchema } from 'rxdb';
+import { ID_MAX_LENGTH } from './constants';
 
 export const virtualChallengeSchema: RxJsonSchema<any> = {
   version: 0,
@@ -6,52 +7,49 @@ export const virtualChallengeSchema: RxJsonSchema<any> = {
   type: 'object',
   properties: {
     id: {
-      type: 'number',
-      minimum: 0,
-      maximum: 999999999
+      type: 'string',
+      maxLength: ID_MAX_LENGTH
     },
     name: {
       type: 'string'
     },
     created_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
     updated_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
     checkpoints: {
-      type: 'object',
-      properties: {
-        totalCount: {
-          type: 'number'
-        },
-        points: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              lat: {
-                type: 'number'
-              },
-              lng: {
-                type: 'number'
-              }
-            },
-            required: ['lat', 'lng']
-          }
-        }
-      }
+      type: 'string'
     },
-    deleted: {
-      type: 'boolean',
-      default: false
-    },
-    _modified: {
-      type: 'number'
-    }
+  //   checkpoints: {
+  //     type: 'object',
+  //     properties: {
+  //       totalCount: {
+  //         type: 'number'
+  //       },
+  //       points: {
+  //         type: 'array',
+  //         items: {
+  //           type: 'object',
+  //           properties: {
+  //             lat: {
+  //               type: 'number'
+  //             },
+  //             lng: {
+  //               type: 'number'
+  //             }
+  //           },
+  //           required: ['lat', 'lng']
+  //         }
+  //       }
+  //     }
+  //   },
   },
   required: ['id', 'name', 'created_at', 'updated_at'],
-  indexes: ['created_at', 'updated_at', '_modified']
+  indexes: ['created_at', 'updated_at']
 };

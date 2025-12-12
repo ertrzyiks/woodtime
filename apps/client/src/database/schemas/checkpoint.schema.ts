@@ -1,4 +1,5 @@
 import type { RxJsonSchema } from 'rxdb';
+import { ID_MAX_LENGTH } from './constants';
 
 export const checkpointSchema: RxJsonSchema<any> = {
   version: 0,
@@ -6,18 +7,21 @@ export const checkpointSchema: RxJsonSchema<any> = {
   type: 'object',
   properties: {
     id: {
-      type: 'number',
-      minimum: 0,
-      maximum: 999999999
+      type: 'string',
+      maxLength: ID_MAX_LENGTH
     },
     event_id: {
-      type: 'number'
+      type: 'string',
+      maxLength: ID_MAX_LENGTH
     },
     cp_id: {
       type: 'number'
     },
     cp_code: {
-      type: 'string'
+      oneOf: [
+        { type: 'string' },
+        { type: 'null' }
+      ]
     },
     skipped: {
       type: 'boolean'
@@ -27,20 +31,15 @@ export const checkpointSchema: RxJsonSchema<any> = {
     },
     created_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
     updated_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
-    deleted: {
-      type: 'boolean',
-      default: false
-    },
-    _modified: {
-      type: 'number'
-    }
   },
   required: ['id', 'event_id', 'cp_id', 'skipped', 'created_at', 'updated_at'],
-  indexes: ['event_id', 'created_at', 'updated_at', '_modified']
+  indexes: ['event_id', 'created_at', 'updated_at']
 };

@@ -13,8 +13,6 @@ type EventDocType = {
   checkpoint_count: number;
   created_at: string;
   updated_at: string;
-  deleted: boolean;
-  _modified: number;
 };
 
 type EventDocument = RxDocument<EventDocType>;
@@ -35,21 +33,22 @@ export const collections = {
       // Static methods
       getUpcoming(this: EventCollection): RxQuery<EventDocType, any> {
         return this.find({
-          selector: {
-            deleted: false
-          },
           sort: [{ created_at: 'desc' }]
         });
       }
-    }
+    },
+    migrationStrategies: {},
   },
   checkpoints: {
-    schema: checkpointSchema
+    schema: checkpointSchema,
+    migrationStrategies: {},
   },
   users: {
-    schema: userSchema
+    schema: userSchema,
+    migrationStrategies: {},
   },
   virtualchallenges: {
-    schema: virtualChallengeSchema
+    schema: virtualChallengeSchema,
+    migrationStrategies: {},
   }
 };

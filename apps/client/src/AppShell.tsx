@@ -1,7 +1,16 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { onError } from '@apollo/client/link/error';
-import { createStyles, makeStyles, ThemeProvider as StylesThemeProvider } from '@mui/styles';
-import { Theme, createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import {
+  createStyles,
+  makeStyles,
+  ThemeProvider as StylesThemeProvider,
+} from '@mui/styles';
+import {
+  Theme,
+  createTheme,
+  ThemeProvider,
+  StyledEngineProvider,
+} from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
 
 import {
@@ -15,9 +24,6 @@ import {
 
 import { LocalStorageWrapper, persistCache } from 'apollo3-cache-persist';
 import InitialNavigationDetector from './components/InitialNavigationDetector/InitialNavigationDetector';
-import CheckpointsService from './components/CheckpointsService/CheckpointsService';
-import Executor from './components/CheckpointsService/Executor';
-import ErrorReporter from './components/CheckpointsService/ErrorReporter';
 import { init as initI18n } from './i18n';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import { RxDBProvider } from './database/RxDBProvider';
@@ -114,14 +120,7 @@ function AppShellInner({
       {client ? (
         <ApolloProvider client={client}>
           <RxDBProvider>
-            <InitialNavigationDetector>
-              <CheckpointsService>
-                <Executor />
-                <ErrorReporter />
-
-                {children}
-              </CheckpointsService>
-            </InitialNavigationDetector>
+            <InitialNavigationDetector>{children}</InitialNavigationDetector>
           </RxDBProvider>
         </ApolloProvider>
       ) : (
@@ -144,9 +143,7 @@ function AppShell({
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <StylesThemeProvider theme={theme}>
-          <AppShellInner apolloClient={apolloClient}>
-            {children}
-          </AppShellInner>
+          <AppShellInner apolloClient={apolloClient}>{children}</AppShellInner>
         </StylesThemeProvider>
       </ThemeProvider>
     </StyledEngineProvider>

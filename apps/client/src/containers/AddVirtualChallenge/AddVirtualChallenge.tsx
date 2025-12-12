@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Slider } from '@mui/material'
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 
 import Map from './Map'
 import { GetVirtualPointsDocument } from '../../queries/getVirtualPoints'
-import { CreateVirtualChallengeDocument } from "../../queries/createVirtualChallenge";
+import { useRxDB } from '../../database/RxDBProvider'
+import { generateTempId } from '../../database/utils/generateTempId';
 
 interface Coords {
   lat: number
@@ -13,12 +14,14 @@ interface Coords {
 
 const AddVirtualChallenge = () => {
   const [points, setPoints] = useState<Coords[]>([])
+  const { db } = useRxDB()
+  
+  // NOTE: getVirtualPoints remains as Apollo query since it's a backend-only
+  // operation that generates random nearby points (not stored in local DB)
   const [getPoints, { loading, data }] = useLazyQuery(GetVirtualPointsDocument, {
     fetchPolicy: 'no-cache',
     notifyOnNetworkStatusChange: true
   })
-
-  const [create] = useMutation(CreateVirtualChallengeDocument)
 
   const [startPoint, setStartPoint] = useState<[number, number] | null>(null)
   const initialPoint: [number, number] = useMemo(() => [54.372158, 18.638306], [])
@@ -47,16 +50,23 @@ const AddVirtualChallenge = () => {
     setPoints(points)
   }, [setPoints])
 
-  const handleCreate = useCallback(() => {
-    create({
-      variables: {
-        input: {
-          name: 'Test',
-          checkpoints: points.map(point => ({ lat: point.lat.toString(), lng: point.lng.toString()}))
-        }
-      }
-    })
-  }, [points, create])
+  const handleCreate = useCallback(async () => {
+    if (!db) return;
+    
+    const now = new Date().toISOString();
+    // TODO: Replace hardcoded name with user input from a form field
+    await db.virtualchallenges.insert({
+      id: generateTempId(),
+      name: 'Test',
+      created_at: now,
+      updated_at: now,
+      checkpoints: {
+        totalCount: points.length,
+        points: points.map(point => ({ lat: point.lat, lng: point.lng }))
+      },
+      deleted: false
+    });
+  }, [points, db])
 
   useEffect(() => {
     if (!startPoint) {

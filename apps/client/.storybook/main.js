@@ -1,14 +1,12 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   framework: {
-    name: "@storybook/react-vite",
+    name: '@storybook/react-vite',
     options: {},
   },
-  stories: [
-    "../**/*.stories.mdx",
-    "../**/*.stories.@(js|jsx|ts|tsx)",
-  ],
+  stories: ['../**/*.stories.mdx', '../**/*.stories.@(js|jsx|ts|tsx)'],
+  staticDirs: ['../public'],
   addons: [],
   typescript: {
     reactDocgen: false,
@@ -18,7 +16,7 @@ module.exports = {
 
     // Handle GraphQL schema files
     config.define = config.define || {};
-    
+
     // Ensure .graphql files are treated as assets for ?raw imports
     config.assetsInclude = config.assetsInclude || [];
     if (!Array.isArray(config.assetsInclude)) {

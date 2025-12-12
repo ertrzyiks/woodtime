@@ -1,18 +1,18 @@
 import { useCallback, useState, useEffect } from 'react';
-import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel'
-import {OrienteeringEvent} from "../../types/OrienteeringEvent";
-import { Fab } from "@mui/material";
-import { makeStyles, createStyles } from "@mui/styles";
-import { Theme } from "@mui/material/styles";
+import LinearProgressWithLabel from '../LinearProgressWithLabel/LinearProgressWithLabel';
+import { OrienteeringEvent } from '../../types/OrienteeringEvent';
+import { Fab } from '@mui/material';
+import { makeStyles, createStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 
 interface VirtualChallenge {
-  id: number
+  id: number;
 }
 
 interface Props {
-  event: OrienteeringEvent
-  virtualChallenge: VirtualChallenge
+  event: OrienteeringEvent;
+  virtualChallenge: VirtualChallenge;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -24,76 +24,80 @@ const useStyles = makeStyles((theme: Theme) =>
     addCheckpointButton: {
       position: 'absolute',
       right: '1em',
-      bottom: '1em'
+      bottom: '1em',
     },
-  })
+  }),
 );
 
-function useUserLocation(): [() => void, { loading: boolean, position: GeolocationPosition | null }] {
-  const [active, setActive] = useState(false)
-  const [position, setPosition] = useState<GeolocationPosition | null>(null)
+function useUserLocation(): [
+  () => void,
+  { loading: boolean; position: GeolocationPosition | null },
+] {
+  const [active, setActive] = useState(false);
+  const [position, setPosition] = useState<GeolocationPosition | null>(null);
 
   useEffect(() => {
     if (!active) {
-      return
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
 
-    const geoSuccess = function(position: GeolocationPosition) {
+    const geoSuccess = function (position: GeolocationPosition) {
       if (cancelled) {
-        return
+        return;
       }
       // hideNudgeBanner();
       // clearTimeout(nudgeTimeoutId);
 
-      setActive(false)
-      setPosition(position)
-    }
+      setActive(false);
+      setPosition(position);
+    };
 
-    const geoError = function(error: GeolocationPositionError) {
+    const geoError = function (error: GeolocationPositionError) {
       if (cancelled) {
-        return
+        return;
       }
 
-      setActive(false)
+      setActive(false);
 
-      switch(error.code) {
+      switch (error.code) {
         case error.TIMEOUT:
           // The user didn't accept the callout
           // showNudgeBanner();
           break;
       }
-    }
+    };
 
-    navigator.geolocation.getCurrentPosition(geoSuccess, geoError, { enableHighAccuracy: true })
+    navigator.geolocation.getCurrentPosition(geoSuccess, geoError, {
+      enableHighAccuracy: true,
+    });
 
     return () => {
-      cancelled = true
-    }
-  }, [active, setPosition])
+      cancelled = true;
+    };
+  }, [active, setPosition]);
 
   const read = useCallback(() => {
-    setActive(true)
-  }, [setActive])
+    setActive(true);
+  }, [setActive]);
 
-  return [read, { position, loading: active }]
+  return [read, { position, loading: active }];
 }
 
-
 const VirtualEvent = ({ event, virtualChallenge }: Props) => {
-  const { checkpoints } = event
+  const { checkpoints } = event;
 
-  const classes = useStyles()
-  const [readLocation, { position, loading }] = useUserLocation()
+  const classes = useStyles();
+  const [readLocation, { position, loading }] = useUserLocation();
 
   useEffect(() => {
     if (!position) {
-      return
+      return;
     }
 
-    console.log(position)
-  }, [position])
+    console.log(position);
+  }, [position]);
 
   return (
     <div>
@@ -107,12 +111,13 @@ const VirtualEvent = ({ event, virtualChallenge }: Props) => {
         color="primary"
         aria-label="add"
         disabled={loading}
-        onClick={() => { readLocation() }}
+        onClick={() => {
+          readLocation();
+        }}
       >
         <AddIcon />
       </Fab>
     </div>
-  )
-
-}
-export default VirtualEvent
+  );
+};
+export default VirtualEvent;

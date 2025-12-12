@@ -1,7 +1,5 @@
 import type { RxJsonSchema } from 'rxdb';
-
-// Constants for schema validation
-const MAX_EVENT_ID = 999999999; // Maximum event ID supported by the system
+import { ID_MAX_LENGTH } from './constants';
 
 export const eventSchema: RxJsonSchema<any> = {
   version: 0,
@@ -9,9 +7,8 @@ export const eventSchema: RxJsonSchema<any> = {
   type: 'object',
   properties: {
     id: {
-      type: 'number',
-      minimum: 0,
-      maximum: MAX_EVENT_ID
+      type: 'string',
+      maxLength: ID_MAX_LENGTH
     },
     name: {
       type: 'string'
@@ -20,27 +17,24 @@ export const eventSchema: RxJsonSchema<any> = {
       type: 'number'
     },
     invite_token: {
-      type: 'string'
+      oneOf: [
+        { type: 'string' },
+        { type: 'null' }
+      ]
     },
     checkpoint_count: {
       type: 'number'
     },
     created_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
     updated_at: {
       type: 'string',
-      format: 'date-time'
+      format: 'date-time',
+      maxLength: 24
     },
-    // GraphQL replication fields
-    deleted: {
-      type: 'boolean',
-      default: false
-    },
-    _modified: {
-      type: 'number'
-    }
   },
   required: ['id', 'name', 'type', 'checkpoint_count', 'created_at', 'updated_at'],
   indexes: ['created_at', 'updated_at']

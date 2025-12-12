@@ -10,9 +10,8 @@ import {
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import { CreateCheckpointDocument } from '../../queries/createCheckpoint';
-import { DeleteCheckpointDocument } from '../../queries/deleteCheckpoint';
+import { useRxDB } from '../../database/RxDBProvider';
+import { generateTempId } from '../../database/utils/generateTempId';
 
 interface Props {
   id: number;
@@ -40,71 +39,66 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
   const labelId = `checkbox-list-label-${id}`;
 
   const history = useHistory();
+  const { db } = useRxDB();
 
-  const [createCheckpoint, { loading: creationLoading, error: creationError }] =
-    useMutation<any, Values>(CreateCheckpointDocument, {
-      refetchQueries: ['getEvent'],
-      awaitRefetchQueries: true,
-      onCompleted: (data) => {
-        history.push(`/events/${data.createCheckpoint.checkpoint.event_id}`);
-      },
-    });
-
-  const [deleteCheckpoint] = useMutation(DeleteCheckpointDocument, {
-    refetchQueries: ['getEvent'],
-    awaitRefetchQueries: true,
-  });
-
-  const handleToggle = (value: number) => {
-    if (checkpoint) {
-      return deleteCheckpoint({ variables: { id: checkpoint.id } });
-    }
+  const handleToggle = async (value: number) => {
+    if (!db) return;
 
     try {
-      return createCheckpoint({
-        variables: {
-          eventId,
-          cpId: value,
-          cpCode: undefined,
+      if (checkpoint) {
+        const checkpointDoc = await db.checkpoints.findOne({
+          selector: { id: checkpoint.id }
+        }).exec();
+
+        if (checkpointDoc) {
+          await checkpointDoc.remove()
+        }
+      } else {
+        // Create checkpoint
+        const now = new Date().toISOString();
+        await db.checkpoints.insert({
+          id: generateTempId(),
+          event_id: eventId,
+          cp_id: value,
+          cp_code: null,
           skipped: false,
-          skipReason: undefined,
-        },
-      });
+          skip_reason: null,
+          created_at: now,
+          updated_at: now,
+        });
+
+        history.push(`/events/${eventId}`);
+      }
     } catch (err) {
       throw err;
     }
   };
 
-  const handleSkipClick = (
+  const handleSkipClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     checkpointId: number
   ) => {
     e.stopPropagation();
 
-    try {
-      return createCheckpoint({
-        variables: {
-          eventId,
-          cpId: checkpointId,
-          cpCode: undefined,
-          skipped: true,
-          skipReason: undefined,
-        },
-      });
-    } catch (err) {
-      throw err;
-    }
+    if (!db) return;
+
+    const now = new Date().toISOString();
+    await db.checkpoints.insert({
+      id: generateTempId(),
+      event_id: eventId,
+      cp_id: checkpointId,
+      cp_code: null,
+      skipped: true,
+      skip_reason: null,
+      created_at: now,
+      updated_at: now,
+    });
+
+    history.push(`/events/${eventId}`);
+
   };
 
   const classes = useStyles();
-
-  if (creationLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (creationError) {
-    return <p>Error :(</p>;
-  }
 
   const skipButton = !checkpoint && (
     <Button variant="contained" onClick={(e) => handleSkipClick(e, id)}>

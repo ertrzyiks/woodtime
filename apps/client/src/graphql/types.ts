@@ -33,6 +33,31 @@ export type Checkpoint = {
   updated_at: Scalars['DateTime']['output'];
 };
 
+export type CheckpointDocument = {
+  __typename?: 'CheckpointDocument';
+  cp_code?: Maybe<Scalars['String']['output']>;
+  cp_id: Scalars['Int']['output'];
+  created_at: Scalars['DateTime']['output'];
+  deleted: Scalars['Boolean']['output'];
+  event_id: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  skip_reason?: Maybe<Scalars['String']['output']>;
+  skipped: Scalars['Boolean']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type CheckpointInput = {
+  cp_code?: InputMaybe<Scalars['String']['input']>;
+  cp_id: Scalars['Int']['input'];
+  created_at: Scalars['DateTime']['input'];
+  deleted: Scalars['Boolean']['input'];
+  event_id: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  skip_reason?: InputMaybe<Scalars['String']['input']>;
+  skipped: Scalars['Boolean']['input'];
+  updated_at: Scalars['DateTime']['input'];
+};
+
 export type Coordinates = {
   __typename?: 'Coordinates';
   lat: Scalars['String']['output'];
@@ -105,6 +130,28 @@ export type Event = {
   virtual_challenge?: Maybe<EventVirtualChallenge>;
 };
 
+export type EventDocument = {
+  __typename?: 'EventDocument';
+  checkpoint_count: Scalars['Int']['output'];
+  created_at: Scalars['DateTime']['output'];
+  deleted: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
+  invite_token?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  type: Scalars['Int']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type EventInput = {
+  checkpoint_count: Scalars['Int']['input'];
+  created_at: Scalars['DateTime']['input'];
+  deleted: Scalars['Boolean']['input'];
+  id: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  type: Scalars['Int']['input'];
+  updated_at: Scalars['DateTime']['input'];
+};
+
 export type EventVirtualChallenge = {
   __typename?: 'EventVirtualChallenge';
   id: Scalars['Int']['output'];
@@ -149,6 +196,9 @@ export type Mutation = {
   inviteToEvent?: Maybe<InviteToEventPayload>;
   joinEvent?: Maybe<JoinEventPayload>;
   login?: Maybe<LoginPayload>;
+  pushCheckpoints: Array<CheckpointDocument>;
+  pushEvents: Array<EventDocument>;
+  pushVirtualChallenges: Array<VirtualChallengeDocument>;
   signIn?: Maybe<SignInPayload>;
 };
 
@@ -212,6 +262,21 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationPushCheckpointsArgs = {
+  checkpoints: Array<CheckpointInput>;
+};
+
+
+export type MutationPushEventsArgs = {
+  events: Array<EventInput>;
+};
+
+
+export type MutationPushVirtualChallengesArgs = {
+  challenges: Array<VirtualChallengeInput>;
+};
+
+
 export type MutationSignInArgs = {
   name: Scalars['String']['input'];
 };
@@ -222,12 +287,33 @@ export type PointsNearbyInput = {
   start: CoordinatesInput;
 };
 
+export type PullCheckpointsResponse = {
+  __typename?: 'PullCheckpointsResponse';
+  checkpoint: ReplicationCheckpoint;
+  documents: Array<CheckpointDocument>;
+};
+
+export type PullEventsResponse = {
+  __typename?: 'PullEventsResponse';
+  checkpoint: ReplicationCheckpoint;
+  documents: Array<EventDocument>;
+};
+
+export type PullVirtualChallengesResponse = {
+  __typename?: 'PullVirtualChallengesResponse';
+  checkpoint: ReplicationCheckpoint;
+  documents: Array<VirtualChallengeDocument>;
+};
+
 export type Query = {
   __typename?: 'Query';
   event?: Maybe<Event>;
   events: Array<Event>;
   me?: Maybe<Me>;
   pointsNearby: CoordinatesConnection;
+  pullCheckpoints: PullCheckpointsResponse;
+  pullEvents: PullEventsResponse;
+  pullVirtualChallenges: PullVirtualChallengesResponse;
   virtualChallenge?: Maybe<VirtualChallenge>;
   virtualChallenges: VirtualChallengeConnection;
 };
@@ -243,8 +329,31 @@ export type QueryPointsNearbyArgs = {
 };
 
 
+export type QueryPullCheckpointsArgs = {
+  limit: Scalars['Int']['input'];
+  minUpdatedAt: Scalars['DateTime']['input'];
+};
+
+
+export type QueryPullEventsArgs = {
+  limit: Scalars['Int']['input'];
+  minUpdatedAt: Scalars['DateTime']['input'];
+};
+
+
+export type QueryPullVirtualChallengesArgs = {
+  limit: Scalars['Int']['input'];
+  minUpdatedAt: Scalars['DateTime']['input'];
+};
+
+
 export type QueryVirtualChallengeArgs = {
   id: Scalars['Int']['input'];
+};
+
+export type ReplicationCheckpoint = {
+  __typename?: 'ReplicationCheckpoint';
+  lastModified: Scalars['Float']['output'];
 };
 
 export type SignInPayload = {
@@ -275,4 +384,23 @@ export type VirtualChallengeConnection = {
   __typename?: 'VirtualChallengeConnection';
   nodes: Array<VirtualChallenge>;
   totalCount: Scalars['Int']['output'];
+};
+
+export type VirtualChallengeDocument = {
+  __typename?: 'VirtualChallengeDocument';
+  checkpoints: Scalars['String']['output'];
+  created_at: Scalars['DateTime']['output'];
+  deleted: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  updated_at: Scalars['DateTime']['output'];
+};
+
+export type VirtualChallengeInput = {
+  checkpoints: Scalars['String']['input'];
+  created_at: Scalars['DateTime']['input'];
+  deleted: Scalars['Boolean']['input'];
+  id: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  updated_at: Scalars['DateTime']['input'];
 };

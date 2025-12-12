@@ -1,26 +1,33 @@
-import { ReactNode } from 'react';
-import { useQuery } from '@apollo/client';
+import { ReactNode, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import ContentLoader from "react-content-loader"
+import ContentLoader from 'react-content-loader';
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';
 import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
-import {GetEventDocument, GetEventQuery} from './data/getEvent';
-import { useInitialNavigation } from '../../hooks/useInitialNavigation';
+import { useRxDocument } from '../../database/hooks/useRxDocument';
+import { useRxQuery } from '../../database/hooks/useRxQuery';
 import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
 import EventIcon from '@mui/icons-material/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import Classic from './components/Classic/Classic';
-import {useEventQueue} from "../../components/CheckpointsService/useEventQueue";
-import {QueueItem} from "../../components/CheckpointsService/CheckpointsService";
-import {useTranslation} from "react-i18next";
+import { useEventQueue } from '../../components/CheckpointsService/useEventQueue';
+import { QueueItem } from '../../components/CheckpointsService/CheckpointsService';
+import { useTranslation } from 'react-i18next';
 
 const EVENT_TYPES = {
   SCORE: 1,
   CLASSIC: 2,
 };
 
-const Loader = ({ children, width, height } : { width: number, height: number, children: ReactNode }) => (
+const Loader = ({
+  children,
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+  children: ReactNode;
+}) => (
   <ContentLoader
     speed={2}
     width={width}
@@ -31,47 +38,77 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   >
     {children}
   </ContentLoader>
-)
+);
 
-function mergeCheckpoints(event: GetEventQuery['event'] | undefined, items: QueueItem['checkpoint'][]) {
+type EventData = {
+  id: number;
+  name: string;
+  type: number;
+  checkpoint_count: number;
+  invite_token?: string;
+  virtual_challenge?: { id: number } | null;
+  participants?: { id: string; name: string }[];
+  checkpoints?: any[];
+};
+
+type CheckpointData = {
+  id: number;
+  event_id: number;
+  cp_id: number;
+  cp_code: string | null;
+  skipped: boolean;
+  skip_reason: string | null;
+};
+
+function mergeCheckpoints(
+  event: EventData | null,
+  checkpoints: CheckpointData[],
+): EventData | null {
   if (!event) {
-    return event
+    return event;
   }
 
   return {
     ...event,
-    checkpoints: [
-      ...event.checkpoints,
-      ...items.map(item => ({
-        id: 0,
-        cp_id: item.cpId,
-        cp_code: item.cpCode ?? null,
-        skipped: item.skipped,
-        skip_reason: item.skipReason ?? null,
-        pending: true,
-        error: item.error
-      }))
-    ]
-  }
+    participants: event.participants || [],
+    checkpoints: [...checkpoints],
+  };
 }
 
 const EventPage = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const items = useEventQueue(parseInt(id, 10))
+  // const items = useEventQueue(parseInt(id, 10))
 
   const classes = useBreadcrumbStyles();
-  const isInitialNavigation = useInitialNavigation();
 
-  const { loading, error, data } = useQuery(GetEventDocument, {
-    variables: { id: parseInt(id, 10) },
-    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  })
+  const {
+    data: eventData,
+    loading: eventLoading,
+    error: eventError,
+  } = useRxDocument('events', id);
 
-  const event = mergeCheckpoints(data?.event, items)
+  const checkpointsQuery = useCallback(
+    (db: any) => {
+      if (!db) return null;
+      return db.checkpoints.find({
+        selector: {
+          event_id: id,
+        },
+        sort: [{ cp_id: 'asc' }],
+      });
+    },
+    [id],
+  );
 
-  if (loading && !data) {
+  const { data: checkpoints, loading: checkpointsLoading } =
+    useRxQuery(checkpointsQuery);
+
+  const loading = eventLoading || checkpointsLoading;
+  const error = eventError;
+  const event = mergeCheckpoints(eventData, checkpoints);
+
+  if (loading && !eventData) {
     return (
       <div>
         <Box px={1} py={2}>
@@ -98,15 +135,14 @@ const EventPage = () => {
             <rect x="0" y="220" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="240" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="260" rx="3" ry="3" width="100" height="10" />
-
           </Loader>
         </Box>
       </div>
-    )
+    );
   }
 
   if (!event) {
-    return <div>Not found</div>
+    return <div>Not found</div>;
   }
 
   const eventContent =
@@ -140,12 +176,14 @@ const EventPage = () => {
 
       {error && <p>Error :(</p>}
 
-      {(event.type === 3 && event.virtual_challenge) ? (
+      {event.type === 3 ? (
         <VirtualEvent
           event={event}
           virtualChallenge={event.virtual_challenge}
         />
-      ) : eventContent}
+      ) : (
+        eventContent
+      )}
     </div>
   );
 };

@@ -16,12 +16,11 @@ import EventIcon from '@mui/icons-material/Event';
 import ListIcon from '@mui/icons-material/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
-import { useMutation, useQuery } from '@apollo/client';
-import { GetEventsDocument } from '../../queries/getEvents';
-import { DeleteEventDocument } from '../../queries/deleteEvent';
+import { useRxQuery } from '../../database/hooks/useRxQuery';
+import { useRxDB } from '../../database/RxDBProvider';
+import { useCallback } from 'react';
 import SimpleChecklist from '../../components/SimpleChecklist/SimpleChecklist';
 import { useState } from 'react';
-import { useInitialNavigation } from '../../hooks/useInitialNavigation';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import {useTranslation} from "react-i18next";
@@ -65,17 +64,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const EventList = () => {
   const { t } = useTranslation()
-  const isInitialNavigation = useInitialNavigation();
-  const { loading, error, data } = useQuery(GetEventsDocument, {
-    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  });
-  const [showChecklist, setShowChecklist] = useState(false);
+  const { db } = useRxDB();
 
-  const [deleteEvent] = useMutation(DeleteEventDocument, {
-    refetchQueries: ['getEvents'],
-    awaitRefetchQueries: true,
-  });
+  // Memoize query constructor to prevent unnecessary re-subscriptions
+  const eventsQuery = useCallback(
+    (db: any) => {
+      if (!db) return null;
+      return db.events.find({
+        sort: [{ created_at: 'desc' }]
+      });
+    },
+    []
+  );
+
+  const { data: events, loading, error } = useRxQuery(eventsQuery);
+  const [showChecklist, setShowChecklist] = useState(false);
 
   const handleChecklistClick = () => {
     setShowChecklist(true);
@@ -85,14 +88,22 @@ const EventList = () => {
     setShowChecklist(false);
   };
 
-  const handleDeleteClick = (eventId: number) => {
-    return deleteEvent({ variables: { id: eventId } });
+  const handleDeleteClick = async (eventId: number) => {
+    if (!db) return;
+
+    const event = await db.events.findOne({
+      selector: { id: eventId }
+    }).exec();
+
+    if (event) {
+      await event.remove()
+    }
   };
 
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
 
-  if (loading && !data) {
+  if (loading && (!events || events.length === 0)) {
     return <p>Loading...</p>;
   }
 
@@ -116,21 +127,11 @@ const EventList = () => {
       {error && <p>Error :(</p>}
 
       <List>
-        {[...(data?.events ?? [])]
-          .sort((a: { id: number }, b: { id: number }) => b.id - a.id)
-          // TODO: generate types
-          .map(
-            ({
-              id,
-              name,
-              created_at,
-            }: {
-              id: number;
-              name: string;
-              created_at: string;
-            }) => (
-              <div className={classes.wrapper} key={id}>
-                <Event id={id} name={name} createdAt={created_at} />
+        {[...(events || [])]
+          .sort((a: any, b: any) => b.id - a.id)
+          .map((event: any) => (
+              <div className={classes.wrapper} key={event.id}>
+                <Event id={event.id} name={event.name} createdAt={event.created_at} />
                 <div className={classes.icons}>
                   <IconButton
                     aria-label="checklist"
@@ -140,7 +141,7 @@ const EventList = () => {
                   </IconButton>
                   <IconButton
                     aria-label="delete"
-                    onClick={() => handleDeleteClick(id)}
+                    onClick={() => handleDeleteClick(event.id)}
                   >
                     <ClearIcon />
                   </IconButton>
