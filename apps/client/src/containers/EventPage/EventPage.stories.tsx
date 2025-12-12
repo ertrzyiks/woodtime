@@ -118,6 +118,7 @@ export const Virtual = {
   args: {
     ...MockTemplate.args,
     name: 'Virtual event',
+    virtual_challenge: { id: '1' },
     type: 3,
   },
 };

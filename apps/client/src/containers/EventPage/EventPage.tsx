@@ -155,8 +155,6 @@ const EventPage = () => {
       <Classic event={event} />
     );
 
-  console.log('EVENT TYPE', event.type);
-
   return (
     <div>
       <Box px={1} py={2}>
@@ -178,7 +176,7 @@ const EventPage = () => {
 
       {error && <p>Error :(</p>}
 
-      {event.type === 3 && event.virtual_challenge ? (
+      {event.type === 3 ? (
         <VirtualEvent
           event={event}
           virtualChallenge={event.virtual_challenge}
