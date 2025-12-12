@@ -1484,9 +1484,13 @@ const conflictHandlerWithMerging = (
 
 ### Immediate Rollback (if critical issues found)
 
-1. Set feature flag `VITE_USE_RXDB=false`
-2. Deploy hotfix
-3. Apollo Client still in codebase, will activate immediately
+**Current Approach (No Feature Flags):**
+1. Revert specific component changes that use RxDB hooks back to Apollo hooks
+2. Components are migrated individually, so rollback can be selective
+3. Apollo Client remains in codebase and will work immediately
+4. Deploy hotfix with reverted components
+
+**Note:** The original plan suggested feature flags (`VITE_USE_RXDB`), but the actual implementation uses direct component migration, so rollback requires reverting specific component code changes.
 
 ### Full Rollback (if needed after cleanup)
 
@@ -1540,19 +1544,78 @@ const conflictHandlerWithMerging = (
 ## Open Questions
 
 1. **Temporary IDs**: How to handle temporary IDs for offline-created documents? 
-   - Solution: Use negative IDs or UUIDs, map to real IDs on sync
+   - Planned Solution: Use negative IDs (see `generateTempId()` utility)
+   - Status: ⚠️ Not yet validated - mutation migrations incomplete
 
 2. **Large Datasets**: What's the strategy for events with many checkpoints?
    - Solution: Implement pagination or virtual scrolling
+   - Status: ❓ To be determined during performance testing
 
 3. **Real-time Updates**: How frequently should replication pull?
-   - Solution: Use live replication with WebSocket fallback
+   - Solution: Using live replication (continuous) with 5s retry
+   - Status: ✅ Implemented in `replication.ts`
 
 4. **Schema Versioning**: How to handle schema migrations?
    - Solution: Implement RxDB migration strategies
+   - Status: ❓ Not yet needed (all schemas at version 0)
 
 5. **File Attachments**: How to handle checkpoint photos or attachments?
    - Solution: Use separate blob storage with references in RxDB
+   - Status: ❓ Not yet implemented
+
+6. **Users Collection Replication**: Should user data be replicated?
+   - Schema exists but replication not configured
+   - Status: ❓ Needs decision based on use case
+
+7. **Authentication Operations**: How to handle sign-in, join event with RxDB?
+   - These may stay as Apollo mutations if they don't need offline support
+   - Status: ❓ Needs architectural decision
+
+## Next Actions for Developers
+
+### Immediate Priority (Phase 4 Completion)
+
+1. **Migrate Remaining Mutations** - Convert these 4 components from Apollo to RxDB:
+   - `src/containers/VirtualChallenge/VirtualChallenge.tsx` - enrollVirtualChallenge mutation
+   - `src/containers/JoinEvent/JoinEvent.tsx` - joinEvent mutation  
+   - `src/containers/SignIn/SignIn.tsx` - signIn mutation (decision needed: keep Apollo or migrate?)
+   - `src/containers/EventInvitePage/EventInvitePage.tsx` - invitation/friends queries
+
+2. **Test Offline Functionality** - Verify that:
+   - Data syncs correctly when going offline/online
+   - Mutations queue properly when offline
+   - Temporary IDs work correctly for offline-created documents
+
+3. **Implement Data Migration** - Create migration logic to:
+   - Clear old Apollo cache on first RxDB initialization
+   - Mark migration complete in localStorage
+   - Handle edge cases during transition
+
+### Medium Priority (Phase 5)
+
+4. **Comprehensive Testing**
+   - Add unit tests for RxDB schemas and hooks
+   - Add integration tests for replication
+   - Add E2E tests for offline scenarios
+   - Test multi-tab synchronization
+
+5. **Performance Monitoring**
+   - Compare query performance vs Apollo Client
+   - Monitor IndexedDB storage usage
+   - Test with large datasets
+
+### Low Priority (Phase 6+)
+
+6. **Remove Apollo Client** - Once all above is complete:
+   - Remove Apollo dependencies from package.json
+   - Delete Apollo-related files (.graphql files, codegen config)
+   - Remove Apollo provider from AppShell.tsx
+   - Update Storybook mocks
+
+7. **Consider Phase 7 Optimizations** - After migration is stable:
+   - Consolidate `updated_at` and `_modified` fields
+   - Auto-generate `CollectionName` type
+   - Optimize indexes and queries
 
 ## Conclusion
 
