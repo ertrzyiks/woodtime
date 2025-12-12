@@ -19,27 +19,37 @@ export default function getMockedApolloClient() {
       },
     },
   });
-  store.set('Query', 'ROOT', 'events', [
-    { id: '1', name: 'Harpus', type: 1, checkpoint_count: 12 },
-    { id: '2', name: 'Azymut', type: 2, checkpoint_count: 12 },
-  ]);
+  store.set('Query', 'ROOT', 'events', [{ id: '1' }, { id: '2' }]);
 
-  store.set('Query', 'ROOT', 'pullEvents', {
-    documents: [
-      {
-        id: '1',
-        name: 'Harpus',
-        type: 1,
-      },
-      {
-        id: '2',
-        name: 'Azymut',
-        type: 2,
-      },
-    ],
-    checkpoint: {
-      lastModified: 0,
+  store.set('PullEventsResponse', 'pull-events-1', {
+    documents: [{ id: '1' }, { id: '2' }],
+  });
+
+  store.set('EventDocument', '1', {
+    id: '1',
+    name: 'Harpus',
+    type: 1,
+    checkpoint_count: 12,
+  });
+
+  store.set('EventDocument', '2', {
+    id: '2',
+    name: 'Azymut',
+    type: 2,
+    checkpoint_count: 12,
+  });
+
+  store.set(
+    'Query',
+    'ROOT',
+    'pullEvents', // field name
+    {
+      documents: [{ id: '1' }, { id: '2' }],
     },
+  );
+
+  store.set('PullEventsResponse', 'ROOT', {
+    documents: [{ id: '1' }, { id: '2' }],
   });
 
   const schemaWithMocks = addMocksToSchema({
@@ -48,7 +58,9 @@ export default function getMockedApolloClient() {
     resolvers: (store) => ({
       Query: {
         event: (_, { id }) => store.get('Event', id),
-        pullEvents: (_, { since }) => store.get('Query', 'ROOT', 'pullEvents'),
+        pullEvents: (_, { since }) => {
+          return store.get('PullEventsResponse', 'ROOT');
+        },
       },
     }),
   });
@@ -58,6 +70,13 @@ export default function getMockedApolloClient() {
     link: new SchemaLink({
       schema: schemaWithMocks,
     }),
+  });
+
+  store.set('EventDocument', '1', {
+    id: '1',
+    name: 'Harpus',
+    type: 2,
+    checkpoint_count: 12,
   });
 
   return { client, store, schemaWithMocks };

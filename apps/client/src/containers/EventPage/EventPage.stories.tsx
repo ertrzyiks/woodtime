@@ -33,14 +33,10 @@ interface MockEventArgs {
   participants: { id: number; name: string }[];
 }
 
-const MockTemplate: Story<MockEventArgs> = ({ ...args }: MockEventArgs) => {
-  const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>();
-  if (!apolloRef.current) {
-    apolloRef.current = getMockedApolloClient();
-  }
+const MockTemplate: Story<MockEventArgs> = ({ store, ...args }: any) => {
+  console.log('STOR', store);
 
-  const { client, store } = apolloRef.current;
-
+  console.log('------ Setting up event with args:', args);
   store.set('Event', '1', { id: '1', ...args });
   store.set('EventDocument', '1', {
     id: '1',
@@ -51,7 +47,7 @@ const MockTemplate: Story<MockEventArgs> = ({ ...args }: MockEventArgs) => {
 
   return (
     <MemoryRouter initialEntries={['/events/1']} initialIndex={0}>
-      <AppShell apolloClient={client}>
+      <AppShell>
         <Route path="/events/:id">
           <EventPage key={Math.random()} />
         </Route>
@@ -74,40 +70,52 @@ MockTemplate.args = {
   ],
 };
 
-export const Classic = MockTemplate.bind({});
-
-Classic.args = {
-  ...MockTemplate.args,
-  name: 'Classic event',
-  type: 2,
+export const Classic = {
+  render: (args: MockEventArgs, { loaded }) => (
+    <MockTemplate {...args} store={loaded.store} />
+  ),
+  args: {
+    ...MockTemplate.args,
+    name: 'Classic event',
+    type: 2,
+  },
 };
 
-export const ScoreLauf = MockTemplate.bind({});
-
-ScoreLauf.args = {
-  ...MockTemplate.args,
-  name: 'ScoreLauf event',
-  type: 1,
+export const ScoreLauf = {
+  render: (args: MockEventArgs, { loaded }) => (
+    <MockTemplate {...args} store={loaded.store} />
+  ),
+  args: {
+    ...MockTemplate.args,
+    name: 'ScoreLauf event',
+    type: 1,
+  },
 };
 
-export const ScoreLaufSkippedCheckpoints = MockTemplate.bind({});
-
-ScoreLaufSkippedCheckpoints.args = {
-  ...MockTemplate.args,
-  name: 'ScoreLauf event with skipped checkpoints',
-  type: 1,
-  checkpoints: [
-    { cp_id: '1', cp_code: 'LOR' },
-    { cp_id: '2', skipped: true, skip_reason: '' },
-  ],
+export const ScoreLaufSkippedCheckpoints = {
+  render: (args: MockEventArgs, { loaded }) => (
+    <MockTemplate {...args} store={loaded.store} />
+  ),
+  args: {
+    ...MockTemplate.args,
+    name: 'ScoreLauf event with skipped checkpoints',
+    type: 1,
+    checkpoints: [
+      { cp_id: '1', cp_code: 'LOR' },
+      { cp_id: '2', skipped: true, skip_reason: '' },
+    ],
+  },
 };
 
-export const Virtual = MockTemplate.bind({});
-
-Virtual.args = {
-  ...MockTemplate.args,
-  name: 'Virtual event',
-  type: 3,
+export const Virtual = {
+  render: (args: MockEventArgs, { loaded }) => (
+    <MockTemplate {...args} store={loaded.store} />
+  ),
+  args: {
+    ...MockTemplate.args,
+    name: 'Virtual event',
+    type: 3,
+  },
 };
 
 export const RealServer = ({ eventId }: { eventId: number }) => (

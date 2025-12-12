@@ -1,6 +1,6 @@
 import { ReactNode, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
-import ContentLoader from "react-content-loader"
+import ContentLoader from 'react-content-loader';
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';
 import VirtualEvent from '../../components/VirtualEvent/VirtualEvent';
 import { useRxDocument } from '../../database/hooks/useRxDocument';
@@ -10,16 +10,24 @@ import EventIcon from '@mui/icons-material/Event';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
 import Classic from './components/Classic/Classic';
-import {useEventQueue} from "../../components/CheckpointsService/useEventQueue";
-import {QueueItem} from "../../components/CheckpointsService/CheckpointsService";
-import {useTranslation} from "react-i18next";
+import { useEventQueue } from '../../components/CheckpointsService/useEventQueue';
+import { QueueItem } from '../../components/CheckpointsService/CheckpointsService';
+import { useTranslation } from 'react-i18next';
 
 const EVENT_TYPES = {
   SCORE: 1,
   CLASSIC: 2,
 };
 
-const Loader = ({ children, width, height } : { width: number, height: number, children: ReactNode }) => (
+const Loader = ({
+  children,
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+  children: ReactNode;
+}) => (
   <ContentLoader
     speed={2}
     width={width}
@@ -30,7 +38,7 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   >
     {children}
   </ContentLoader>
-)
+);
 
 type EventData = {
   id: number;
@@ -52,28 +60,33 @@ type CheckpointData = {
   skip_reason: string | null;
 };
 
-function mergeCheckpoints(event: EventData | null, checkpoints: CheckpointData[]): EventData | null {
+function mergeCheckpoints(
+  event: EventData | null,
+  checkpoints: CheckpointData[],
+): EventData | null {
   if (!event) {
-    return event
+    return event;
   }
 
   return {
     ...event,
     participants: event.participants || [],
-    checkpoints: [
-      ...checkpoints,
-    ]
-  }
+    checkpoints: [...checkpoints],
+  };
 }
 
 const EventPage = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   // const items = useEventQueue(parseInt(id, 10))
 
   const classes = useBreadcrumbStyles();
 
-  const { data: eventData, loading: eventLoading, error: eventError } = useRxDocument('events', id);
+  const {
+    data: eventData,
+    loading: eventLoading,
+    error: eventError,
+  } = useRxDocument('events', id);
 
   const checkpointsQuery = useCallback(
     (db: any) => {
@@ -82,17 +95,18 @@ const EventPage = () => {
         selector: {
           event_id: id,
         },
-        sort: [{ cp_id: 'asc' }]
+        sort: [{ cp_id: 'asc' }],
       });
     },
-    [id]
+    [id],
   );
 
-  const { data: checkpoints, loading: checkpointsLoading } = useRxQuery(checkpointsQuery);
+  const { data: checkpoints, loading: checkpointsLoading } =
+    useRxQuery(checkpointsQuery);
 
   const loading = eventLoading || checkpointsLoading;
   const error = eventError;
-  const event = mergeCheckpoints(eventData, checkpoints)
+  const event = mergeCheckpoints(eventData, checkpoints);
 
   if (loading && !eventData) {
     return (
@@ -121,15 +135,14 @@ const EventPage = () => {
             <rect x="0" y="220" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="240" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="260" rx="3" ry="3" width="100" height="10" />
-
           </Loader>
         </Box>
       </div>
-    )
+    );
   }
 
   if (!event) {
-    return <div>Not found</div>
+    return <div>Not found</div>;
   }
 
   const eventContent =
@@ -141,6 +154,8 @@ const EventPage = () => {
     ) : (
       <Classic event={event} />
     );
+
+  console.log('EVENT TYPE', event.type);
 
   return (
     <div>
@@ -163,12 +178,14 @@ const EventPage = () => {
 
       {error && <p>Error :(</p>}
 
-      {(event.type === 3 && event.virtual_challenge) ? (
+      {event.type === 3 && event.virtual_challenge ? (
         <VirtualEvent
           event={event}
           virtualChallenge={event.virtual_challenge}
         />
-      ) : eventContent}
+      ) : (
+        eventContent
+      )}
     </div>
   );
 };
