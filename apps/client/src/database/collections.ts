@@ -2,6 +2,7 @@ import { eventSchema } from './schemas/event.schema';
 import { checkpointSchema } from './schemas/checkpoint.schema';
 import { userSchema } from './schemas/user.schema';
 import { virtualChallengeSchema } from './schemas/virtualChallenge.schema';
+import { participantSchema } from './schemas/participant.schema';
 import type { RxDocument, RxCollection, RxQuery } from 'rxdb';
 
 // Define document types for proper typing
@@ -49,6 +50,10 @@ export const collections = {
   },
   virtualchallenges: {
     schema: virtualChallengeSchema,
+    migrationStrategies: {},
+  },
+  participants: {
+    schema: participantSchema,
     migrationStrategies: {},
   }
 };
