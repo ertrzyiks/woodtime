@@ -291,22 +291,8 @@ class Database extends DataSource {
           // Generate new ID for temporary IDs
           const [newId] = await knex("events").insert(eventData);
           actualId = newId;
-          // Add user as participant for new events
-          await knex("participants").insert({
-            user_id: userId,
-            event_id: actualId,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
         } else {
           await knex("events").insert({ id: event.id, ...eventData });
-          // Add user as participant for new events
-          await knex("participants").insert({
-            user_id: userId,
-            event_id: event.id,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
         }
 
         await this.createParticipant({

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { app, server as apolloServer } from "./src/app";
 import knex from "./knex";
+import Database from "./src/datasources/database.js";
 
 describe("Push Mutations Security Tests", () => {
   let server;
@@ -231,7 +232,6 @@ describe("Push Mutations Security Tests", () => {
 
   describe("Database-level tests", () => {
     it("should only allow updates to events where user is a participant", async () => {
-      const Database = require("./src/datasources/database");
       const db = new Database();
 
       // Try to update event 1 as User 2 (not a participant)
@@ -256,7 +256,6 @@ describe("Push Mutations Security Tests", () => {
     });
 
     it("should allow updates to events where user is a participant", async () => {
-      const Database = require("./src/datasources/database");
       const db = new Database();
 
       // Update event 1 as User 1 (is a participant)
@@ -282,7 +281,6 @@ describe("Push Mutations Security Tests", () => {
     });
 
     it("should only allow checkpoint updates for events where user is a participant", async () => {
-      const Database = require("./src/datasources/database");
       const db = new Database();
 
       // Add a checkpoint
@@ -322,7 +320,6 @@ describe("Push Mutations Security Tests", () => {
     });
 
     it("should allow checkpoint updates for events where user is a participant", async () => {
-      const Database = require("./src/datasources/database");
       const db = new Database();
 
       // Add a checkpoint
@@ -363,7 +360,6 @@ describe("Push Mutations Security Tests", () => {
     });
 
     it("should add user as participant when creating new event", async () => {
-      const Database = require("./src/datasources/database");
       const db = new Database();
 
       // Create new event as User 2
