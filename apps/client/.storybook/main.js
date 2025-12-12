@@ -24,6 +24,12 @@ module.exports = {
     }
     config.assetsInclude.push(/\.graphql$/);
 
+    // Remove the copy-index-to-404 plugin for Storybook builds
+    // This plugin is only needed for the main app deployment
+    config.plugins = config.plugins.filter(
+      plugin => plugin && plugin.name !== 'copy-index-to-404'
+    );
+
     return config;
   },
 };
