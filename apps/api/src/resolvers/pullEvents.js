@@ -1,9 +1,15 @@
-module.exports = async (_, { limit, minUpdatedAt }, { dataSources: { db } }) => {
+module.exports = async (
+  _,
+  { limit, minUpdatedAt },
+  { dataSources: { db } },
+) => {
   const documents = await db.pullEvents({ limit, minUpdatedAt });
-  const checkpoint = await db.getEventsCheckpoint();
 
   return {
     documents,
-    checkpoint,
+    checkpoint: {
+      lastModified:
+        documents.length > 0 ? documents[documents.length - 1]._modified : 0,
+    },
   };
 };

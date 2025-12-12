@@ -23,9 +23,6 @@ export const eventSchema: RxJsonSchema<any> = {
       ]
     },
     checkpoint_count: {
-      type: 'string'
-    },
-    checkpoint_count: {
       type: 'number'
     },
     created_at: {

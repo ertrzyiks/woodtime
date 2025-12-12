@@ -33,9 +33,6 @@ export const collections = {
       // Static methods
       getUpcoming(this: EventCollection): RxQuery<EventDocType, any> {
         return this.find({
-          selector: {
-            deleted: false
-          },
           sort: [{ created_at: 'desc' }]
         });
       }

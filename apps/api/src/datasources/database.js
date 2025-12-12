@@ -231,7 +231,7 @@ class Database extends DataSource {
         "_modified",
       )
       .from("events")
-      .where("_modified", ">=", minDate)
+      .where("_modified", ">", minDate)
       .orderBy("_modified", "asc")
       .limit(limit);
 
@@ -239,18 +239,6 @@ class Database extends DataSource {
       ...resolveDates(event),
       deleted: Boolean(event.deleted),
     }));
-  }
-
-  async getEventsCheckpoint() {
-    const result = await knex
-      .select("_modified")
-      .from("events")
-      .orderBy("_modified", "desc")
-      .limit(1);
-
-    return {
-      lastModified: result.length > 0 ? result[0]._modified : 0,
-    };
   }
 
   async pushEvents(events) {
@@ -371,8 +359,8 @@ class Database extends DataSource {
         cp_code: checkpoint.cp_code,
         skipped: checkpoint.skipped ? 1 : 0,
         skip_reason: checkpoint.skip_reason,
-        created_at: checkpoint.created_at,
-        updated_at: checkpoint.updated_at,
+        created_at: new Date(checkpoint.created_at).toISOString(),
+        updated_at: new Date(checkpoint.updated_at).toISOString(),
         deleted: checkpoint.deleted ? 1 : 0,
       };
 

@@ -186,16 +186,16 @@ const pushCheckpointsQueryBuilder = (docs: Array<Record<string, any>>) => {
       }
     `,
     variables: {
-      checkpoints: docs.map((doc) => ({
-        id: doc.id,
-        event_id: doc.event_id,
-        cp_id: doc.cp_id,
-        cp_code: doc.cp_code,
-        skipped: doc.skipped,
-        skip_reason: doc.skip_reason,
-        created_at: doc.created_at,
-        updated_at: doc.updated_at,
-        deleted: doc.deleted,
+      checkpoints: docs.map(({ newDocumentState }) => ({
+        id: newDocumentState.id,
+        event_id: newDocumentState.event_id,
+        cp_id: newDocumentState.cp_id,
+        cp_code: newDocumentState.cp_code,
+        skipped: newDocumentState.skipped,
+        skip_reason: newDocumentState.skip_reason,
+        created_at: newDocumentState.created_at,
+        updated_at: newDocumentState.updated_at,
+        deleted: newDocumentState.deleted,
       })),
     },
   };
@@ -299,9 +299,10 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullEventsQueryBuilder,
+      batchSize: 20
     },
     push: {
-      queryBuilder: pushEventsQueryBuilder,
+      queryBuilder: pushEventsQueryBuilder
     },
     deletedField: 'deleted',
     live: true, // Enable continuous replication
@@ -330,6 +331,7 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullCheckpointsQueryBuilder,
+      batchSize: 20
     },
     push: {
       queryBuilder: pushCheckpointsQueryBuilder,
@@ -359,6 +361,7 @@ export function setupReplication(db: RxDatabase) {
     },
     pull: {
       queryBuilder: pullVirtualChallengesQueryBuilder,
+      batchSize: 20
     },
     push: {
       queryBuilder: pushVirtualChallengesQueryBuilder,

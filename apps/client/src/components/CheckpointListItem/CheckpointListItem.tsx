@@ -45,23 +45,18 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
 
   const handleToggle = async (value: number) => {
     if (!db) return;
-    
+
     setCreationLoading(true);
     setCreationError(null);
-    
+
     try {
       if (checkpoint) {
-        // Delete checkpoint (soft delete)
         const checkpointDoc = await db.checkpoints.findOne({
           selector: { id: checkpoint.id }
         }).exec();
-        
+
         if (checkpointDoc) {
-          await checkpointDoc.update({
-            $set: {
-              deleted: true
-            }
-          });
+          await checkpointDoc.remove()
         }
       } else {
         // Create checkpoint
@@ -75,9 +70,8 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
           skip_reason: null,
           created_at: now,
           updated_at: now,
-          deleted: false
         });
-        
+
         history.push(`/events/${eventId}`);
       }
       setCreationLoading(false);
@@ -93,9 +87,9 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
     checkpointId: number
   ) => {
     e.stopPropagation();
-    
+
     if (!db) return;
-    
+
     setCreationLoading(true);
     setCreationError(null);
 
@@ -112,7 +106,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
         updated_at: now,
         deleted: false
       });
-      
+
       history.push(`/events/${eventId}`);
       setCreationLoading(false);
     } catch (err) {

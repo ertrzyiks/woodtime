@@ -17,7 +17,6 @@ import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
 import Solution from '../../../../components/Solution/Solution';
-import {CheckpointsDispatchContext} from "../../../../components/CheckpointsService/CheckpointsService";
 import {Checkpoint} from "../../../../types/Checkpoint";
 import Participants from "../../../../components/Participants/Participants";
 import {useRxDB} from "../../../../database/RxDBProvider";
@@ -61,24 +60,19 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
 
   const classes = useStyles();
 
-  const dispatch = useContext(CheckpointsDispatchContext)
   const { db } = useRxDB();
 
   const handleDeleteClick = async (checkpoint: Checkpoint) => {
     if (checkpoint.pending) {
-      return dispatch({
-        type: 'delete',
-        eventId: event.id,
-        id: checkpoint.cp_id
-      })
+      // TODO: remove using rxdb
     }
 
     if (!db) return;
-    
+
     const checkpointDoc = await db.checkpoints.findOne({
       selector: { id: checkpoint.id }
     }).exec();
-    
+
     if (checkpointDoc) {
       await checkpointDoc.update({
         $set: {
