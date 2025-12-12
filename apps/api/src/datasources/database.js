@@ -216,24 +216,29 @@ class Database extends DataSource {
 
   // RxDB Replication Methods
 
-  async pullEvents({ limit, minUpdatedAt }) {
+  async pullEvents({ limit, minUpdatedAt, userId }) {
     const minDate = new Date(minUpdatedAt).getTime();
-    const events = await knex
+
+    const query = knex
       .select(
-        "id",
-        "name",
-        "type",
-        "invite_token",
-        "checkpoint_count",
-        "created_at",
-        "updated_at",
-        "deleted",
-        "_modified",
+        "events.id",
+        "events.name",
+        "events.type",
+        "events.invite_token",
+        "events.checkpoint_count",
+        "events.created_at",
+        "events.updated_at",
+        "events.deleted",
+        "events._modified",
       )
       .from("events")
-      .where("_modified", ">", minDate)
-      .orderBy("_modified", "asc")
+      .join("participants", "events.id", "=", "participants.event_id")
+      .andWhere("participants.user_id", userId)
+      .where("events._modified", ">", minDate)
+      .orderBy("events._modified", "asc")
       .limit(limit);
+
+    const events = await query;
 
     return events.map((event) => ({
       ...resolveDates(event),
