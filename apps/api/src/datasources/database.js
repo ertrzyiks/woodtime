@@ -308,24 +308,27 @@ class Database extends DataSource {
     return results;
   }
 
-  async pullCheckpoints({ limit, minUpdatedAt }) {
+  async pullCheckpoints({ limit, minUpdatedAt, userId }) {
     const minDate = new Date(minUpdatedAt).getTime();
     const checkpoints = await knex
       .select(
-        "id",
-        "event_id",
-        "cp_id",
-        "cp_code",
-        "skipped",
-        "skip_reason",
-        "created_at",
-        "updated_at",
-        "deleted",
-        "_modified",
+        "checkpoints.id",
+        "checkpoints.event_id",
+        "checkpoints.cp_id",
+        "checkpoints.cp_code",
+        "checkpoints.skipped",
+        "checkpoints.skip_reason",
+        "checkpoints.created_at",
+        "checkpoints.updated_at",
+        "checkpoints.deleted",
+        "checkpoints._modified",
       )
       .from("checkpoints")
-      .where("_modified", ">=", minDate)
-      .orderBy("_modified", "asc")
+      .join("events", "checkpoints.event_id", "=", "events.id")
+      .join("participants", "events.id", "=", "participants.event_id")
+      .where("participants.user_id", userId)
+      .andWhere("checkpoints._modified", ">=", minDate)
+      .orderBy("checkpoints._modified", "asc")
       .limit(limit);
 
     return checkpoints.map((checkpoint) => ({
