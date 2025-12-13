@@ -217,12 +217,12 @@ type LoginPayload {
 
 type JoinEventPayload {
   success: Boolean!
-  event: Event
+  event: EventDocument
 }
 
 type InviteToEventPayload {
   success: Boolean!
-  event: Event
+  event: EventDocument
 }
 
 type CreateEventResult {
@@ -268,7 +268,7 @@ type CheckInViertualCheckpointResult {
 type Mutation {
   signIn(name: String!): SignInPayload
   login(token: String!): LoginPayload
-  joinEvent(id: Int!, token: String!): JoinEventPayload
+  joinEvent(id: String!, token: String!): JoinEventPayload
   inviteToEvent(id: String!, friendId: String!): InviteToEventPayload
 
   createEvent(
@@ -304,7 +304,5 @@ type Mutation {
   pushVirtualChallenges(
     challenges: [VirtualChallengeInput!]!
   ): [VirtualChallengeDocument!]!
-  pushParticipants(
-    participants: [ParticipantInput!]!
-  ): [ParticipantDocument!]!
+  pushParticipants(participants: [ParticipantInput!]!): [ParticipantDocument!]!
 }

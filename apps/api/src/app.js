@@ -57,6 +57,8 @@ const {
   pushEvents,
   pullVirtualChallenges,
   pushVirtualChallenges,
+  pullParticipants,
+  pushParticipants,
 } = require("./resolvers");
 
 const app = express();
@@ -75,6 +77,7 @@ const resolvers = {
     pullCheckpoints,
     pullEvents,
     pullVirtualChallenges,
+    pullParticipants,
   },
   Event: {
     checkpoints,
@@ -102,6 +105,7 @@ const resolvers = {
     pushCheckpoints,
     pushEvents,
     pushVirtualChallenges,
+    pushParticipants,
   },
 };
 

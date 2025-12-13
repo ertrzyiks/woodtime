@@ -1,24 +1,24 @@
 import { useEffect } from 'react';
-import {useMutation} from "@apollo/client";
-import {useHistory, useLocation, useParams} from 'react-router-dom'
+import { useMutation } from '@apollo/client';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 
-import {JoinEventDocument} from "./data/joinEvent";
-import {EventForListFragmentDoc} from "../../queries/eventForListFragment";
+import { JoinEventDocument } from './data/joinEvent';
+import { EventForListFragmentDoc } from '../../queries/eventForListFragment';
 
 const JoinEvent = () => {
-  const { id } = useParams<{ id: string }>()
-  const location = useLocation()
-  const history = useHistory()
-  const urlParams = new URLSearchParams(location.search)
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const history = useHistory();
+  const urlParams = new URLSearchParams(location.search);
 
   const [join, { data, loading }] = useMutation(JoinEventDocument, {
     variables: {
-      id: parseInt(id, 10),
-      token: urlParams.get('token')
+      id,
+      token: urlParams.get('token'),
     },
     update: (cache, { data }) => {
       if (!data?.joinEvent?.event) {
-        return
+        return;
       }
 
       cache.modify({
@@ -26,34 +26,34 @@ const JoinEvent = () => {
           events: (existingEvents = []) => {
             const newEventRef = cache.writeFragment({
               data: data?.joinEvent?.event,
-              fragment: EventForListFragmentDoc
-            })
+              fragment: EventForListFragmentDoc,
+            });
 
-            return [...existingEvents, newEventRef]
-          }
-        }
-      })
+            return [...existingEvents, newEventRef];
+          },
+        },
+      });
     },
     onCompleted: (data) => {
       if (data?.joinEvent?.success) {
-        history.push(`/events/${id}`)
+        history.push(`/events/${id}`);
       }
-    }
-  })
+    },
+  });
 
   useEffect(() => {
-    join()
-  }, [join])
+    join();
+  }, [join]);
 
   if (loading) {
-    return <div>Joining</div>
+    return <div>Joining</div>;
   }
 
   if (data?.joinEvent?.success) {
-    return <div>Success</div>
+    return <div>Success</div>;
   }
 
-  return <div>Couldn't join</div>
-}
+  return <div>Couldn't join</div>;
+};
 
-export default JoinEvent
+export default JoinEvent;

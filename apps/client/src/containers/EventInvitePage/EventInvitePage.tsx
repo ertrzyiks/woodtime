@@ -1,21 +1,30 @@
 import { ReactNode } from 'react';
-import {useTranslation} from "react-i18next";
-import {Link as RouterLink, useParams} from "react-router-dom";
-import {Box, Breadcrumbs, Link, Typography} from "@mui/material";
-import EventIcon from "@mui/icons-material/Event";
-import {useMutation, useQuery} from "@apollo/client";
-import {GetEventDocument} from "../EventPage/data/getEvent";
-import {GetFriendsDocument} from "./data/getFriends";
-import {InviteToEventDocument} from "./data/invite";
-import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
-import {useInitialNavigation} from "../../hooks/useInitialNavigation";
-import ContentLoader from "react-content-loader";
-import IconButton from "@mui/material/IconButton";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
-import Button from "@mui/material/Button";
+import { useTranslation } from 'react-i18next';
+import { Link as RouterLink, useParams } from 'react-router-dom';
+import { Box, Breadcrumbs, Link, Typography } from '@mui/material';
+import EventIcon from '@mui/icons-material/Event';
+import { useMutation, useQuery } from '@apollo/client';
+import { GetEventDocument } from '../EventPage/data/getEvent';
+import { GetFriendsDocument } from './data/getFriends';
+import { InviteToEventDocument } from './data/invite';
+import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
+import { useInitialNavigation } from '../../hooks/useInitialNavigation';
+import ContentLoader from 'react-content-loader';
+import IconButton from '@mui/material/IconButton';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import Button from '@mui/material/Button';
+import { useRxDocument } from '../../database/hooks/useRxDocument';
 
-const Loader = ({ children, width, height } : { width: number, height: number, children: ReactNode }) => (
+const Loader = ({
+  children,
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+  children: ReactNode;
+}) => (
   <ContentLoader
     speed={2}
     width={width}
@@ -26,27 +35,23 @@ const Loader = ({ children, width, height } : { width: number, height: number, c
   >
     {children}
   </ContentLoader>
-)
+);
 
 const EventInvitePage = () => {
-  const { t } = useTranslation()
-  const { id } = useParams<{ id: string }>()
+  const { t } = useTranslation();
+  const { id } = useParams<{ id: string }>();
 
-  const classes = useBreadcrumbStyles()
-  const isInitialNavigation = useInitialNavigation()
+  const classes = useBreadcrumbStyles();
+  const isInitialNavigation = useInitialNavigation();
 
-  const { loading, data } = useQuery(GetEventDocument, {
-    variables: { id: parseInt(id, 10) },
-    fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
-  })
+  const { data, loading } = useRxDocument('events', id);
 
   const { data: friendsData } = useQuery(GetFriendsDocument, {
     fetchPolicy: isInitialNavigation ? 'cache-and-network' : undefined,
-    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined
-  })
+    nextFetchPolicy: isInitialNavigation ? 'cache-first' : undefined,
+  });
 
-  const [invite] = useMutation(InviteToEventDocument)
+  const [invite] = useMutation(InviteToEventDocument);
 
   if (loading && !data) {
     return (
@@ -75,28 +80,25 @@ const EventInvitePage = () => {
             <rect x="0" y="220" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="240" rx="3" ry="3" width="100" height="10" />
             <rect x="0" y="260" rx="3" ry="3" width="100" height="10" />
-
           </Loader>
         </Box>
       </div>
-    )
+    );
   }
 
-  const event = data?.event
+  const event = data;
 
   if (!event) {
-    return <div>Not found</div>
+    return <div>Not found</div>;
   }
 
-  const inviteUrl = `${window.location.protocol}//${window.location.host}/join/${event.id}?token=${event.invite_token}`
+  const inviteUrl = `${window.location.protocol}//${window.location.host}/join/${event.id}?token=${event.invite_token}`;
 
   const handleClick = () => {
     try {
-      window.navigator.clipboard.writeText(inviteUrl)
-    } catch {
-
-    }
-  }
+      window.navigator.clipboard.writeText(inviteUrl);
+    } catch {}
+  };
 
   return (
     <div>
@@ -135,16 +137,25 @@ const EventInvitePage = () => {
         {t('event.actions.inviteFriend')}
 
         <Box mt={1}>
-          {friendsData?.me?.friends.map(friend => (
-            <Button key={friend.id} onClick={() => invite({ variables: { eventId: event.id.toString(), friendId: friend.id }})}>
+          {friendsData?.me?.friends.map((friend) => (
+            <Button
+              key={friend.id}
+              onClick={() =>
+                invite({
+                  variables: {
+                    eventId: event.id.toString(),
+                    friendId: friend.id,
+                  },
+                })
+              }
+            >
               + {friend.name}
             </Button>
           ))}
         </Box>
-
       </Box>
     </div>
-  )
-}
+  );
+};
 
-export default EventInvitePage
+export default EventInvitePage;
