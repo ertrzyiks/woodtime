@@ -9,7 +9,7 @@ initialize({
   serviceWorker: { url: '/apiMockServiceWorker.js' },
 });
 
-const { schemaWithMocks, store } = getMockedApolloClient();
+const { schemaWithMocks, store, client } = getMockedApolloClient();
 
 const mockGraphQLQuery = (operationName) => {
   return graphql.query(operationName, async ({ query, variables }) => {
@@ -58,7 +58,7 @@ export const parameters = {
 };
 
 const storeLoader = async () => {
-  return { store };
+  return { store, client };
 };
 
 const rxdbLoader = async () => {

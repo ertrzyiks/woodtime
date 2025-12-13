@@ -23,7 +23,11 @@ interface MockEventArgs {
   participants: { id: number; name: string }[];
 }
 
-const MockTemplate: Story<MockEventArgs> = ({ store, ...args }: any) => {
+const MockTemplate: Story<MockEventArgs> = ({
+  client,
+  store,
+  ...args
+}: any) => {
   store.set('Event', '1', { id: '1', ...args });
   store.set('Query', 'ROOT', 'me', {
     id: '1',
@@ -35,7 +39,7 @@ const MockTemplate: Story<MockEventArgs> = ({ store, ...args }: any) => {
 
   return (
     <MemoryRouter initialEntries={['/events/1/invite']} initialIndex={0}>
-      <AppShell>
+      <AppShell apolloClient={client}>
         <Route path="/events/:id/invite">
           <EventInvitePage key={Math.random()} />
         </Route>
@@ -60,7 +64,7 @@ MockTemplate.args = {
 
 export const Mocked = {
   render: (args: MockEventArgs, { loaded }) => (
-    <MockTemplate {...args} store={loaded.store} />
+    <MockTemplate {...args} store={loaded.store} client={loaded.client} />
   ),
   args: {
     ...MockTemplate.args,
