@@ -1,7 +1,10 @@
 import selfsigned from "selfsigned";
 import fs from "fs";
 import path from "path";
-import { app, server } from "./app.js";
+import { app, server, contextFunction } from "./app.js";
+import { expressMiddleware } from "@apollo/server/express4";
+import cors from "cors";
+import bodyParser from "body-parser";
 import https from "https";
 import { dir } from "console";
 
@@ -96,18 +99,22 @@ const pems = await getPems();
 
 async function init() {
   await server.start();
-  server.applyMiddleware({
-    app,
-    path: "/woodtime",
-    cors: {
+  
+  app.use(
+    "/woodtime",
+    cors({
       origin: [
         "https://studio.apollographql.com",
         "http://localhost:3000",
         "http://localhost:6006",
       ],
       credentials: true,
-    },
-  });
+    }),
+    bodyParser.json(),
+    expressMiddleware(server, {
+      context: contextFunction,
+    }),
+  );
 
   https
     .createServer(

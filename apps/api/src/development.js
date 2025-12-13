@@ -1,7 +1,10 @@
 const selfsigned = require('selfsigned')
 const fs = require('fs')
 const path = require('path')
-const {app, server} = require('./app')
+const {app, server, contextFunction} = require('./app')
+const { expressMiddleware } = require('@apollo/server/express4')
+const cors = require('cors')
+const bodyParser = require('body-parser')
 
 const getPems = () => {
   try {
@@ -93,14 +96,18 @@ const pems = getPems()
 
 async function init() {
   await server.start()
-  server.applyMiddleware({
-    app,
-    path: '/woodtime',
-    cors: {
+  
+  app.use(
+    '/woodtime',
+    cors({
       origin: ['https://studio.apollographql.com', 'http://localhost:3000', 'http://localhost:6006'],
       credentials: true
-    }
-  });
+    }),
+    bodyParser.json(),
+    expressMiddleware(server, {
+      context: contextFunction
+    })
+  );
 
   const https = require('https')
   https.createServer({
