@@ -63,6 +63,16 @@ describe("Database.pullCheckpoints", () => {
       table.foreign("event_id").references("events.id").onDelete("CASCADE");
     });
 
+    await testKnex.schema.createTable("virtual_challenges", (table) => {
+      table.increments("id").primary();
+      table.string("name").notNullable();
+      table.text("checkpoints");
+      table.string("created_at").notNullable();
+      table.string("updated_at").notNullable();
+      table.integer("deleted").defaultTo(0);
+      table.integer("_modified").defaultTo(0);
+    });
+
     // Mock the knex module to use our test instance
     originalKnex = require.cache[require.resolve("../../knex")];
     require.cache[require.resolve("../../knex")] = {
@@ -80,6 +90,7 @@ describe("Database.pullCheckpoints", () => {
     await testKnex("participants").del();
     await testKnex("events").del();
     await testKnex("users").del();
+    await testKnex("virtual_challenges").del();
   });
 
   afterAll(async () => {
