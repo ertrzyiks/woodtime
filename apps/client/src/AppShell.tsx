@@ -1,5 +1,6 @@
 import { useEffect, useState, ReactNode } from 'react';
-import { onError } from '@apollo/client/link/error';
+import { ErrorLink } from '@apollo/client/link/error';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { createStyles, makeStyles, ThemeProvider as StylesThemeProvider } from '@mui/styles';
 import { Theme, createTheme, ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import { CircularProgress } from '@mui/material';
@@ -7,11 +8,11 @@ import { CircularProgress } from '@mui/material';
 import {
   ApolloClient,
   ApolloLink,
-  ApolloProvider,
   createHttpLink,
   InMemoryCache,
   NormalizedCacheObject,
 } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 
 import { LocalStorageWrapper, persistCache } from 'apollo3-cache-persist';
 import InitialNavigationDetector from './components/InitialNavigationDetector/InitialNavigationDetector';
@@ -22,9 +23,9 @@ import { init as initI18n } from './i18n';
 import PwaUpdateNotification from './components/PwaUpdateNofication/PwaUpdateNotification';
 import { RxDBProvider } from './database/RxDBProvider';
 
-const errorLink = onError(({ graphQLErrors }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ extensions }) => {
+const errorLink = new ErrorLink(({ error }) => {
+  if (CombinedGraphQLErrors.is(error)) {
+    error.errors.forEach(({ extensions }) => {
       if (extensions && extensions.code === 'UNAUTHENTICATED') {
         window.location.href =
           '/sign-in?redirect_url=' + encodeURIComponent(window.location.href);

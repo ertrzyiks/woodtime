@@ -17,7 +17,7 @@ import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
 import { Field, Form } from 'react-final-form';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 
 import {CreateEventDocument} from '../../queries/createEvent';
 import {GetEventsDocument} from '../../queries/getEvents';

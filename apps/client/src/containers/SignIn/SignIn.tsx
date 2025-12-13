@@ -1,7 +1,7 @@
 import { Field, Form } from 'react-final-form'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import {useMutation} from "@apollo/client";
+import {useMutation} from "@apollo/client/react";
 import {SignInDocument} from "./data/signIn";
 import {Box} from "@mui/material";
 import {useHistory} from "react-router-dom";

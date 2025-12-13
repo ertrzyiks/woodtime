@@ -1,6 +1,6 @@
 import {CheckpointsDispatchContext, CheckpointsStateContext} from "./CheckpointsService";
 import {useContext, useEffect} from "react";
-import {useMutation} from "@apollo/client";
+import {useMutation} from "@apollo/client/react";
 import {CreateCheckpointDocument} from "../../queries/createCheckpoint";
 import {GetEventDocument} from "../../containers/EventPage/data/getEvent";
 

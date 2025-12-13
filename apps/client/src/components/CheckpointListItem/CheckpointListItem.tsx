@@ -10,7 +10,7 @@ import {
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { CreateCheckpointDocument } from '../../queries/createCheckpoint';
 import { DeleteCheckpointDocument } from '../../queries/deleteCheckpoint';
 

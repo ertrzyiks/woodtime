@@ -18,7 +18,7 @@ import MissingCheckpointsArea from '../../../../components/MissingCheckpointsAre
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
 import Solution from '../../../../components/Solution/Solution';
 import {CheckpointsDispatchContext} from "../../../../components/CheckpointsService/CheckpointsService";
-import {useMutation} from "@apollo/client";
+import {useMutation} from "@apollo/client/react";
 import {Checkpoint} from "../../../../types/Checkpoint";
 import {DeleteCheckpointDocument} from "../../../../queries/deleteCheckpoint";
 import Participants from "../../../../components/Participants/Participants";

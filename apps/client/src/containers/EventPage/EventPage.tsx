@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import ContentLoader from "react-content-loader"
 import ScoreLauf from './components/ScoreLauf/ScoreLauf';

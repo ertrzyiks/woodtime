@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {Link as RouterLink, useParams} from "react-router-dom";
 import {Box, Breadcrumbs, Link, Typography} from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
-import {useMutation, useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client/react";
 import {GetEventDocument} from "../EventPage/data/getEvent";
 import {GetFriendsDocument} from "./data/getFriends";
 import {InviteToEventDocument} from "./data/invite";

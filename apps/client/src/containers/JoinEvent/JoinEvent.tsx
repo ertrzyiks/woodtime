@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import {useMutation} from "@apollo/client";
+import {useMutation} from "@apollo/client/react";
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {JoinEventDocument} from "./data/joinEvent";

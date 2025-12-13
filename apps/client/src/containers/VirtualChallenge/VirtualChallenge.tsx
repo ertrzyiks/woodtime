@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react';
 import {useHistory, useParams } from "react-router-dom"
 import {GetVirtualChallengeDocument} from "../../queries/getVirtualChallenge";
 import {useInitialNavigation} from "../../hooks/useInitialNavigation";

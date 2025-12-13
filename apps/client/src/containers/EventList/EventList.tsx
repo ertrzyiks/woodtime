@@ -16,7 +16,7 @@ import EventIcon from '@mui/icons-material/Event';
 import ListIcon from '@mui/icons-material/List';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { GetEventsDocument } from '../../queries/getEvents';
 import { DeleteEventDocument } from '../../queries/deleteEvent';
 import SimpleChecklist from '../../components/SimpleChecklist/SimpleChecklist';
