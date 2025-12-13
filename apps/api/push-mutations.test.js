@@ -3,7 +3,7 @@ import { app, server as apolloServer } from "./src/app";
 import knex from "./knex";
 import Database from "./src/datasources/database.js";
 
-describe.skip("Push Mutations Security Tests", () => {
+describe("Push Mutations Security Tests", () => {
   let server;
   let port;
 
