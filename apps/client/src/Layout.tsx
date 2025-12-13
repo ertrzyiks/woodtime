@@ -7,10 +7,13 @@ import {
   Typography,
   Link,
   BottomNavigation,
-  BottomNavigationAction
+  BottomNavigationAction,
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import EventIcon from '@mui/icons-material/Event';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import {
   Link as RouterLink,
   useHistory,
@@ -18,6 +21,8 @@ import {
 } from 'react-router-dom';
 
 import {useTranslation} from "react-i18next";
+import { removeRxDatabase } from 'rxdb/plugins/core';
+import { storage } from './database/setup';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -76,6 +81,15 @@ function BottomBar({ className }: { className: string }) {
 function Layout({ children }: { children: ReactNode }) {
   const classes = useStyles()
 
+  const handleClearStorage = async () => {
+    try {
+      await removeRxDatabase('woodtime', storage, true);
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear RXDB storage:', error);
+    }
+  };
+
   return (
     <div>
       <AppBar position="static">
@@ -85,6 +99,17 @@ function Layout({ children }: { children: ReactNode }) {
               Woodtime
             </Link>
           </Typography>
+          {process.env.NODE_ENV === 'development' && (
+            <Tooltip title="Clear RXDB Storage">
+              <IconButton
+                color="inherit"
+                onClick={handleClearStorage}
+                aria-label="clear rxdb storage"
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </Toolbar>
       </AppBar>
 
