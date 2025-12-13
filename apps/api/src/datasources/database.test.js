@@ -165,22 +165,7 @@ describe("Database", () => {
     });
   });
 
-  describe("deleteEventById", () => {
-    it("should delete event by id", async () => {
-      await testKnex("events").insert({
-        id: 1,
-        name: "Test Event",
-        type: 1,
-        checkpoint_count: 5,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
 
-      await db.deleteEventById(1);
-      const result = await testKnex("events").where({ id: 1 });
-      expect(result).toHaveLength(0);
-    });
-  });
 
   describe("createEvent", () => {
     it("should create a new event", async () => {

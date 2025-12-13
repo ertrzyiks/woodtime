@@ -71,9 +71,7 @@ class Database extends DataSource {
     return resolveDates(event);
   }
 
-  deleteEventById(id) {
-    return this.knex("events").where({ id }).del();
-  }
+
 
   async createEvent({
     id,
