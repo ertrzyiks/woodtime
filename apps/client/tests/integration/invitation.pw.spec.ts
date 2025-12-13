@@ -123,8 +123,8 @@ test.describe('Invitation Integration Tests', () => {
       
       console.log(`User 1: Final invite URL: ${inviteUrl}`);
       
-      // Verify invite URL format (token should be a UUID, not "undefined")
-      expect(inviteUrl).toMatch(new RegExp(`http://localhost:3000/join/${eventId}\\?token=[a-zA-Z0-9-]+$`));
+      // Verify invite URL format (token should be a valid UUID, not "undefined")
+      expect(inviteUrl).toMatch(new RegExp(`http://localhost:3000/join/${eventId}\\?token=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`));
       expect(inviteUrl).not.toContain('undefined');
 
       // ===== USER 2: Sign in as "Event Joiner" =====
