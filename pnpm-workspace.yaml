@@ -6,6 +6,7 @@ onlyBuiltDependencies:
   - '@firebase/util'
   - core-js-pure
   - esbuild
+  - msw
   - protobufjs
   - rxdb
   - sqlite3
