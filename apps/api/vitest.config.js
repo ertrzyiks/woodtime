@@ -6,7 +6,7 @@ module.exports = defineConfig({
     environment: 'node',
     testTimeout: 10000,
     env: {
-      NODE_ENV: 'development',
+      NODE_ENV: 'test',
     },
   },
 });

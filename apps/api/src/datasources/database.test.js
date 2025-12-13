@@ -73,19 +73,13 @@ beforeAll(async () => {
     table.integer("_modified").defaultTo(0);
   });
 
-  // Mock the knex module to use our test instance
-  originalKnex = require.cache[require.resolve("../../knex")];
-  require.cache[require.resolve("../../knex")] = {
-    exports: testKnex,
-  };
-
   // Import Database after mocking knex
   Database = require("./database");
-  db = new Database();
+  db = new Database(testKnex);
 });
 
 beforeEach(async () => {
-  // Clean up tables before each test  
+  // Clean up tables before each test
   await testKnex("checkpoints").del();
   await testKnex("participants").del();
   await testKnex("events").del();
@@ -98,7 +92,7 @@ afterAll(async () => {
   if (originalKnex) {
     require.cache[require.resolve("../../knex")] = originalKnex;
   }
-  
+
   await testKnex.destroy();
 });
 
@@ -191,6 +185,7 @@ describe("Database", () => {
   describe("createEvent", () => {
     it("should create a new event", async () => {
       const result = await db.createEvent({
+        id: "1",
         name: "New Event",
         type: 1,
         checkpointCount: 5,
@@ -559,7 +554,7 @@ describe("Database", () => {
   describe("pushEvents", () => {
     it("should push new events", async () => {
       await testKnex("users").insert({
-        id: 1,
+        id: "1",
         name: "Test User",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -567,7 +562,7 @@ describe("Database", () => {
 
       const events = [
         {
-          id: -1,
+          id: "1",
           name: "New Event",
           type: 1,
           checkpoint_count: 5,
@@ -576,7 +571,7 @@ describe("Database", () => {
           deleted: false,
         },
       ];
-      const result = await db.pushEvents(events, { id: 1 });
+      const result = await db.pushEvents(events, "user-1");
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe("New Event");
       expect(result[0].id).toBeGreaterThan(0);
@@ -586,7 +581,7 @@ describe("Database", () => {
   describe("pushCheckpoints", () => {
     it("should push new checkpoints", async () => {
       await testKnex("events").insert({
-        id: 1,
+        id: "1",
         name: "Test Event",
         type: 1,
         checkpoint_count: 5,
@@ -594,10 +589,18 @@ describe("Database", () => {
         updated_at: new Date().toISOString(),
       });
 
+      await testKnex("participants").insert({
+        id: "1",
+        user_id: "user-1",
+        event_id: "1",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
       const checkpoints = [
         {
-          id: -1,
-          event_id: 1,
+          id: "1",
+          event_id: "1",
           cp_id: 1,
           cp_code: "CP1",
           skipped: false,
@@ -607,7 +610,7 @@ describe("Database", () => {
           deleted: false,
         },
       ];
-      const result = await db.pushCheckpoints(checkpoints);
+      const result = await db.pushCheckpoints(checkpoints, "user-1");
       expect(result).toHaveLength(1);
       expect(result[0].cp_code).toBe("CP1");
       expect(result[0].id).toBeGreaterThan(0);
