@@ -73,15 +73,9 @@ beforeAll(async () => {
     table.integer("_modified").defaultTo(0);
   });
 
-  // Mock the knex module to use our test instance
-  originalKnex = require.cache[require.resolve("../../knex")];
-  require.cache[require.resolve("../../knex")] = {
-    exports: testKnex,
-  };
-
   // Import Database after mocking knex
   Database = require("./database");
-  db = new Database();
+  db = new Database(testKnex);
 });
 
 beforeEach(async () => {

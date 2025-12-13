@@ -12,18 +12,25 @@ const resolveDates = (obj) => {
 };
 
 class Database extends DataSource {
+  constructor(knexInstance = knex) {
+    super();
+    this.knex = knexInstance;
+  }
   initialize(config) {
     this.context = config.context;
   }
 
   async findUserById(id) {
-    const user = await knex.select("id", "name").from("users").where({ id });
+    const user = await this.knex
+      .select("id", "name")
+      .from("users")
+      .where({ id });
 
     return user[0];
   }
 
   async findEventsForUser({ id }) {
-    const events = await knex
+    const events = await this.knex
       .select(
         "events.id",
         "events.name",
@@ -41,7 +48,7 @@ class Database extends DataSource {
   }
 
   async findEventById(id) {
-    const rows = await knex
+    const rows = await this.knex
       .select(
         "id",
         "name",
@@ -65,7 +72,7 @@ class Database extends DataSource {
   }
 
   deleteEventById(id) {
-    return knex("events").where({ id }).del();
+    return this.knex("events").where({ id }).del();
   }
 
   async createEvent({
@@ -86,7 +93,7 @@ class Database extends DataSource {
       updated_at: new Date().toISOString(),
     };
 
-    const ids = await knex("events").insert(event);
+    const ids = await this.knex("events").insert(event);
 
     return {
       id: ids[0],
@@ -95,7 +102,7 @@ class Database extends DataSource {
   }
 
   async findParticipant({ userId, eventId }) {
-    const participants = await knex
+    const participants = await this.knex
       .select("id")
       .from("participants")
       .where({ user_id: userId, event_id: eventId });
@@ -104,7 +111,7 @@ class Database extends DataSource {
   }
 
   findParticipantsForEvent(id) {
-    return knex
+    return this.knex
       .select("users.id", "users.name")
       .from("participants")
       .join("users", "users.id", "=", "participants.user_id")
@@ -118,7 +125,7 @@ class Database extends DataSource {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    const ids = await knex("participants").insert(participant);
+    const ids = await this.knex("participants").insert(participant);
 
     return {
       id: ids[0],
@@ -137,7 +144,7 @@ class Database extends DataSource {
       updated_at: new Date().toISOString(),
     };
 
-    const ids = await knex("checkpoints").insert(checkpoint);
+    const ids = await this.knex("checkpoints").insert(checkpoint);
 
     return {
       id: ids[0],
@@ -146,11 +153,11 @@ class Database extends DataSource {
   }
 
   deleteCheckpoint(id) {
-    return knex("checkpoints").where({ id }).del();
+    return this.knex("checkpoints").where({ id }).del();
   }
 
   async findCheckpointById(id) {
-    const rows = await knex
+    const rows = await this.knex
       .select("id", "event_id")
       .from("checkpoints")
       .where({ id });
@@ -164,7 +171,7 @@ class Database extends DataSource {
   }
 
   async findCheckpointsForEvent(id) {
-    const checkpoints = await knex
+    const checkpoints = await this.knex
       .select(
         "id",
         "cp_id",
@@ -184,11 +191,11 @@ class Database extends DataSource {
   }
 
   async findFriendForUser({ id }) {
-    const subquery = knex
+    const subquery = this.knex
       .select("event_id")
       .from("participants")
       .where({ user_id: id });
-    const friends = await knex
+    const friends = await this.knex
       .select("users.id", "name")
       .distinct("user_id")
       .join("users", "users.id", "=", "participants.user_id")
@@ -201,12 +208,12 @@ class Database extends DataSource {
   }
 
   async isFriendForUser({ id, friendId }) {
-    const subquery = knex
+    const subquery = this.knex
       .select("event_id")
       .from("participants")
       .where({ user_id: id });
 
-    const friends = await knex
+    const friends = await this.knex
       .select("users.id")
       .join("users", "users.id", "=", "participants.user_id")
       .from("participants")
@@ -221,7 +228,7 @@ class Database extends DataSource {
   async pullEvents({ limit, minUpdatedAt, userId }) {
     const minDate = new Date(minUpdatedAt).getTime();
 
-    const query = knex
+    const query = this.knex
       .select(
         "events.id",
         "events.name",
@@ -253,7 +260,7 @@ class Database extends DataSource {
 
     for (const event of events) {
       // Check if event exists
-      const existing = await knex
+      const existing = await this.knex
         .select("id")
         .from("events")
         .where({ id: event.id })
@@ -261,7 +268,7 @@ class Database extends DataSource {
 
       // For existing events, verify user is a participant
       if (existing) {
-        const participant = await knex
+        const participant = await this.knex
           .select("id")
           .from("participants")
           .where({ user_id: userId, event_id: event.id })
@@ -286,7 +293,7 @@ class Database extends DataSource {
 
       if (existing) {
         // Update existing event
-        await knex("events").where({ id: event.id }).update(eventData);
+        await this.knex("events").where({ id: event.id }).update(eventData);
       } else {
         await this.createEvent({
           id: event.id,
@@ -302,7 +309,7 @@ class Database extends DataSource {
       }
 
       // Fetch the updated/created event
-      const updated = await knex
+      const updated = await this.knex
         .select(
           "id",
           "name",
@@ -329,7 +336,7 @@ class Database extends DataSource {
 
   async pullCheckpoints({ limit, minUpdatedAt, userId }) {
     const minDate = new Date(minUpdatedAt).getTime();
-    const checkpoints = await knex
+    const checkpoints = await this.knex
       .select(
         "checkpoints.id",
         "checkpoints.event_id",
@@ -358,7 +365,7 @@ class Database extends DataSource {
   }
 
   async getCheckpointsCheckpoint() {
-    const result = await knex
+    const result = await this.knex
       .select("_modified")
       .from("checkpoints")
       .orderBy("_modified", "desc")
@@ -374,7 +381,7 @@ class Database extends DataSource {
 
     for (const checkpoint of checkpoints) {
       // Verify user is a participant in the event
-      const participant = await knex
+      const participant = await this.knex
         .select("id")
         .from("participants")
         .where({ user_id: userId, event_id: checkpoint.event_id })
@@ -386,7 +393,7 @@ class Database extends DataSource {
       }
 
       // Check if checkpoint exists
-      const existing = await knex
+      const existing = await this.knex
         .select("id")
         .from("checkpoints")
         .where({ id: checkpoint.id })
@@ -407,17 +414,17 @@ class Database extends DataSource {
 
       if (existing) {
         // Update existing checkpoint
-        await knex("checkpoints")
+        await this.knex("checkpoints")
           .where({ id: checkpoint.id })
           .update(checkpointData);
       } else {
         // Insert new checkpoint (handle temporary IDs)
         if (checkpoint.id < 0) {
           // Generate new ID for temporary IDs
-          const [newId] = await knex("checkpoints").insert(checkpointData);
+          const [newId] = await this.knex("checkpoints").insert(checkpointData);
           actualId = newId;
         } else {
-          await knex("checkpoints").insert({
+          await this.knex("checkpoints").insert({
             id: checkpoint.id,
             ...checkpointData,
           });
@@ -425,7 +432,7 @@ class Database extends DataSource {
       }
 
       // Fetch the updated/created checkpoint
-      const updated = await knex
+      const updated = await this.knex
         .select(
           "id",
           "event_id",
@@ -454,7 +461,7 @@ class Database extends DataSource {
 
   async pullVirtualChallenges({ limit, minUpdatedAt }) {
     const minDate = new Date(minUpdatedAt).getTime();
-    const challenges = await knex
+    const challenges = await this.knex
       .select(
         "id",
         "name",
@@ -476,7 +483,7 @@ class Database extends DataSource {
   }
 
   async getVirtualChallengesCheckpoint() {
-    const result = await knex
+    const result = await this.knex
       .select("_modified")
       .from("virtual_challenges")
       .orderBy("_modified", "desc")
@@ -492,7 +499,7 @@ class Database extends DataSource {
 
     for (const challenge of challenges) {
       // Check if challenge exists
-      const existing = await knex
+      const existing = await this.knex
         .select("id")
         .from("virtual_challenges")
         .where({ id: challenge.id })
@@ -510,7 +517,7 @@ class Database extends DataSource {
 
       if (existing) {
         // Update existing challenge
-        await knex("virtual_challenges")
+        await this.knex("virtual_challenges")
           .where({ id: challenge.id })
           .update(challengeData);
       } else {
@@ -518,10 +525,10 @@ class Database extends DataSource {
         if (challenge.id < 0) {
           // Generate new ID for temporary IDs
           const [newId] =
-            await knex("virtual_challenges").insert(challengeData);
+            await this.knex("virtual_challenges").insert(challengeData);
           actualId = newId;
         } else {
-          await knex("virtual_challenges").insert({
+          await this.knex("virtual_challenges").insert({
             id: challenge.id,
             ...challengeData,
           });
@@ -529,7 +536,7 @@ class Database extends DataSource {
       }
 
       // Fetch the updated/created challenge
-      const updated = await knex
+      const updated = await this.knex
         .select(
           "id",
           "name",
