@@ -230,10 +230,7 @@ type CreateEventResult {
   event: Event!
 }
 
-type DeleteEventResult {
-  success: Boolean!
-  id: Int!
-}
+
 
 type CreateCheckpointResult {
   success: Boolean!
@@ -276,8 +273,6 @@ type Mutation {
     checkpointCount: Int!
     type: Int!
   ): CreateEventResult
-
-  deleteEvent(id: Int!): DeleteEventResult
 
   createCheckpoint(
     event_id: Int!
