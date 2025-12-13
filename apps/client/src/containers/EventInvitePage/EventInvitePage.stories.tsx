@@ -1,9 +1,7 @@
-import { useRef } from 'react';
-
 import EventInvitePage from './EventInvitePage';
 import { MemoryRouter, Route } from 'react-router-dom';
 import AppShell from '../../AppShell';
-import getMockedApolloClient from '../../support/storybook/getMockedApolloClient';
+import { Story } from '@storybook/react';
 
 export default {
   title: 'Pages/EventInvitePage',
@@ -22,17 +20,11 @@ interface MockEventArgs {
   type: number;
   checkpoint_count: number;
   checkpoints: { cp_id: string; cp_code: string }[];
+  participants: { id: number; name: string }[];
 }
 
-const MockTemplate = ({ ...args }: MockEventArgs) => {
-  const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>();
-  if (!apolloRef.current) {
-    apolloRef.current = getMockedApolloClient();
-  }
-
-  const { client, store } = apolloRef.current;
-
-  store.set('Event', '99', { id: '99', ...args });
+const MockTemplate: Story<MockEventArgs> = ({ store, ...args }: any) => {
+  store.set('Event', '1', { id: '1', ...args });
   store.set('Query', 'ROOT', 'me', {
     id: '1',
     friends: [
@@ -42,8 +34,8 @@ const MockTemplate = ({ ...args }: MockEventArgs) => {
   });
 
   return (
-    <MemoryRouter initialEntries={['/events/99/invite']} initialIndex={0}>
-      <AppShell apolloClient={client}>
+    <MemoryRouter initialEntries={['/events/1/invite']} initialIndex={0}>
+      <AppShell>
         <Route path="/events/:id/invite">
           <EventInvitePage key={Math.random()} />
         </Route>
@@ -66,12 +58,15 @@ MockTemplate.args = {
   ],
 };
 
-export const Mocked = MockTemplate.bind({});
-
-Mocked.args = {
-  ...MockTemplate.args,
-  name: 'Classic event',
-  type: 1,
+export const Mocked = {
+  render: (args: MockEventArgs, { loaded }) => (
+    <MockTemplate {...args} store={loaded.store} />
+  ),
+  args: {
+    ...MockTemplate.args,
+    name: 'Classic event',
+    type: 1,
+  },
 };
 
 export const RealServer = ({ eventId }: { eventId: number }) => (
