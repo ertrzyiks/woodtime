@@ -246,7 +246,7 @@ class Database extends DataSource {
     }));
   }
 
-  async pushEvents(events) {
+  async pushEvents(events, user) {
     const results = [];
 
     for (const event of events) {
@@ -280,6 +280,11 @@ class Database extends DataSource {
         } else {
           await knex("events").insert({ id: event.id, ...eventData });
         }
+
+        await this.createParticipant({
+          userId: user.id,
+          eventId: actualId,
+        });
       }
 
       // Fetch the updated/created event

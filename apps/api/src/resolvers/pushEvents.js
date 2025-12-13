@@ -1,4 +1,4 @@
-module.exports = async (_, { events }, { dataSources: { db } }) => {
-  const results = await db.pushEvents(events);
+module.exports = async (_, { events }, { dataSources: { db }, user }) => {
+  const results = await db.pushEvents(events, user);
   return results;
 };
