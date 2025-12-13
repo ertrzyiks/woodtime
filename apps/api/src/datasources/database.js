@@ -69,12 +69,14 @@ class Database extends DataSource {
   }
 
   async createEvent({
+    id,
     name,
     type,
     checkpointCount,
     virtualChallengeId = null,
   }) {
     const event = {
+      id,
       name,
       type,
       checkpoint_count: checkpointCount,
@@ -286,14 +288,12 @@ class Database extends DataSource {
         // Update existing event
         await knex("events").where({ id: event.id }).update(eventData);
       } else {
-        // Insert new event (handle temporary IDs)
-        if (event.id < 0) {
-          // Generate new ID for temporary IDs
-          const [newId] = await knex("events").insert(eventData);
-          actualId = newId;
-        } else {
-          await knex("events").insert({ id: event.id, ...eventData });
-        }
+        await this.createEvent({
+          id: event.id,
+          name: event.name,
+          type: event.type,
+          checkpointCount: event.checkpoint_count,
+        });
 
         await this.createParticipant({
           userId,
