@@ -123,8 +123,9 @@ test.describe('Invitation Integration Tests', () => {
       
       console.log(`User 1: Final invite URL: ${inviteUrl}`);
       
-      // Verify invite URL format
-      expect(inviteUrl).toMatch(new RegExp(`http://localhost:3000/join/${eventId}\\?token=[^u]`));
+      // Verify invite URL format (token should be a UUID, not "undefined")
+      expect(inviteUrl).toMatch(new RegExp(`http://localhost:3000/join/${eventId}\\?token=[a-zA-Z0-9-]+$`));
+      expect(inviteUrl).not.toContain('undefined');
 
       // ===== USER 2: Sign in as "Event Joiner" =====
       console.log('User 2: Signing in as Event Joiner');
@@ -165,26 +166,23 @@ test.describe('Invitation Integration Tests', () => {
       // ===== VERIFICATION: Verify the invitation flow completed successfully =====
       console.log('Verification: Invitation flow completed successfully');
       
-      // Take final screenshots
-      await page2.screenshot({ path: '/tmp/invitation-test-user2-final.png' });
-      await page1.goto(`http://localhost:3000/events/${eventId}`);
-      await page1.waitForLoadState('networkidle');
-      await page1.screenshot({ path: '/tmp/invitation-test-user1-final.png' });
-      
       // Verify User 2 is on the event page (successful join)
       expect(page2.url()).toContain(`/events/${eventId}`);
       console.log('✓ User 2 successfully joined the event via invitation link');
       
-      // Verify the event name is visible to both users
+      // Verify the event name is visible to User 2
       await expect(page2.locator(`text=${eventName}`).first()).toBeVisible();
       console.log('✓ User 2 can see the event details');
       
+      // Verify User 1 can still access their event
+      await page1.goto(`http://localhost:3000/events/${eventId}`);
+      await page1.waitForLoadState('networkidle');
       await expect(page1.locator(`text=${eventName}`).first()).toBeVisible();
       console.log('✓ User 1 can still access their event');
       
-      // Take screenshots for verification
-      await page1.screenshot({ path: '/tmp/invitation-test-user1.png' });
-      await page2.screenshot({ path: '/tmp/invitation-test-user2.png' });
+      // Take final screenshots for manual verification
+      await page1.screenshot({ path: '/tmp/invitation-test-user1-final.png' });
+      await page2.screenshot({ path: '/tmp/invitation-test-user2-final.png' });
       
       console.log('✓ Invitation test completed successfully');
       console.log('✓ Both users can see each other as participants');
