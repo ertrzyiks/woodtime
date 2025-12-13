@@ -37,7 +37,6 @@ const {
   event,
   checkpoints,
   createEvent,
-  deleteEvent,
   createCheckpoint,
   createVirtualChallenge,
   enrollVirtualChallenge,
@@ -94,7 +93,6 @@ const resolvers = {
   Mutation: {
     signIn,
     createEvent,
-    deleteEvent,
     inviteToEvent,
     joinEvent,
     createCheckpoint,

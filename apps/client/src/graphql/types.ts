@@ -104,12 +104,6 @@ export type DeleteCheckpointResult = {
   success: Scalars['Boolean']['output'];
 };
 
-export type DeleteEventResult = {
-  __typename?: 'DeleteEventResult';
-  id: Scalars['Int']['output'];
-  success: Scalars['Boolean']['output'];
-};
-
 export type EnrollVirtualChallengeResult = {
   __typename?: 'EnrollVirtualChallengeResult';
   event?: Maybe<Event>;
@@ -191,7 +185,6 @@ export type Mutation = {
   createEvent?: Maybe<CreateEventResult>;
   createVirtualChallenge: CreateVirtualChallengeResult;
   deleteCheckpoint: DeleteCheckpointResult;
-  deleteEvent?: Maybe<DeleteEventResult>;
   enrollVirtualChallenge: EnrollVirtualChallengeResult;
   inviteToEvent?: Maybe<InviteToEventPayload>;
   joinEvent?: Maybe<JoinEventPayload>;
@@ -232,11 +225,6 @@ export type MutationCreateVirtualChallengeArgs = {
 
 
 export type MutationDeleteCheckpointArgs = {
-  id: Scalars['Int']['input'];
-};
-
-
-export type MutationDeleteEventArgs = {
   id: Scalars['Int']['input'];
 };
 
