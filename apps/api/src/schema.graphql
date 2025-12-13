@@ -106,6 +106,15 @@ type VirtualChallengeDocument {
   deleted: Boolean!
 }
 
+type ParticipantDocument {
+  id: String!
+  user_id: String!
+  event_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
+}
+
 type ReplicationCheckpoint {
   lastModified: Float!
 }
@@ -122,6 +131,11 @@ type PullCheckpointsResponse {
 
 type PullVirtualChallengesResponse {
   documents: [VirtualChallengeDocument!]!
+  checkpoint: ReplicationCheckpoint!
+}
+
+type PullParticipantsResponse {
+  documents: [ParticipantDocument!]!
   checkpoint: ReplicationCheckpoint!
 }
 
@@ -156,6 +170,15 @@ input VirtualChallengeInput {
   deleted: Boolean!
 }
 
+input ParticipantInput {
+  id: String!
+  user_id: String!
+  event_id: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted: Boolean!
+}
+
 type Query {
   me: Me
   events: [Event!]!
@@ -172,6 +195,10 @@ type Query {
     limit: Int!
     minUpdatedAt: DateTime!
   ): PullVirtualChallengesResponse!
+  pullParticipants(
+    limit: Int!
+    minUpdatedAt: DateTime!
+  ): PullParticipantsResponse!
 }
 
 type SignInPayload {
@@ -190,12 +217,12 @@ type LoginPayload {
 
 type JoinEventPayload {
   success: Boolean!
-  event: Event
+  event: EventDocument
 }
 
 type InviteToEventPayload {
   success: Boolean!
-  event: Event
+  event: EventDocument
 }
 
 type CreateEventResult {
@@ -241,7 +268,7 @@ type CheckInViertualCheckpointResult {
 type Mutation {
   signIn(name: String!): SignInPayload
   login(token: String!): LoginPayload
-  joinEvent(id: Int!, token: String!): JoinEventPayload
+  joinEvent(id: String!, token: String!): JoinEventPayload
   inviteToEvent(id: String!, friendId: String!): InviteToEventPayload
 
   createEvent(
@@ -277,4 +304,5 @@ type Mutation {
   pushVirtualChallenges(
     challenges: [VirtualChallengeInput!]!
   ): [VirtualChallengeDocument!]!
+  pushParticipants(participants: [ParticipantInput!]!): [ParticipantDocument!]!
 }

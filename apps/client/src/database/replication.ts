@@ -296,6 +296,93 @@ const pushVirtualChallengesQueryBuilder = (
   };
 };
 
+// Pull query for participants
+const pullParticipantsQueryBuilder = (
+  checkpoint: ReplicationCheckpoint | null | undefined,
+  limit: number,
+) => {
+  if (!checkpoint) {
+    return {
+      operationName: 'PullParticipants',
+      query: `
+        query PullParticipants($limit: Int!, $minUpdatedAt: DateTime!) {
+          pullParticipants(limit: $limit, minUpdatedAt: $minUpdatedAt) {
+            documents {
+              id
+              user_id
+              event_id
+              created_at
+              updated_at
+              deleted
+            }
+            checkpoint {
+              lastModified
+            }
+          }
+        }
+      `,
+      variables: {
+        limit,
+        minUpdatedAt: new Date(0).toISOString(),
+      },
+    };
+  }
+
+  return {
+    operationName: 'PullParticipants',
+    query: `
+      query PullParticipants($limit: Int!, $minUpdatedAt: DateTime!) {
+        pullParticipants(limit: $limit, minUpdatedAt: $minUpdatedAt) {
+          documents {
+            id
+            user_id
+            event_id
+            created_at
+            updated_at
+            deleted
+          }
+          checkpoint {
+            lastModified
+          }
+        }
+      }
+    `,
+    variables: {
+      limit,
+      minUpdatedAt: new Date(checkpoint.lastModified).toISOString(),
+    },
+  };
+};
+
+// Push query for participants
+const pushParticipantsQueryBuilder = (docs: Array<Record<string, any>>) => {
+  return {
+    operationName: 'PushParticipants',
+    query: `
+      mutation PushParticipants($participants: [ParticipantInput!]!) {
+        pushParticipants(participants: $participants) {
+          id
+          user_id
+          event_id
+          created_at
+          updated_at
+          deleted
+        }
+      }
+    `,
+    variables: {
+      participants: docs.map(({ newDocumentState }) => ({
+        id: newDocumentState.id,
+        user_id: newDocumentState.user_id,
+        event_id: newDocumentState.event_id,
+        created_at: newDocumentState.created_at,
+        updated_at: newDocumentState.updated_at,
+        deleted: newDocumentState.deleted,
+      })),
+    },
+  };
+};
+
 function handleUnauthenticated(err: RxError) {
   const { parameters } = err;
 
@@ -411,9 +498,41 @@ export function setupReplication(db: RxDatabase) {
     handleUnauthenticated(err);
   });
 
+  // Replicate participants collection
+  const participantsReplication = replicateGraphQL({
+    replicationIdentifier: 'participants-replication',
+    collection: db.participants,
+    url: {
+      http: GRAPHQL_ENDPOINT,
+    },
+    pull: {
+      queryBuilder: pullParticipantsQueryBuilder,
+      batchSize: 20,
+    },
+    push: {
+      queryBuilder: pushParticipantsQueryBuilder,
+    },
+    deletedField: 'deleted',
+    live: true,
+    retryTime: 5000,
+    autoStart: true,
+    fetch: (url, options) => {
+      return fetch(url, {
+        ...options,
+        credentials: 'include',
+      });
+    },
+  });
+
+  participantsReplication.error$.subscribe((err) => {
+    console.error('Participants replication error:', err);
+    handleUnauthenticated(err);
+  });
+
   return {
     events: eventsReplication,
     checkpoints: checkpointsReplication,
     virtualchallenges: virtualChallengesReplication,
+    participants: participantsReplication,
   };
 }

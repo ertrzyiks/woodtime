@@ -20,7 +20,9 @@ module.exports = {
   pullEvents: require("./pullEvents"),
   pullCheckpoints: require("./pullCheckpoints"),
   pullVirtualChallenges: require("./pullVirtualChallenges"),
+  pullParticipants: require("./pullParticipants"),
   pushEvents: require("./pushEvents"),
   pushCheckpoints: require("./pushCheckpoints"),
   pushVirtualChallenges: require("./pushVirtualChallenges"),
+  pushParticipants: require("./pushParticipants"),
 };

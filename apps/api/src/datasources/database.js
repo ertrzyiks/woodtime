@@ -558,6 +558,104 @@ class Database extends DataSource {
 
     return results;
   }
+
+  async pullParticipants({ limit, minUpdatedAt, userId }) {
+    const minDate = new Date(minUpdatedAt).getTime();
+
+    const query = knex
+      .select(
+        "participants.id",
+        "participants.user_id",
+        "participants.event_id",
+        "participants.created_at",
+        "participants.updated_at",
+        "participants.deleted",
+        "participants._modified",
+      )
+      .from("participants")
+      .join("events", "participants.event_id", "=", "events.id")
+      .join(
+        "participants as user_participants",
+        "events.id",
+        "=",
+        "user_participants.event_id"
+      )
+      .where("user_participants.user_id", userId)
+      .andWhere("participants._modified", ">", minDate)
+      .orderBy("participants._modified", "asc")
+      .limit(limit);
+
+    const participants = await query;
+
+    return participants.map((participant) => ({
+      ...resolveDates(participant),
+      deleted: Boolean(participant.deleted),
+    }));
+  }
+
+  async pushParticipants(participants) {
+    const results = [];
+
+    for (const participant of participants) {
+      // Check if participant exists
+      const existing = await knex
+        .select("id")
+        .from("participants")
+        .where({ id: participant.id })
+        .first();
+
+      const participantData = {
+        user_id: participant.user_id,
+        event_id: participant.event_id,
+        created_at: new Date(participant.created_at).toISOString(),
+        updated_at: new Date(participant.updated_at).toISOString(),
+        deleted: participant.deleted ? 1 : 0,
+      };
+
+      let actualId = participant.id;
+
+      if (existing) {
+        // Update existing participant
+        await knex("participants")
+          .where({ id: participant.id })
+          .update(participantData);
+      } else {
+        // Insert new participant (handle temporary IDs)
+        if (participant.id < 0) {
+          // Generate new ID for temporary IDs
+          const [newId] = await knex("participants").insert(participantData);
+          actualId = newId;
+        } else {
+          await knex("participants").insert({
+            id: participant.id,
+            ...participantData,
+          });
+        }
+      }
+
+      // Fetch the updated/created participant
+      const updated = await knex
+        .select(
+          "id",
+          "user_id",
+          "event_id",
+          "created_at",
+          "updated_at",
+          "deleted",
+          "_modified",
+        )
+        .from("participants")
+        .where({ id: actualId })
+        .first();
+
+      results.push({
+        ...resolveDates(updated),
+        deleted: Boolean(updated.deleted),
+      });
+    }
+
+    return results;
+  }
 }
 
 module.exports = Database;
