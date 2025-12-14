@@ -53,11 +53,9 @@ test.describe('Invitation Integration Tests', () => {
       // Fill in the event form
       const eventName = `Invitation Test Event ${Date.now()}`;
       
-      // Wait a bit for the dialog to fully render
-      await page1.waitForTimeout(500);
-      
-      // Fill Name field
+      // Wait for the form inputs to be ready
       const nameInput = page1.locator('input[id="standard-basic"]').first();
+      await nameInput.waitFor({ state: 'visible', timeout: 5000 });
       await nameInput.fill(eventName);
       
       // Fill Points field
@@ -100,25 +98,50 @@ test.describe('Invitation Integration Tests', () => {
       await page1.waitForSelector('button:has-text("Copy invitation link")', { timeout: 10000 });
       
       // Wait for the invite token to be populated (retry mechanism)
+      // The token is generated on the server and replicated via RxDB
       let inviteUrl = '';
       let attempts = 0;
       const maxAttempts = 10;
       
       while (attempts < maxAttempts) {
         await page1.click('button:has-text("Copy invitation link")');
-        await page1.waitForTimeout(500);
         
-        inviteUrl = await page1.evaluate(() => navigator.clipboard.readText());
+        // Wait for clipboard to be populated using Playwright's polling
+        try {
+          inviteUrl = await page1.waitForFunction(
+            async () => {
+              const text = await navigator.clipboard.readText();
+              return text && text.length > 0 ? text : null;
+            },
+            { timeout: 2000, polling: 100 }
+          ).then(handle => handle.jsonValue());
+        } catch (e) {
+          console.log(`User 1: Attempt ${attempts + 1}: Failed to read clipboard`);
+          inviteUrl = '';
+        }
+        
         console.log(`User 1: Attempt ${attempts + 1}: Invite URL: ${inviteUrl}`);
         
-        // Check if token is not undefined
+        // Check if token is valid (not undefined)
         if (!inviteUrl.includes('token=undefined') && inviteUrl.includes('token=')) {
           break;
         }
         
         attempts++;
-        // Wait a bit longer for replication to happen
-        await page1.waitForTimeout(1000);
+        
+        // Wait for network activity indicating replication has occurred
+        // We wait for any GraphQL pullEvents response that might contain the updated token
+        if (attempts < maxAttempts) {
+          try {
+            // Wait for network response with exponential backoff timeout
+            await page1.waitForResponse(
+              response => response.url().includes('/woodtime') && response.status() === 200,
+              { timeout: 500 * (attempts + 1) }
+            );
+          } catch (e) {
+            // Timeout is acceptable, continue to next attempt
+          }
+        }
       }
       
       console.log(`User 1: Final invite URL: ${inviteUrl}`);
