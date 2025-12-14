@@ -77,6 +77,9 @@ interface GridData {
   cells: boolean[][]; // true = stamped, false = empty
 }
 
+// Threshold for determining if a cell is stamped (lower intensity = darker = stamped)
+const STAMPED_CELL_THRESHOLD = 128;
+
 const CardScanner = () => {
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
@@ -88,6 +91,19 @@ const CardScanner = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [gridData, setGridData] = useState<GridData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isOpenCVLoaded, setIsOpenCVLoaded] = useState(false);
+
+  // Check if OpenCV is loaded
+  useEffect(() => {
+    const checkOpenCV = () => {
+      if (typeof cv !== 'undefined') {
+        setIsOpenCVLoaded(true);
+      } else {
+        setTimeout(checkOpenCV, 100);
+      }
+    };
+    checkOpenCV();
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -144,9 +160,7 @@ const CardScanner = () => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     // Check if OpenCV is loaded
-    if (typeof cv === 'undefined') {
-      console.log('OpenCV.js not yet loaded');
-      setTimeout(processFrame, 100);
+    if (!isOpenCVLoaded) {
       return;
     }
 
@@ -288,8 +302,8 @@ const CardScanner = () => {
           const mean = cv.mean(gray);
           const intensity = mean[0];
           
-          // Simple threshold: if mean intensity is below 128, consider it stamped
-          cells[row][col] = intensity < 128;
+          // Simple threshold: if mean intensity is below threshold, consider it stamped
+          cells[row][col] = intensity < STAMPED_CELL_THRESHOLD;
           
           // Cleanup
           gray.delete();
@@ -305,10 +319,10 @@ const CardScanner = () => {
   };
 
   useEffect(() => {
-    if (isRecording) {
+    if (isRecording && isOpenCVLoaded) {
       processFrame();
     }
-  }, [isRecording]);
+  }, [isRecording, isOpenCVLoaded]);
 
   const handleBack = () => {
     history.push('/');
