@@ -46,6 +46,14 @@ Each cell is analyzed to determine if it's stamped or empty:
 - **Grid Size**: Fixed at 5 rows × 7 columns (35 cells total)
 - **Detection Threshold**: 128 (on a 0-255 scale)
 
+## Security Considerations
+
+- OpenCV.js is currently loaded from CDN without integrity hash
+- For production deployment, consider:
+  - Adding integrity hash to the script tag
+  - Self-hosting OpenCV.js for better security and reliability
+  - Using Subresource Integrity (SRI) to ensure script hasn't been tampered with
+
 ## Future Enhancements
 
 - Add ML model for improved cell classification
@@ -53,3 +61,4 @@ Each cell is analyzed to determine if it's stamped or empty:
 - Support for different grid sizes
 - Export/save grid data
 - Share grid results
+- Self-host OpenCV.js with integrity verification
