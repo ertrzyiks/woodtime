@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -87,6 +87,7 @@ const CardScanner = () => {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [gridData, setGridData] = useState<GridData | null>(null);
@@ -111,6 +112,9 @@ const CardScanner = () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
   }, [stream]);
 
@@ -133,6 +137,10 @@ const CardScanner = () => {
   };
 
   const stopCamera = () => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
@@ -143,7 +151,7 @@ const CardScanner = () => {
     setIsRecording(false);
   };
 
-  const processFrame = () => {
+  const processFrame = useCallback(() => {
     if (!videoRef.current || !canvasRef.current || !isRecording) return;
 
     const video = videoRef.current;
@@ -264,9 +272,9 @@ const CardScanner = () => {
 
     // Continue processing
     if (isRecording) {
-      requestAnimationFrame(processFrame);
+      animationFrameRef.current = requestAnimationFrame(processFrame);
     }
-  };
+  }, [isRecording, isOpenCVLoaded]);
 
   const extractGridCells = (warpedMat: any) => {
     const rows = 5;
@@ -322,7 +330,7 @@ const CardScanner = () => {
     if (isRecording && isOpenCVLoaded) {
       processFrame();
     }
-  }, [isRecording, isOpenCVLoaded]);
+  }, [isRecording, isOpenCVLoaded, processFrame]);
 
   const handleBack = () => {
     history.push('/');
