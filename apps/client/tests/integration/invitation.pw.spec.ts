@@ -108,13 +108,15 @@ test.describe('Invitation Integration Tests', () => {
         
         // Wait for clipboard to be populated using Playwright's polling
         try {
-          inviteUrl = await page1.waitForFunction(
+          const handle = await page1.waitForFunction(
             async () => {
               const text = await navigator.clipboard.readText();
               return text && text.length > 0 ? text : null;
             },
             { timeout: 2000, polling: 100 }
-          ).then(handle => handle.jsonValue());
+          );
+          inviteUrl = await handle.jsonValue();
+          await handle.dispose();
         } catch (e) {
           console.log(`User 1: Attempt ${attempts + 1}: Failed to read clipboard`);
           inviteUrl = '';
