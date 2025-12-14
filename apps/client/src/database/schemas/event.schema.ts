@@ -8,34 +8,38 @@ export const eventSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     name: {
-      type: 'string'
+      type: 'string',
     },
     type: {
-      type: 'number'
+      type: 'number',
     },
     invite_token: {
-      oneOf: [
-        { type: 'string' },
-        { type: 'null' }
-      ]
+      oneOf: [{ type: 'string' }, { type: 'null' }],
     },
     checkpoint_count: {
-      type: 'number'
+      type: 'number',
     },
     created_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
     updated_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
   },
-  required: ['id', 'name', 'type', 'checkpoint_count', 'created_at', 'updated_at'],
-  indexes: ['created_at', 'updated_at']
+  required: [
+    'id',
+    'name',
+    'type',
+    'checkpoint_count',
+    'created_at',
+    'updated_at',
+  ],
+  indexes: ['created_at', 'updated_at'],
 };

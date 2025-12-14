@@ -31,5 +31,9 @@ export function generateTempId(): string {
   // Date.now() returns ~1.7e12, so we use 100 multiplier (1.7e14) which is well within safe range
   // With timestamp (ms precision), persistent clientId (1M range), and 10-bit random,
   // collision risk is extremely low even across multiple clients
-  return ((Date.now() * 100 + parseInt(clientId) + (randomBytes[0] % 1024)).toFixed(0));
+  return (
+    Date.now() * 100 +
+    parseInt(clientId) +
+    (randomBytes[0] % 1024)
+  ).toFixed(0);
 }

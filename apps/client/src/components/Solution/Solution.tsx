@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { Checkpoint } from '../../types/Checkpoint';
-import {useTranslation} from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   checkpoints: Checkpoint[];
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Solution = ({ checkpoints, max }: Props) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const seqCheckpointIds = Array(max)
     .fill(max)

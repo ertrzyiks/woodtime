@@ -11,5 +11,5 @@ export const useBreadcrumbStyles = makeStyles((theme: Theme) =>
       width: 20,
       height: 20,
     },
-  })
+  }),
 );

@@ -1,12 +1,12 @@
 import LinearProgress, {
   LinearProgressProps,
 } from '@mui/material/LinearProgress';
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from '@mui/material';
 
 function LinearProgressWithLabel({
- current,
- max,
- ...props
+  current,
+  max,
+  ...props
 }: LinearProgressProps & { current: number; max: number }) {
   const value = (100 * current) / max;
 
@@ -24,4 +24,4 @@ function LinearProgressWithLabel({
   );
 }
 
-export default LinearProgressWithLabel
+export default LinearProgressWithLabel;

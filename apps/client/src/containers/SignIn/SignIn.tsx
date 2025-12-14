@@ -1,36 +1,36 @@
-import { Field, Form } from 'react-final-form'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import {useMutation} from "@apollo/client";
-import {SignInDocument} from "./data/signIn";
-import {Box} from "@mui/material";
-import {useHistory} from "react-router-dom";
+import { Field, Form } from 'react-final-form';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { useMutation } from '@apollo/client';
+import { SignInDocument } from './data/signIn';
+import { Box } from '@mui/material';
+import { useHistory } from 'react-router-dom';
 
 interface Values {
-  name: string
+  name: string;
 }
 
 const SignIn = () => {
-  const history = useHistory()
+  const history = useHistory();
 
   const [signIn] = useMutation(SignInDocument, {
     onCompleted: () => {
-      const urlParams = new URLSearchParams(history.location.search)
+      const urlParams = new URLSearchParams(history.location.search);
 
-      const redirect = urlParams.get('redirect_url')
+      const redirect = urlParams.get('redirect_url');
       if (redirect) {
-        window.location.href = decodeURIComponent(redirect)
+        window.location.href = decodeURIComponent(redirect);
       } else {
-        history.push('/')
+        history.push('/');
       }
-    }
-  })
+    },
+  });
 
   const handleSubmit = (values: Values) => {
     return signIn({
-      variables: values
-    })
-  }
+      variables: values,
+    });
+  };
 
   return (
     <Box px={2} py={1}>
@@ -59,11 +59,11 @@ const SignIn = () => {
                 Create
               </Button>
             </form>
-          )
+          );
         }}
       />
     </Box>
-  )
-}
+  );
+};
 
-export default SignIn
+export default SignIn;

@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import {useTranslation} from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   scoredIds: number[];
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const MissingCheckpointsArea = ({ scoredIds, max }: Props) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   const allPoints = Array(max)
     .fill(max)

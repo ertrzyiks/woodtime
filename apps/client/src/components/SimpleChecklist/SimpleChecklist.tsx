@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
     listWrapper: {
       padding: 10,
     },
-  })
+  }),
 );
 
 const SimpleChecklist = (props: Props) => {

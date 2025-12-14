@@ -1,18 +1,31 @@
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  DateTime: { input: any; output: any; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
+  DateTime: { input: any; output: any };
 };
 
 export type CheckInViertualCheckpointResult = {
@@ -196,12 +209,10 @@ export type Mutation = {
   signIn?: Maybe<SignInPayload>;
 };
 
-
 export type MutationCheckInVirtualCheckpointArgs = {
   event_id: Scalars['Int']['input'];
   position: CoordinatesInput;
 };
-
 
 export type MutationCreateCheckpointArgs = {
   cp_code?: InputMaybe<Scalars['String']['input']>;
@@ -211,65 +222,53 @@ export type MutationCreateCheckpointArgs = {
   skipped?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-
 export type MutationCreateEventArgs = {
   checkpointCount: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   type: Scalars['Int']['input'];
 };
 
-
 export type MutationCreateVirtualChallengeArgs = {
   input: CreateVirtualChallengeInput;
 };
-
 
 export type MutationDeleteCheckpointArgs = {
   id: Scalars['Int']['input'];
 };
 
-
 export type MutationEnrollVirtualChallengeArgs = {
   id: Scalars['Int']['input'];
 };
-
 
 export type MutationInviteToEventArgs = {
   friendId: Scalars['String']['input'];
   id: Scalars['String']['input'];
 };
 
-
 export type MutationJoinEventArgs = {
   id: Scalars['String']['input'];
   token: Scalars['String']['input'];
 };
 
-
 export type MutationLoginArgs = {
   token: Scalars['String']['input'];
 };
-
 
 export type MutationPushCheckpointsArgs = {
   checkpoints: Array<CheckpointInput>;
 };
 
-
 export type MutationPushEventsArgs = {
   events: Array<EventInput>;
 };
-
 
 export type MutationPushParticipantsArgs = {
   participants: Array<ParticipantInput>;
 };
 
-
 export type MutationPushVirtualChallengesArgs = {
   challenges: Array<VirtualChallengeInput>;
 };
-
 
 export type MutationSignInArgs = {
   name: Scalars['String']['input'];
@@ -338,40 +337,33 @@ export type Query = {
   virtualChallenges: VirtualChallengeConnection;
 };
 
-
 export type QueryEventArgs = {
   id: Scalars['Int']['input'];
 };
 
-
 export type QueryPointsNearbyArgs = {
   input: PointsNearbyInput;
 };
-
 
 export type QueryPullCheckpointsArgs = {
   limit: Scalars['Int']['input'];
   minUpdatedAt: Scalars['DateTime']['input'];
 };
 
-
 export type QueryPullEventsArgs = {
   limit: Scalars['Int']['input'];
   minUpdatedAt: Scalars['DateTime']['input'];
 };
-
 
 export type QueryPullParticipantsArgs = {
   limit: Scalars['Int']['input'];
   minUpdatedAt: Scalars['DateTime']['input'];
 };
 
-
 export type QueryPullVirtualChallengesArgs = {
   limit: Scalars['Int']['input'];
   minUpdatedAt: Scalars['DateTime']['input'];
 };
-
 
 export type QueryVirtualChallengeArgs = {
   id: Scalars['Int']['input'];

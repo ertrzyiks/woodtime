@@ -1,15 +1,8 @@
-import {
-  Box,
-  Fab,
-  Grid,
-  GridSpacing,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { Box, Fab, Grid, GridSpacing, Paper, Typography } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { useState, useContext } from 'react';
-import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel'
+import LinearProgressWithLabel from '../../../../components/LinearProgressWithLabel/LinearProgressWithLabel';
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
 
 import AddIcon from '@mui/icons-material/Add';
@@ -17,10 +10,9 @@ import { Link } from 'react-router-dom';
 import MissingCheckpointsArea from '../../../../components/MissingCheckpointsArea/MissingCheckpointsArea';
 import CheckpointCard from '../../../../components/CheckpointCard/CheckpointCard';
 import Solution from '../../../../components/Solution/Solution';
-import {Checkpoint} from "../../../../types/Checkpoint";
-import Participants from "../../../../components/Participants/Participants";
-import {useRxDB} from "../../../../database/RxDBProvider";
-
+import { Checkpoint } from '../../../../types/Checkpoint';
+import Participants from '../../../../components/Participants/Participants';
+import { useRxDB } from '../../../../database/RxDBProvider';
 
 interface Props {
   event: OrienteeringEvent;
@@ -40,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 5,
     },
     pendingItem: {
-      opacity: 0.7
+      opacity: 0.7,
     },
     control: {
       padding: theme.spacing(2),
@@ -50,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
       right: '1em',
       bottom: '1em',
     },
-  })
+  }),
 );
 
 const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
@@ -69,15 +61,17 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
 
     if (!db) return;
 
-    const checkpointDoc = await db.checkpoints.findOne({
-      selector: { id: checkpoint.id }
-    }).exec();
+    const checkpointDoc = await db.checkpoints
+      .findOne({
+        selector: { id: checkpoint.id },
+      })
+      .exec();
 
     if (checkpointDoc) {
       await checkpointDoc.update({
         $set: {
-          deleted: true
-        }
+          deleted: true,
+        },
       });
     }
   };
@@ -86,10 +80,7 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
     <Box m={1}>
       <Typography variant="h6">{event.name}</Typography>
 
-      <Participants
-        list={event.participants}
-        eventId={event.id}
-      />
+      <Participants list={event.participants} eventId={event.id} />
 
       <LinearProgressWithLabel
         current={checkpoints.length}
@@ -101,7 +92,13 @@ const ScoreLauf = ({ event, newCheckpointPath }: Props) => {
           <Grid item xs={12}>
             <Grid container justify="flex-start" spacing={spacing}>
               {checkpoints.map((checkpoint) => (
-                <Grid key={checkpoint.cp_id} item className={[classes.item].concat(checkpoint.pending ? [classes.pendingItem] : []).join(' ')}>
+                <Grid
+                  key={checkpoint.cp_id}
+                  item
+                  className={[classes.item]
+                    .concat(checkpoint.pending ? [classes.pendingItem] : [])
+                    .join(' ')}
+                >
                   <Paper className={classes.paper}>
                     <CheckpointCard
                       checkpoint={checkpoint}

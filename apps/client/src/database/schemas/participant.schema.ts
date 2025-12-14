@@ -8,27 +8,27 @@ export const participantSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     user_id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     event_id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     created_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
     updated_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
   },
   required: ['id', 'user_id', 'event_id', 'created_at', 'updated_at'],
-  indexes: ['user_id', 'event_id', 'created_at', 'updated_at']
+  indexes: ['user_id', 'event_id', 'created_at', 'updated_at'],
 };

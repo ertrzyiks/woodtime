@@ -1,30 +1,32 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom';
 
-export const InitialNavigationContext = createContext(false)
+export const InitialNavigationContext = createContext(false);
 
 interface Props {
-  children: ReactNode
+  children: ReactNode;
 }
 
 const InitialNavigationDetector = ({ children }: Props) => {
-  const [firstPathName, setFirstPathName] = useState<string | null>(null)
-  const [isFirst, setIsFirst] = useState(true)
-  const location = useLocation()
+  const [firstPathName, setFirstPathName] = useState<string | null>(null);
+  const [isFirst, setIsFirst] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     if (!firstPathName) {
-      setFirstPathName(location.pathname)
+      setFirstPathName(location.pathname);
     } else if (firstPathName !== location.pathname) {
-      setIsFirst(false)
+      setIsFirst(false);
     }
-  }, [firstPathName, location.pathname, isFirst, setIsFirst])
+  }, [firstPathName, location.pathname, isFirst, setIsFirst]);
 
   return (
-    <InitialNavigationContext.Provider value={(!firstPathName || firstPathName === location.pathname) && isFirst}>
+    <InitialNavigationContext.Provider
+      value={(!firstPathName || firstPathName === location.pathname) && isFirst}
+    >
       {children}
     </InitialNavigationContext.Provider>
-  )
-}
+  );
+};
 
-export default InitialNavigationDetector
+export default InitialNavigationDetector;

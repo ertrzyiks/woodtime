@@ -4,18 +4,18 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import PublicIcon from '@mui/icons-material/Public';
 
-import LoadingIndicator from "../../components/LoadingIndicator/LoadingIndicator";
-import {useBreadcrumbStyles} from "../../hooks/useBreadcrumbStyles";
+import LoadingIndicator from '../../components/LoadingIndicator/LoadingIndicator';
+import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { Link } from 'react-router-dom';
 import ListItemText from '@mui/material/ListItemText';
 import { format } from 'date-fns';
 import { useRxQuery } from '../../database/hooks/useRxQuery';
-import Fab from "@mui/material/Fab";
+import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import { createStyles, makeStyles } from "@mui/styles";
-import { Theme } from "@mui/material/styles";
+import { createStyles, makeStyles } from '@mui/styles';
+import { Theme } from '@mui/material/styles';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -24,28 +24,25 @@ const useStyles = makeStyles((theme: Theme) =>
       right: '1em',
       bottom: '5em',
     },
-  })
+  }),
 );
 
 const VirtualChallengeList = () => {
-  const classes = useStyles()
+  const classes = useStyles();
 
-  const challengesQuery = useCallback(
-    (db: any) => {
-      if (!db) return null;
-      return db.virtualchallenges.find({
-        sort: [{ created_at: 'desc' }]
-      });
-    },
-    []
-  );
+  const challengesQuery = useCallback((db: any) => {
+    if (!db) return null;
+    return db.virtualchallenges.find({
+      sort: [{ created_at: 'desc' }],
+    });
+  }, []);
 
   const { data: challenges, loading } = useRxQuery(challengesQuery);
 
   const breadcrumbClasses = useBreadcrumbStyles();
 
   if (loading && (!challenges || challenges.length === 0)) {
-    return (<div>Loading</div>)
+    return <div>Loading</div>;
   }
 
   return (
@@ -63,7 +60,12 @@ const VirtualChallengeList = () => {
 
       <List>
         {(challenges || []).map((challenge: any) => (
-          <ListItem key={challenge.id} button component={Link} to={`/virtual-challenges/${challenge.id}`}>
+          <ListItem
+            key={challenge.id}
+            button
+            component={Link}
+            to={`/virtual-challenges/${challenge.id}`}
+          >
             <ListItemText
               primary={challenge.name}
               secondary={format(new Date(challenge.created_at), 'dd/MM/yyyy')}
@@ -82,7 +84,7 @@ const VirtualChallengeList = () => {
         <AddIcon />
       </Fab>
     </div>
-  )
-}
+  );
+};
 
-export default VirtualChallengeList
+export default VirtualChallengeList;
