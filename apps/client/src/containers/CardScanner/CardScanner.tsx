@@ -80,6 +80,10 @@ interface GridData {
 // Threshold for determining if a cell is stamped (lower intensity = darker = stamped)
 const STAMPED_CELL_THRESHOLD = 128;
 
+// TODO: Integrate TensorFlow.js for ML-based cell classification
+// The @tensorflow/tfjs dependency is installed and ready for future enhancement
+// to replace the simple intensity threshold with a trained model
+
 const CardScanner = () => {
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
