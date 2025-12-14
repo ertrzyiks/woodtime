@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { createRequire } from "module";
-import { app, server as apolloServer } from "./src/app";
+import { app, server as apolloServer, contextFunction } from "./src/app";
+import { expressMiddleware } from "@apollo/server/express4";
+import cors from "cors";
+import bodyParser from "body-parser";
 
 describe("API E2E Tests", () => {
   let server;
@@ -11,14 +14,17 @@ describe("API E2E Tests", () => {
     await apolloServer.start();
 
     // Apply middleware
-    apolloServer.applyMiddleware({
-      app,
-      path: "/woodtime",
-      cors: {
+    app.use(
+      "/woodtime",
+      cors({
         origin: true,
         credentials: true,
-      },
-    });
+      }),
+      bodyParser.json(),
+      expressMiddleware(apolloServer, {
+        context: contextFunction,
+      })
+    );
 
     // Start the HTTP server
     port = 0; // Use random available port

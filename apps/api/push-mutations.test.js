@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { app, server as apolloServer } from "./src/app";
+import { app, server as apolloServer, contextFunction } from "./src/app";
+import { expressMiddleware } from "@apollo/server/express4";
+import cors from "cors";
+import bodyParser from "body-parser";
 import knex from "./knex";
 import Database from "./src/datasources/database.js";
 
@@ -15,14 +18,17 @@ describe("Push Mutations Security Tests", () => {
     await apolloServer.start();
 
     // Apply middleware
-    apolloServer.applyMiddleware({
-      app,
-      path: "/woodtime",
-      cors: {
+    app.use(
+      "/woodtime",
+      cors({
         origin: true,
         credentials: true,
-      },
-    });
+      }),
+      bodyParser.json(),
+      expressMiddleware(apolloServer, {
+        context: contextFunction,
+      })
+    );
 
     // Start the HTTP server
     port = 0; // Use random available port

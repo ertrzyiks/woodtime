@@ -2,11 +2,8 @@ const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const SQLiteStore = require("connect-sqlite3")(session);
-const {
-  ApolloServer,
-  AuthenticationError,
-  ApolloError,
-} = require("apollo-server-express");
+const { ApolloServer } = require("@apollo/server");
+const { GraphQLError } = require("graphql");
 const { applyMiddleware } = require("graphql-middleware");
 const { GraphQLScalarType, Kind } = require("graphql");
 const { makeExecutableSchema } = require("@graphql-tools/schema");
@@ -125,22 +122,22 @@ const permissions = shield(
   {
     fallbackError: async (thrownThing, parent, args, context, info) => {
       if (thrownThing === null) {
-        return new AuthenticationError("Access denied");
+        return new GraphQLError("Access denied");
       }
-      if (thrownThing instanceof ApolloError) {
+      if (thrownThing instanceof GraphQLError) {
         // expected errors
         return thrownThing;
       }
       if (thrownThing instanceof Error) {
         // unexpected errors
         console.error(thrownThing);
-        return new ApolloError("Internal server error", "ERR_INTERNAL_SERVER");
+        return new GraphQLError("Internal server error", "ERR_INTERNAL_SERVER");
       }
 
       // what the hell got thrown
       console.error("The resolver threw something that is not an error.");
       console.error(thrownThing);
-      return new ApolloError("Internal server error", "ERR_INTERNAL_SERVER");
+      return new GraphQLError("Internal server error", "ERR_INTERNAL_SERVER");
     },
   },
 );
@@ -170,11 +167,20 @@ const loadSessionUser = async (resolve, root, args, context, info) => {
 
 const server = new ApolloServer({
   schema: applyMiddleware(schema, loadSessionUser, permissions),
-  context,
-  dataSources: () => ({
-    db: new Database(),
-  }),
 });
+
+const contextFunction = async ({ req }) => {
+  const userId = req.session.user_id;
+  const db = new Database();
+
+  return {
+    signIn: (id) => {
+      req.session.user_id = id;
+    },
+    _userId: userId,
+    dataSources: { db },
+  };
+};
 
 app.set("trust proxy", 1);
 
@@ -200,4 +206,5 @@ app.use(
 module.exports = {
   app,
   server,
+  contextFunction,
 };
