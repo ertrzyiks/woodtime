@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import { OrienteeringEvent } from '../../../../types/OrienteeringEvent';
@@ -16,10 +16,6 @@ const useStyles = makeStyles((theme: Theme) =>
     gridContainer: {
       marginTop: theme.spacing(2),
       marginBottom: theme.spacing(2),
-    },
-    gridItem: {
-      display: 'flex',
-      justifyContent: 'center',
     },
   }),
 );
@@ -43,22 +39,26 @@ const Classic = ({ event }: Props) => {
         max={checkpoint_count}
       />
 
-      <Box className={classes.gridContainer}>
-        <Grid container spacing={2}>
-          {allPoints.map((p) => {
-            const matchingPoint = checkpoints.find((ch) => ch.cp_id === p);
+      <Box
+        className={classes.gridContainer}
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
+        {allPoints.map((p) => {
+          const matchingPoint = checkpoints.find((ch) => ch.cp_id === p);
 
-            return (
-              <Grid key={p} className={classes.gridItem}>
-                <CheckpointGridCell
-                  checkpointNumber={p}
-                  checkpoint={matchingPoint}
-                  eventId={id}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
+          return (
+            <CheckpointGridCell
+              key={p}
+              checkpointNumber={p}
+              checkpoint={matchingPoint}
+              eventId={id}
+            />
+          );
+        })}
       </Box>
 
       <MissingCheckpointsArea

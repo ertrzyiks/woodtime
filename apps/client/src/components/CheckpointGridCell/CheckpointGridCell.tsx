@@ -84,30 +84,34 @@ const CheckpointGridCell = ({
       });
     } else if (state === 'on') {
       // On -> Skip: Update checkpoint to skipped
-      const checkpointDoc = await db.checkpoints
-        .findOne({
-          selector: { id: checkpoint!.id },
-        })
-        .exec();
+      if (checkpoint) {
+        const checkpointDoc = await db.checkpoints
+          .findOne({
+            selector: { id: checkpoint.id },
+          })
+          .exec();
 
-      if (checkpointDoc) {
-        await checkpointDoc.update({
-          $set: {
-            skipped: true,
-            updated_at: now,
-          },
-        });
+        if (checkpointDoc) {
+          await checkpointDoc.update({
+            $set: {
+              skipped: true,
+              updated_at: now,
+            },
+          });
+        }
       }
     } else {
       // Skip -> Off: Remove checkpoint
-      const checkpointDoc = await db.checkpoints
-        .findOne({
-          selector: { id: checkpoint!.id },
-        })
-        .exec();
+      if (checkpoint) {
+        const checkpointDoc = await db.checkpoints
+          .findOne({
+            selector: { id: checkpoint.id },
+          })
+          .exec();
 
-      if (checkpointDoc) {
-        await checkpointDoc.remove();
+        if (checkpointDoc) {
+          await checkpointDoc.remove();
+        }
       }
     }
   };
