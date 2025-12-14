@@ -18,8 +18,8 @@ importers:
   apps/api:
     dependencies:
       '@apollo/server':
-        specifier: 4.0.0
-        version: 4.0.0(encoding@0.1.13)(graphql@16.12.0)
+        specifier: 4.0.5
+        version: 4.0.5(encoding@0.1.13)(graphql@16.12.0)
       '@graphql-tools/schema':
         specifier: 10.0.30
         version: 10.0.30(graphql@16.12.0)
@@ -325,9 +325,9 @@ packages:
     peerDependencies:
       graphql: 14.x || 15.x || 16.x
 
-  '@apollo/server@4.0.0':
-    resolution: {integrity: sha512-PcIyjVKGkbG3k2kjn/0o/kMfJrdZYma62r/c1YOB362UQwlX0GZNL53ZmRst+wTwi0x10rEnxcCUTnyLjumT9g==}
-    engines: {node: '>=12.0'}
+  '@apollo/server@4.0.5':
+    resolution: {integrity: sha512-pDCAWdN3NduzGAMI9W8yzy4RK1QnvyMB5LX3pfXw88v25yW5gcUAJkJlW7tY3a5ZwX9xjJqWmcYGE+bsSjzDRA==}
+    engines: {node: '>=14.16.0'}
     deprecated: Apollo Server v4 is deprecated and will transition to end-of-life on January 26, 2026. As long as you are already using a non-EOL version of Node.js, upgrading to v5 should take only a few minutes. See https://www.apollographql.com/docs/apollo-server/previous-versions for details.
     peerDependencies:
       graphql: ^16.6.0
@@ -4636,6 +4636,9 @@ packages:
     resolution: {integrity: sha512-zsFhmbkAzwhTft6nd3VxcG0cvJsT70rL+BIGHWVq5fi6MwGrHwzqKaxXE+Hl2GmnGItnDKPPkO5/LQqjVkIdFg==}
     engines: {node: '>=10'}
 
+  node-abort-controller@3.1.1:
+    resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
+
   node-addon-api@7.1.1:
     resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
 
@@ -6251,7 +6254,7 @@ snapshots:
       '@apollo/utils.logger': 2.0.1
       graphql: 16.12.0
 
-  '@apollo/server@4.0.0(encoding@0.1.13)(graphql@16.12.0)':
+  '@apollo/server@4.0.5(encoding@0.1.13)(graphql@16.12.0)':
     dependencies:
       '@apollo/cache-control-types': 1.0.3(graphql@16.12.0)
       '@apollo/server-gateway-interface': 1.1.1(graphql@16.12.0)
@@ -6274,8 +6277,9 @@ snapshots:
       express: 4.22.1
       graphql: 16.12.0
       loglevel: 1.9.2
-      lru-cache: 7.13.1
+      lru-cache: 7.18.3
       negotiator: 0.6.4
+      node-abort-controller: 3.1.1
       node-fetch: 2.7.0(encoding@0.1.13)
       uuid: 9.0.1
       whatwg-mimetype: 3.0.0
@@ -11422,6 +11426,8 @@ snapshots:
   node-abi@3.85.0:
     dependencies:
       semver: 7.7.3
+
+  node-abort-controller@3.1.1: {}
 
   node-addon-api@7.1.1: {}
 
