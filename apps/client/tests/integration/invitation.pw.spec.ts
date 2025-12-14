@@ -110,10 +110,13 @@ test.describe('Invitation Integration Tests', () => {
         // Use Playwright's expect with retry to poll clipboard
         try {
           await expect(async () => {
-            inviteUrl = await page1.evaluate(() => navigator.clipboard.readText());
-            expect(inviteUrl).toBeTruthy();
-            expect(inviteUrl.length).toBeGreaterThan(0);
+            const text = await page1.evaluate(() => navigator.clipboard.readText());
+            expect(text).toBeTruthy();
+            expect(text.length).toBeGreaterThan(0);
+            return text;
           }).toPass({ timeout: 2000 });
+          // Read the final value after successful assertion
+          inviteUrl = await page1.evaluate(() => navigator.clipboard.readText());
         } catch (e) {
           console.log(`User 1: Attempt ${attempts + 1}: Failed to read clipboard`);
           inviteUrl = '';
@@ -129,12 +132,13 @@ test.describe('Invitation Integration Tests', () => {
         attempts++;
         
         // Wait for network activity indicating replication has occurred
-        // We wait for any GraphQL pullEvents response that might contain the updated token
+        // We wait for any GraphQL response that might contain the updated token
         if (attempts < maxAttempts) {
+          const GRAPHQL_ENDPOINT = 'https://localhost:8080/woodtime';
           try {
             // Wait for network response with exponential backoff timeout
             await page1.waitForResponse(
-              response => response.url().includes('/woodtime') && response.status() === 200,
+              response => response.url().includes(GRAPHQL_ENDPOINT) && response.status() === 200,
               { timeout: 500 * (attempts + 1) }
             );
           } catch (e) {
