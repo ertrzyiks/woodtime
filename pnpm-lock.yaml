@@ -27,8 +27,8 @@ importers:
         specifier: 3.3.2
         version: 3.3.2(encoding@0.1.13)
       body-parser:
-        specifier: 1.20.4
-        version: 1.20.4
+        specifier: 2.2.1
+        version: 2.2.1
       connect-sqlite3:
         specifier: 0.9.16
         version: 0.9.16
@@ -9160,7 +9160,7 @@ snapshots:
       bytes: 3.1.2
       content-type: 1.0.5
       debug: 4.4.3
-      http-errors: 2.0.0
+      http-errors: 2.0.1
       iconv-lite: 0.7.0
       on-finished: 2.4.1
       qs: 6.14.0
