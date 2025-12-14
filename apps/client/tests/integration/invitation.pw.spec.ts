@@ -106,17 +106,14 @@ test.describe('Invitation Integration Tests', () => {
       while (attempts < maxAttempts) {
         await page1.click('button:has-text("Copy invitation link")');
         
-        // Wait for clipboard to be populated using Playwright's polling
+        // Wait for clipboard to be populated
+        // Use Playwright's expect with retry to poll clipboard
         try {
-          const handle = await page1.waitForFunction(
-            async () => {
-              const text = await navigator.clipboard.readText();
-              return text && text.length > 0 ? text : null;
-            },
-            { timeout: 2000, polling: 100 }
-          );
-          inviteUrl = await handle.jsonValue();
-          await handle.dispose();
+          await expect(async () => {
+            inviteUrl = await page1.evaluate(() => navigator.clipboard.readText());
+            expect(inviteUrl).toBeTruthy();
+            expect(inviteUrl.length).toBeGreaterThan(0);
+          }).toPass({ timeout: 2000 });
         } catch (e) {
           console.log(`User 1: Attempt ${attempts + 1}: Failed to read clipboard`);
           inviteUrl = '';
