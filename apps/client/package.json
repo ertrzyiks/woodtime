@@ -96,7 +96,7 @@
     "msw": "2.12.4",
     "msw-storybook-addon": "2.0.6",
     "storybook": "10.1.9",
-    "vite": "7.2.7"
+    "vite": "7.3.0"
   },
   "msw": {
     "workerDirectory": [
