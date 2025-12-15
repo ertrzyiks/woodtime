@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Paper, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import BlockIcon from '@mui/icons-material/Block';
 import { Checkpoint } from '../../types/Checkpoint';
 import { useRxDB } from '../../database/RxDBProvider';
 import { generateTempId } from '../../database/utils/generateTempId';
@@ -17,15 +19,15 @@ const useStyles = makeStyles((theme: Theme) =>
     cell: {
       width: 60,
       height: 60,
+      minWidth: 60,
+      position: 'relative',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      cursor: 'pointer',
+      padding: 0,
       transition: 'all 0.2s ease-in-out',
-      userSelect: 'none',
       '&:hover': {
         transform: 'scale(1.05)',
-        boxShadow: theme.shadows[4],
       },
     },
     cellOff: {
@@ -39,11 +41,17 @@ const useStyles = makeStyles((theme: Theme) =>
     cellSkip: {
       backgroundColor: theme.palette.warning.main,
       color: theme.palette.warning.contrastText,
-      fontStyle: 'italic',
     },
     number: {
+      position: 'absolute',
+      top: 4,
+      left: 4,
+      fontSize: '0.75rem',
       fontWeight: 'bold',
-      fontSize: '1.25rem',
+      lineHeight: 1,
+    },
+    icon: {
+      fontSize: '1.5rem',
     },
   }),
 );
@@ -127,14 +135,27 @@ const CheckpointGridCell = ({
     }
   };
 
+  const getIcon = () => {
+    switch (state) {
+      case 'on':
+        return <CheckCircleIcon className={classes.icon} />;
+      case 'skip':
+        return <BlockIcon className={classes.icon} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Paper
+    <Button
       className={getCellClass()}
       onClick={handleClick}
-      elevation={state === 'off' ? 1 : 3}
+      variant="contained"
+      disableElevation
     >
       <Typography className={classes.number}>{checkpointNumber}</Typography>
-    </Paper>
+      {getIcon()}
+    </Button>
   );
 };
 
