@@ -3,27 +3,35 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
-export default defineConfig({
-  server: {
-    port: 3000,
-  },
-  plugins: [
-    react(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      strategies: 'generateSW',
-      filename: 'service-worker.js',
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-      },
-    }),
-    {
-      name: 'copy-index-to-404',
-      apply: 'build',
-      closeBundle() {
-        const fs = require('fs');
-        fs.copyFileSync('dist/index.html', 'dist/404.html');
-      },
+export default defineConfig(({ command, mode }) => {
+  // Check if we're building for Storybook
+  const isStorybook = process.env.npm_lifecycle_script?.includes('storybook') || false;
+
+  return {
+    server: {
+      port: 3000,
     },
-  ],
+    plugins: [
+      react(),
+      // Only include PWA plugin when not building for Storybook
+      ...(!isStorybook ? [
+        VitePWA({
+          registerType: 'autoUpdate',
+          strategies: 'generateSW',
+          filename: 'service-worker.js',
+          workbox: {
+            globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          },
+        }),
+      ] : []),
+      {
+        name: 'copy-index-to-404',
+        apply: 'build',
+        closeBundle() {
+          const fs = require('fs');
+          fs.copyFileSync('dist/index.html', 'dist/404.html');
+        },
+      },
+    ],
+  };
 });
