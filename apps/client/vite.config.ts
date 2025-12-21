@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(() => {
   // Check if we're building for Storybook
   const isStorybook = process.env.npm_lifecycle_script?.includes('storybook') || false;
 
