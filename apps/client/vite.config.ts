@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -8,6 +9,14 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      strategies: 'generateSW',
+      filename: 'service-worker.js',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+      },
+    }),
     {
       name: 'copy-index-to-404',
       apply: 'build',
