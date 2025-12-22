@@ -1,11 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import {
-  Box,
-  Button,
-  Paper,
-  Typography,
-  Breadcrumbs,
-} from '@mui/material';
+import { Box, Button, Paper, Typography, Breadcrumbs } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
@@ -68,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) =>
     cellStamped: {
       backgroundColor: '#4caf50',
     },
-  })
+  }),
 );
 
 interface GridData {
@@ -88,7 +82,7 @@ const CardScanner = () => {
   const classes = useStyles();
   const breadcrumbClasses = useBreadcrumbStyles();
   const history = useHistory();
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
@@ -114,7 +108,7 @@ const CardScanner = () => {
   useEffect(() => {
     return () => {
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -126,9 +120,9 @@ const CardScanner = () => {
     try {
       setError(null);
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: 1280, height: 720 }
+        video: { facingMode: 'environment', width: 1280, height: 720 },
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
         setStream(mediaStream);
@@ -146,7 +140,7 @@ const CardScanner = () => {
       animationFrameRef.current = null;
     }
     if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       setStream(null);
     }
     if (videoRef.current) {
@@ -161,7 +155,7 @@ const CardScanner = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
+
     if (!ctx) return;
 
     // Set canvas dimensions to match video
@@ -179,38 +173,45 @@ const CardScanner = () => {
     try {
       // Get image data from canvas
       const src = cv.imread(canvas);
-      
+
       // Convert to grayscale
       const gray = new cv.Mat();
       cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      
+
       // Apply Gaussian blur
       const blurred = new cv.Mat();
       cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
-      
+
       // Edge detection with Canny
       const edges = new cv.Mat();
       cv.Canny(blurred, edges, 50, 150);
-      
+
       // Find contours
       const contours = new cv.MatVector();
       const hierarchy = new cv.Mat();
-      cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
-      
+      cv.findContours(
+        edges,
+        contours,
+        hierarchy,
+        cv.RETR_EXTERNAL,
+        cv.CHAIN_APPROX_SIMPLE,
+      );
+
       // Find the largest quadrilateral
       let maxArea = 0;
       let bestContour = null;
-      
+
       for (let i = 0; i < contours.size(); i++) {
         const contour = contours.get(i);
         const area = cv.contourArea(contour);
-        
-        if (area > maxArea && area > 10000) { // Minimum area threshold
+
+        if (area > maxArea && area > 10000) {
+          // Minimum area threshold
           const peri = cv.arcLength(contour, true);
           const approx = new cv.Mat();
           cv.approxPolyDP(contour, approx, 0.02 * peri, true);
-          
-          if (approx.rows === 4) {
+
+          if (approx.rows > 4) {
             maxArea = area;
             if (bestContour) bestContour.delete();
             bestContour = approx;
@@ -219,37 +220,37 @@ const CardScanner = () => {
           }
         }
       }
-      
+
       if (bestContour) {
         // Draw the detected quadrilateral
         const color = new cv.Scalar(0, 255, 0, 255);
         const pts = new cv.MatVector();
         pts.push_back(bestContour);
         cv.drawContours(src, pts, 0, color, 3);
-        
+
         // Perform perspective transform
         const srcPoints = cv.Mat.zeros(4, 1, cv.CV_32FC2);
         for (let i = 0; i < 4; i++) {
           srcPoints.data32F[i * 2] = bestContour.data32S[i * 2];
           srcPoints.data32F[i * 2 + 1] = bestContour.data32S[i * 2 + 1];
         }
-        
+
         // Define destination points (800x600 rectangle)
-        const dstPoints = cv.matFromArray(4, 1, cv.CV_32FC2, [
-          0, 0,
-          800, 0,
-          800, 600,
-          0, 600
-        ]);
-        
+        const dstPoints = cv.matFromArray(
+          4,
+          1,
+          cv.CV_32FC2,
+          [0, 0, 800, 0, 800, 600, 0, 600],
+        );
+
         // Get perspective transform matrix
         const M = cv.getPerspectiveTransform(srcPoints, dstPoints);
         const warped = new cv.Mat();
         cv.warpPerspective(src, warped, M, new cv.Size(800, 600));
-        
+
         // Extract grid cells (assuming 5 rows x 7 cols)
         extractGridCells(warped);
-        
+
         // Cleanup
         M.delete();
         warped.delete();
@@ -258,10 +259,10 @@ const CardScanner = () => {
         pts.delete();
         bestContour.delete();
       }
-      
+
       // Display result
       cv.imshow(canvas, src);
-      
+
       // Cleanup
       src.delete();
       gray.delete();
@@ -269,7 +270,6 @@ const CardScanner = () => {
       edges.delete();
       contours.delete();
       hierarchy.delete();
-      
     } catch (err) {
       console.error('Error processing frame:', err);
     }
@@ -287,9 +287,9 @@ const CardScanner = () => {
     const height = warpedMat.rows;
     const cellWidth = width / cols;
     const cellHeight = height / rows;
-    
+
     const cells: boolean[][] = [];
-    
+
     for (let row = 0; row < rows; row++) {
       cells[row] = [];
       for (let col = 0; col < cols; col++) {
@@ -297,11 +297,11 @@ const CardScanner = () => {
         const y = Math.floor(row * cellHeight);
         const w = Math.floor(cellWidth);
         const h = Math.floor(cellHeight);
-        
+
         try {
           // Extract cell region
           const roi = warpedMat.roi(new cv.Rect(x, y, w, h));
-          
+
           // Convert to grayscale if needed
           const gray = new cv.Mat();
           if (roi.channels() === 4) {
@@ -309,14 +309,14 @@ const CardScanner = () => {
           } else {
             roi.copyTo(gray);
           }
-          
+
           // Calculate mean intensity
           const mean = cv.mean(gray);
           const intensity = mean[0];
-          
+
           // Simple threshold: if mean intensity is below threshold, consider it stamped
           cells[row][col] = intensity < STAMPED_CELL_THRESHOLD;
-          
+
           // Cleanup
           gray.delete();
           roi.delete();
@@ -326,7 +326,7 @@ const CardScanner = () => {
         }
       }
     }
-    
+
     setGridData({ rows, cols, cells });
   };
 
@@ -356,12 +356,16 @@ const CardScanner = () => {
           Card Scanner
         </Typography>
         <Typography variant="body2" color="textSecondary">
-          Use your camera to scan a card with a grid. The scanner will detect the grid and extract each cell.
+          Use your camera to scan a card with a grid. The scanner will detect
+          the grid and extract each cell.
         </Typography>
       </Paper>
 
       {error && (
-        <Paper className={classes.infoBox} style={{ backgroundColor: '#ffebee' }}>
+        <Paper
+          className={classes.infoBox}
+          style={{ backgroundColor: '#ffebee' }}
+        >
           <Typography color="error">{error}</Typography>
         </Paper>
       )}
