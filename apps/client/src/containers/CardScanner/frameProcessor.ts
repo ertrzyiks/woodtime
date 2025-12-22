@@ -58,6 +58,7 @@ export function processVideoFrame(
         const approx = new cv.Mat();
         cv.approxPolyDP(contour, approx, 0.02 * peri, true);
 
+        // We want exactly 4 points for a quadrilateral (the card outline)
         if (approx.rows === 4) {
           maxArea = area;
           if (bestContour) bestContour.delete();
