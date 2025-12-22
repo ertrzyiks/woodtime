@@ -58,7 +58,7 @@
   },
   "scripts": {
     "start": "concurrently \"pnpm vite\" \"pnpm generate --watch\"",
-    "build:dist": "vite build",
+    "build:dist": "VITE_ENABLE_PWA=true vite build",
     "test": "vitest",
     "test:integration": "playwright test",
     "format": "prettier --write \"src/**/*.{js,json,jsx,ts,tsx,md,css,scss,jql,graphql}\"",
