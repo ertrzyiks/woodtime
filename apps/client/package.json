@@ -58,7 +58,7 @@
   },
   "scripts": {
     "start": "concurrently \"pnpm vite\" \"pnpm generate --watch\"",
-    "build:dist": "vite build",
+    "build:dist": "VITE_ENABLE_PWA=true vite build",
     "test": "vitest",
     "test:integration": "playwright test",
     "format": "prettier --write \"src/**/*.{js,json,jsx,ts,tsx,md,css,scss,jql,graphql}\"",
@@ -96,7 +96,8 @@
     "msw": "2.12.4",
     "msw-storybook-addon": "2.0.6",
     "storybook": "10.1.10",
-    "vite": "7.3.0"
+    "vite": "7.3.0",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "msw": {
     "workerDirectory": [
