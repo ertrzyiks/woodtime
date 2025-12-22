@@ -1,4 +1,4 @@
-query getVirtualPoints ($input: PointsNearbyInput!) {
+query getVirtualPoints($input: PointsNearbyInput!) {
   pointsNearby(input: $input) {
     points {
       lat

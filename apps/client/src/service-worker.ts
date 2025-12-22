@@ -51,7 +51,7 @@ registerRoute(
     // Return true to signal that we want to use the handler.
     return true;
   },
-  createHandlerBoundToURL(import.meta.env.BASE_URL + '/index.html')
+  createHandlerBoundToURL(import.meta.env.BASE_URL + '/index.html'),
 );
 
 // An example runtime caching route for requests that aren't handled by the
@@ -68,7 +68,7 @@ registerRoute(
       // least-recently used images are removed.
       new ExpirationPlugin({ maxEntries: 50 }),
     ],
-  })
+  }),
 );
 
 // Cache the Google Fonts stylesheets with a stale-while-revalidate strategy.
@@ -76,7 +76,7 @@ registerRoute(
   ({ url }) => url.origin === 'https://fonts.googleapis.com',
   new StaleWhileRevalidate({
     cacheName: 'google-fonts-stylesheets',
-  })
+  }),
 );
 
 // Cache the underlying font files with a cache-first strategy for 1 year.
@@ -93,7 +93,7 @@ registerRoute(
         maxEntries: 30,
       }),
     ],
-  })
+  }),
 );
 
 // This allows the web app to trigger skipWaiting via

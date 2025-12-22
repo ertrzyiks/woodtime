@@ -1,9 +1,5 @@
-mutation CreateVirtualChallenge(
-  $input: CreateVirtualChallengeInput!
-) {
-  createVirtualChallenge(
-    input: $input
-  ) {
+mutation CreateVirtualChallenge($input: CreateVirtualChallengeInput!) {
+  createVirtualChallenge(input: $input) {
     success
     virtualChallenge {
       id

@@ -4,12 +4,12 @@ import type { RxQuery, RxDatabase } from 'rxdb';
 
 /**
  * Custom hook for reactive RxDB queries.
- * 
- * @param queryConstructor - Function that constructs an RxDB query. 
+ *
+ * @param queryConstructor - Function that constructs an RxDB query.
  *                          Should be memoized with useCallback or useMemo
  *                          to prevent unnecessary re-subscriptions.
  * @returns Object with data, loading, and error states
- * 
+ *
  * @example
  * ```tsx
  * const query = useCallback(
@@ -23,7 +23,7 @@ import type { RxQuery, RxDatabase } from 'rxdb';
  * ```
  */
 export function useRxQuery<T>(
-  queryConstructor: (db: RxDatabase) => RxQuery<T> | null
+  queryConstructor: (db: RxDatabase) => RxQuery<T> | null,
 ) {
   const { db } = useRxDB();
   const [data, setData] = useState<T[]>([]);
@@ -35,13 +35,13 @@ export function useRxQuery<T>(
 
     setLoading(true);
     const query = queryConstructor(db);
-    
+
     // Handle null query (e.g., when feature flag is off)
     if (!query) {
       setLoading(false);
       return;
     }
-    
+
     const subscription = query.$.subscribe({
       next: (results) => {
         setData(results);
@@ -50,7 +50,7 @@ export function useRxQuery<T>(
       error: (err) => {
         setError(err);
         setLoading(false);
-      }
+      },
     });
 
     return () => {

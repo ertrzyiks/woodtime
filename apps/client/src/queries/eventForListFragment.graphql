@@ -1,6 +1,6 @@
 fragment EventForList on Event {
-    id
-    name
-    checkpoint_count
-    created_at
+  id
+  name
+  checkpoint_count
+  created_at
 }

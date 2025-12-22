@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: 0,
       width: '100%',
     },
-  })
+  }),
 );
 
 // Create a theme instance for MUI v5
@@ -106,7 +106,7 @@ function AppShellInner({
         new ApolloClient({
           cache,
           link: ApolloLink.from([errorLink, getLink()]),
-        })
+        }),
       );
     }
 

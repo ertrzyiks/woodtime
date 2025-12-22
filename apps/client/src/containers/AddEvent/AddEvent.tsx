@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
     radioLabel: {
       fontSize: '0.6rem',
     },
-  })
+  }),
 );
 
 const AddEvent = () => {

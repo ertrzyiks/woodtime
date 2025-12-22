@@ -1,59 +1,59 @@
 import { useRef } from 'react';
 import * as React from 'react';
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from 'react-router-dom';
 
 import SignIn from './SignIn';
-import AppShell from '../../AppShell'
-import getMockedApolloClient from "../../support/storybook/getMockedApolloClient";
-import {useNavigationLog} from "../../support/storybook/useNavigationLog";
+import AppShell from '../../AppShell';
+import getMockedApolloClient from '../../support/storybook/getMockedApolloClient';
+import { useNavigationLog } from '../../support/storybook/useNavigationLog';
 
 export default {
   title: 'Pages/SignIn',
   component: SignIn,
   argTypes: {
-    onNavigate: { action: 'navigation' }
+    onNavigate: { action: 'navigation' },
   },
   decorators: [
     (Story: React.ComponentType) => (
       <MemoryRouter initialEntries={['/']} initialIndex={0}>
         <Story />
       </MemoryRouter>
-    )
-  ]
-}
+    ),
+  ],
+};
 
 interface Args {
-  onNavigate: (params: { pathname: string }) => void
+  onNavigate: (params: { pathname: string }) => void;
 }
 
 export const Mocked = ({ onNavigate }: Args) => {
-  useNavigationLog({ onNavigate })
+  useNavigationLog({ onNavigate });
 
-  const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>()
+  const apolloRef = useRef<ReturnType<typeof getMockedApolloClient>>();
   if (!apolloRef.current) {
-    apolloRef.current = getMockedApolloClient()
+    apolloRef.current = getMockedApolloClient();
   }
 
-  const { client } = apolloRef.current
+  const { client } = apolloRef.current;
 
   return (
     <AppShell apolloClient={client}>
       <SignIn />
     </AppShell>
-  )
-}
+  );
+};
 
 export const RealServer = ({ onNavigate }: Args) => {
-  useNavigationLog({ onNavigate })
+  useNavigationLog({ onNavigate });
 
   return (
     <AppShell>
-      <SignIn  />
+      <SignIn />
     </AppShell>
-  )
-}
+  );
+};
 
 RealServer.parameters = {
   chromatic: { disableSnapshot: true },
   msw: { handlers: [] },
-}
+};

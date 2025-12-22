@@ -8,22 +8,22 @@ export const userSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     name: {
-      type: 'string'
+      type: 'string',
     },
     created_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
     updated_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
   },
   required: ['id', 'name', 'created_at', 'updated_at'],
-  indexes: ['created_at', 'updated_at']
+  indexes: ['created_at', 'updated_at'],
 };

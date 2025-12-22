@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) =>
     margin: {
       margin: theme.spacing(1),
     },
-  })
+  }),
 );
 
 interface Values {
@@ -28,8 +28,8 @@ const AddCheckpointPage = () => {
   const history = useHistory();
 
   const handleCheckpointSubmit = (checkpoint: any) => {
-      // TODO: add checkpoint using rxdb
-    history.push(`/events/${eventId}`)
+    // TODO: add checkpoint using rxdb
+    history.push(`/events/${eventId}`);
   };
 
   const classes = useStyles();
@@ -107,7 +107,7 @@ const AddCheckpointPage = () => {
         );
       }}
     />
-  )
-}
+  );
+};
 
 export default AddCheckpointPage;

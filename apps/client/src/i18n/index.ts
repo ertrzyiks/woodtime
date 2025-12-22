@@ -1,9 +1,9 @@
-import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
-import LanguageDetector from 'i18next-browser-languagedetector'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
-import translationEn from './translations/en.json'
-import translationPl from './translations/pl.json'
+import translationEn from './translations/en.json';
+import translationPl from './translations/pl.json';
 
 export function init() {
   i18n
@@ -12,15 +12,15 @@ export function init() {
     .init({
       resources: {
         en: {
-          translation: translationEn
+          translation: translationEn,
         },
         pl: {
-          translation: translationPl
-        }
+          translation: translationPl,
+        },
       },
       fallbackLng: 'en',
       interpolation: {
-        escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
-      }
-    })
+        escapeValue: false, // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+      },
+    });
 }

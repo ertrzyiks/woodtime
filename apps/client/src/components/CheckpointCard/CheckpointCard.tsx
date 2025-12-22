@@ -1,7 +1,4 @@
-import {
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { Theme } from '@mui/material/styles';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -9,7 +6,7 @@ import { Checkpoint } from '../../types/Checkpoint';
 
 interface Props {
   checkpoint: Checkpoint;
-  onDelete: (checkpoint: Checkpoint) => void
+  onDelete: (checkpoint: Checkpoint) => void;
   eventId: number;
 }
 
@@ -38,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
       top: -3,
       right: -5,
     },
-  })
+  }),
 );
 
 const CheckpointCard = ({ checkpoint, onDelete }: Props) => {
@@ -69,10 +66,7 @@ const CheckpointCard = ({ checkpoint, onDelete }: Props) => {
         </div>
       </div>
       <div className={classes.deleteIcon}>
-        <IconButton
-          aria-label="delete"
-          onClick={() => onDelete(checkpoint)}
-        >
+        <IconButton aria-label="delete" onClick={() => onDelete(checkpoint)}>
           <ClearIcon />
         </IconButton>
       </div>

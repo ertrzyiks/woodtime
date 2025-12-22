@@ -3,4 +3,3 @@ mutation DeleteCheckpoint($id: Int!) {
     id
   }
 }
-

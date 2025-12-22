@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
     skippedText: {
       fontStyle: 'italic',
     },
-  })
+  }),
 );
 
 const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
@@ -46,12 +46,14 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
 
     try {
       if (checkpoint) {
-        const checkpointDoc = await db.checkpoints.findOne({
-          selector: { id: checkpoint.id }
-        }).exec();
+        const checkpointDoc = await db.checkpoints
+          .findOne({
+            selector: { id: checkpoint.id },
+          })
+          .exec();
 
         if (checkpointDoc) {
-          await checkpointDoc.remove()
+          await checkpointDoc.remove();
         }
       } else {
         // Create checkpoint
@@ -76,7 +78,7 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
 
   const handleSkipClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    checkpointId: number
+    checkpointId: number,
   ) => {
     e.stopPropagation();
 
@@ -95,7 +97,6 @@ const CheckpointListItem = ({ id, checkpoint, eventId }: Props) => {
     });
 
     history.push(`/events/${eventId}`);
-
   };
 
   const classes = useStyles();

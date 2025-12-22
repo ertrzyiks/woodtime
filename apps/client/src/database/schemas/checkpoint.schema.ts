@@ -8,38 +8,35 @@ export const checkpointSchema: RxJsonSchema<any> = {
   properties: {
     id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     event_id: {
       type: 'string',
-      maxLength: ID_MAX_LENGTH
+      maxLength: ID_MAX_LENGTH,
     },
     cp_id: {
-      type: 'number'
+      type: 'number',
     },
     cp_code: {
-      oneOf: [
-        { type: 'string' },
-        { type: 'null' }
-      ]
+      oneOf: [{ type: 'string' }, { type: 'null' }],
     },
     skipped: {
-      type: 'boolean'
+      type: 'boolean',
     },
     skip_reason: {
-      type: ['string', 'null']
+      type: ['string', 'null'],
     },
     created_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
     updated_at: {
       type: 'string',
       format: 'date-time',
-      maxLength: 24
+      maxLength: 24,
     },
   },
   required: ['id', 'event_id', 'cp_id', 'skipped', 'created_at', 'updated_at'],
-  indexes: ['event_id', 'created_at', 'updated_at']
+  indexes: ['event_id', 'created_at', 'updated_at'],
 };

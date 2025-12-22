@@ -28,15 +28,15 @@ export const collections = {
         return this.collection.database.checkpoints
           .find({ selector: { event_id: this.id } })
           .exec();
-      }
+      },
     },
     statics: {
       // Static methods
       getUpcoming(this: EventCollection): RxQuery<EventDocType, any> {
         return this.find({
-          sort: [{ created_at: 'desc' }]
+          sort: [{ created_at: 'desc' }],
         });
-      }
+      },
     },
     migrationStrategies: {},
   },
@@ -55,5 +55,5 @@ export const collections = {
   participants: {
     schema: participantSchema,
     migrationStrategies: {},
-  }
+  },
 };

@@ -9,18 +9,14 @@ import {
   BottomNavigation,
   BottomNavigationAction,
   IconButton,
-  Tooltip
+  Tooltip,
 } from '@mui/material';
 import PublicIcon from '@mui/icons-material/Public';
 import EventIcon from '@mui/icons-material/Event';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import {
-  Link as RouterLink,
-  useHistory,
-  useLocation,
-} from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 
-import {useTranslation} from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import { removeRxDatabase } from 'rxdb/plugins/core';
 import { storage } from './database/setup';
 
@@ -40,23 +36,26 @@ const useStyles = makeStyles((theme: Theme) =>
       width: '100%',
       height: '100%',
       justifyContent: 'center',
-      display: 'flex'
+      display: 'flex',
     },
     bottomBar: {
       position: 'fixed',
       bottom: 0,
-      width: '100%'
-    }
-  })
+      width: '100%',
+    },
+  }),
 );
 
 function BottomBar({ className }: { className: string }) {
-  const { t } = useTranslation()
-  const history = useHistory()
-  const location = useLocation()
+  const { t } = useTranslation();
+  const history = useHistory();
+  const location = useLocation();
 
-  if (location.pathname !== '/' && location.pathname !== '/virtual-challenges') {
-    return null
+  if (
+    location.pathname !== '/' &&
+    location.pathname !== '/virtual-challenges'
+  ) {
+    return null;
   }
 
   return (
@@ -64,22 +63,28 @@ function BottomBar({ className }: { className: string }) {
       value={location.pathname === '/' ? 0 : 1}
       onChange={(event, newValue) => {
         if (newValue === 0) {
-          history.push('/')
+          history.push('/');
         } else {
-          history.push('/virtual-challenges')
+          history.push('/virtual-challenges');
         }
       }}
       showLabels
       className={className}
     >
-      <BottomNavigationAction label={t('navigation.events')} icon={<EventIcon />} />
-      <BottomNavigationAction label={t('navigation.virtual_challenges')} icon={<PublicIcon />} />
+      <BottomNavigationAction
+        label={t('navigation.events')}
+        icon={<EventIcon />}
+      />
+      <BottomNavigationAction
+        label={t('navigation.virtual_challenges')}
+        icon={<PublicIcon />}
+      />
     </BottomNavigation>
-  )
+  );
 }
 
 function Layout({ children }: { children: ReactNode }) {
-  const classes = useStyles()
+  const classes = useStyles();
 
   const handleClearStorage = async () => {
     try {
@@ -115,7 +120,7 @@ function Layout({ children }: { children: ReactNode }) {
 
       {children}
 
-      <BottomBar className={classes.bottomBar}/>
+      <BottomBar className={classes.bottomBar} />
     </div>
   );
 }
