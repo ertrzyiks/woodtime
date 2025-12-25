@@ -12,6 +12,11 @@ export interface GridStructure {
   cols: number;
 }
 
+export interface ExtractionContext {
+  sourceMat?: any;
+  inverseTransform?: any;
+}
+
 /**
  * Detect the grid structure (rows and columns) from a warped card image
  * Uses edge detection and projection analysis to identify grid lines
@@ -43,7 +48,7 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
       cv.ADAPTIVE_THRESH_GAUSSIAN_C,
       cv.THRESH_BINARY_INV,
       11,
-      2
+      2,
     );
 
     // Use Hough Line Transform to detect lines
@@ -55,14 +60,14 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
       Math.PI / 180, // theta
       50, // threshold
       Math.min(warpedMat.cols, warpedMat.rows) * 0.3, // minLineLength
-      20 // maxLineGap
+      20, // maxLineGap
     );
 
     // Separate horizontal and vertical lines
     const horizontalLines = new Set<number>();
     const verticalLines = new Set<number>();
-    
-    const angleThreshold = 10 * Math.PI / 180; // 10 degrees tolerance
+
+    const angleThreshold = (10 * Math.PI) / 180; // 10 degrees tolerance
 
     for (let i = 0; i < lines.rows; i++) {
       const x1 = lines.data32S[i * 4];
@@ -75,7 +80,10 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
       const angle = Math.atan2(dy, dx);
 
       // Check if line is horizontal (angle close to 0 or PI)
-      if (Math.abs(angle) < angleThreshold || Math.abs(Math.abs(angle) - Math.PI) < angleThreshold) {
+      if (
+        Math.abs(angle) < angleThreshold ||
+        Math.abs(Math.abs(angle) - Math.PI) < angleThreshold
+      ) {
         const y = Math.floor((y1 + y2) / 2);
         // Only consider lines that span significant width
         if (Math.abs(dx) > warpedMat.cols * 0.4) {
@@ -83,7 +91,10 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
         }
       }
       // Check if line is vertical (angle close to PI/2 or -PI/2)
-      else if (Math.abs(angle - Math.PI / 2) < angleThreshold || Math.abs(angle + Math.PI / 2) < angleThreshold) {
+      else if (
+        Math.abs(angle - Math.PI / 2) < angleThreshold ||
+        Math.abs(angle + Math.PI / 2) < angleThreshold
+      ) {
         const x = Math.floor((x1 + x2) / 2);
         // Only consider lines that span significant height
         if (Math.abs(dy) > warpedMat.rows * 0.4) {
@@ -92,84 +103,8 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
       }
     }
 
-    // If Hough didn't find enough lines, try morphological approach with smaller kernels
-    if (horizontalLines.size < 3 || verticalLines.size < 3) {
-      // Detect horizontal and vertical lines using morphological operations
-      const horizontalKernel = cv.getStructuringElement(
-        cv.MORPH_RECT,
-        new cv.Size(Math.floor(warpedMat.cols / 30), 1)
-      );
-      const verticalKernel = cv.getStructuringElement(
-        cv.MORPH_RECT,
-        new cv.Size(1, Math.floor(warpedMat.rows / 30))
-      );
-
-      const horizontal = new cv.Mat();
-      const vertical = new cv.Mat();
-
-      cv.morphologyEx(binary, horizontal, cv.MORPH_OPEN, horizontalKernel);
-      cv.morphologyEx(binary, vertical, cv.MORPH_OPEN, verticalKernel);
-
-      // Dilate to make detection easier
-      cv.dilate(horizontal, horizontal, horizontalKernel);
-      cv.dilate(vertical, vertical, verticalKernel);
-
-      // Find contours for horizontal lines
-      const horizontalContours = new cv.MatVector();
-      const horizontalHierarchy = new cv.Mat();
-      cv.findContours(
-        horizontal,
-        horizontalContours,
-        horizontalHierarchy,
-        cv.RETR_EXTERNAL,
-        cv.CHAIN_APPROX_SIMPLE
-      );
-
-      // Find contours for vertical lines
-      const verticalContours = new cv.MatVector();
-      const verticalHierarchy = new cv.Mat();
-      cv.findContours(
-        vertical,
-        verticalContours,
-        verticalHierarchy,
-        cv.RETR_EXTERNAL,
-        cv.CHAIN_APPROX_SIMPLE
-      );
-
-      // Count significant horizontal lines
-      for (let i = 0; i < horizontalContours.size(); i++) {
-        const contour = horizontalContours.get(i);
-        const rect = cv.boundingRect(contour);
-        const y = rect.y + Math.floor(rect.height / 2);
-        
-        // Only consider lines that span a significant portion of the width
-        if (rect.width > warpedMat.cols * 0.4) {
-          horizontalLines.add(y);
-        }
-      }
-
-      // Count significant vertical lines
-      for (let i = 0; i < verticalContours.size(); i++) {
-        const contour = verticalContours.get(i);
-        const rect = cv.boundingRect(contour);
-        const x = rect.x + Math.floor(rect.width / 2);
-        
-        // Only consider lines that span a significant portion of the height
-        if (rect.height > warpedMat.rows * 0.4) {
-          verticalLines.add(x);
-        }
-      }
-
-      // Cleanup morphological structures
-      horizontal.delete();
-      vertical.delete();
-      horizontalKernel.delete();
-      verticalKernel.delete();
-      horizontalContours.delete();
-      horizontalHierarchy.delete();
-      verticalContours.delete();
-      verticalHierarchy.delete();
-    }
+    console.log('horizontalLines detected:', horizontalLines);
+    console.log('verticalLines detected:', verticalLines);
 
     // Cleanup
     gray.delete();
@@ -207,7 +142,7 @@ const log = (...args: any[]) => {
  */
 export function processVideoFrame(
   canvas: HTMLCanvasElement,
-  extractGridCells: (warpedMat: any) => void,
+  extractGridCells: (warpedMat: any, context?: ExtractionContext) => void,
 ): HTMLCanvasElement | null {
   try {
     // Get image data from canvas
@@ -290,14 +225,16 @@ export function processVideoFrame(
 
       // Get perspective transform matrix
       const M = cv.getPerspectiveTransform(srcPoints, dstPoints);
+      const inverseM = cv.getPerspectiveTransform(dstPoints, srcPoints);
       const warped = new cv.Mat();
       cv.warpPerspective(src, warped, M, new cv.Size(800, 600));
 
       // Extract grid cells (assuming 5 rows x 7 cols)
-      extractGridCells(warped);
+      extractGridCells(warped, { sourceMat: src, inverseTransform: inverseM });
 
       // Cleanup
       M.delete();
+      inverseM.delete();
       warped.delete();
       dstPoints.delete();
       srcPoints.delete();
@@ -332,39 +269,77 @@ export function processVideoFrame(
  */
 export function extractGridCellsFromMat(
   warpedMat: any,
+  context?: ExtractionContext,
   rows?: number,
   cols?: number,
 ): GridData {
-  // Try to detect grid structure if not provided
-  let finalRows = rows;
-  let finalCols = cols;
-  
-  if (!rows || !cols) {
-    const detected = detectGridStructure(warpedMat);
-    if (detected) {
-      finalRows = rows || detected.rows;
-      finalCols = cols || detected.cols;
-    } else {
-      // Fallback to defaults if detection fails
-      finalRows = rows || 5;
-      finalCols = cols || 7;
-    }
-  }
+  // Use provided grid size or fall back to defaults
+  const finalRows = rows || 5;
+  const finalCols = cols || 10;
+
+  const skipHeaderRows = 2;
+
+  const sourceMat = context?.sourceMat;
+  const inverseTransform = context?.inverseTransform;
+  const overlayTarget = sourceMat || warpedMat;
+  const rectColor = new cv.Scalar(255, 0, 0, 255);
 
   const width = warpedMat.cols;
   const height = warpedMat.rows;
   const cellWidth = width / finalCols;
   const cellHeight = height / finalRows;
 
-  const cells: boolean[][] = [];
+  const effectiveRows = Math.max(0, finalRows - skipHeaderRows);
+  const cells: boolean[][] = Array.from({ length: effectiveRows }, () => []);
 
-  for (let row = 0; row < finalRows; row++) {
-    cells[row] = [];
+  for (let row = skipHeaderRows; row < finalRows; row++) {
+    const outputRow = row - skipHeaderRows;
     for (let col = 0; col < finalCols; col++) {
       const x = Math.floor(col * cellWidth);
       const y = Math.floor(row * cellHeight);
       const w = Math.floor(cellWidth);
       const h = Math.floor(cellHeight);
+
+      // Draw the assumed grid cell on the original canvas for visualization
+      if (overlayTarget) {
+        if (inverseTransform && sourceMat) {
+          const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x,
+            y,
+            x + w,
+            y,
+            x + w,
+            y + h,
+            x,
+            y + h,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(corners, projected, inverseTransform);
+
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+
+          cv.line(sourceMat, pts[0], pts[1], rectColor, 2);
+          cv.line(sourceMat, pts[1], pts[2], rectColor, 2);
+          cv.line(sourceMat, pts[2], pts[3], rectColor, 2);
+          cv.line(sourceMat, pts[3], pts[0], rectColor, 2);
+
+          projected.delete();
+          corners.delete();
+        } else {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x, y),
+            new cv.Point(x + w, y + h),
+            rectColor,
+            2,
+          );
+        }
+      }
 
       try {
         // Extract cell region
@@ -383,17 +358,17 @@ export function extractGridCellsFromMat(
         const intensity = mean[0];
 
         // Simple threshold: if mean intensity is below threshold, consider it stamped
-        cells[row][col] = intensity < STAMPED_CELL_THRESHOLD;
+        cells[outputRow][col] = intensity < STAMPED_CELL_THRESHOLD;
 
         // Cleanup
         gray.delete();
         roi.delete();
       } catch (err) {
         console.error('Error extracting cell:', err);
-        cells[row][col] = false;
+        cells[outputRow][col] = false;
       }
     }
   }
 
-  return { rows: finalRows, cols: finalCols, cells };
+  return { rows: effectiveRows, cols: finalCols, cells };
 }
