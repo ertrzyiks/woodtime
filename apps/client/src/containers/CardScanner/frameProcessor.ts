@@ -353,14 +353,144 @@ export function extractGridCellsFromMat(
           roi.copyTo(gray);
         }
 
-        // Calculate mean intensity
-        const mean = cv.mean(gray);
-        const intensity = mean[0];
+        // Focus on the center area and detect dark blobs via contours
+        const centerWidth = Math.max(1, Math.floor(w * 0.4));
+        const centerHeight = Math.max(1, Math.floor(h * 0.4));
+        const centerX = Math.floor(w * 0.3); // start after a margin from top-left
+        const centerY = Math.floor(h * 0.3);
+        const centerRect = new cv.Rect(
+          centerX,
+          centerY,
+          centerWidth,
+          centerHeight,
+        );
 
-        // Simple threshold: if mean intensity is below threshold, consider it stamped
-        cells[outputRow][col] = intensity < STAMPED_CELL_THRESHOLD;
+        // Visualize center detection window in purple
+        const centerColor = new cv.Scalar(128, 0, 128, 255);
+        if (inverseTransform && sourceMat) {
+          const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x + centerX,
+            y + centerY,
+            x + centerX + centerWidth,
+            y + centerY,
+            x + centerX + centerWidth,
+            y + centerY + centerHeight,
+            x + centerX,
+            y + centerY + centerHeight,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(corners, projected, inverseTransform);
+
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+
+          cv.line(sourceMat, pts[0], pts[1], centerColor, 1);
+          cv.line(sourceMat, pts[1], pts[2], centerColor, 1);
+          cv.line(sourceMat, pts[2], pts[3], centerColor, 1);
+          cv.line(sourceMat, pts[3], pts[0], centerColor, 1);
+
+          projected.delete();
+          corners.delete();
+        } else if (overlayTarget) {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x + centerX, y + centerY),
+            new cv.Point(x + centerX + centerWidth, y + centerY + centerHeight),
+            centerColor,
+            1,
+          );
+        }
+        const centerRoi = gray.roi(centerRect);
+
+        const binary = new cv.Mat();
+        cv.threshold(
+          centerRoi,
+          binary,
+          STAMPED_CELL_THRESHOLD,
+          255,
+          cv.THRESH_BINARY_INV,
+        );
+
+        const dotContours = new cv.MatVector();
+        const dotHierarchy = new cv.Mat();
+        cv.findContours(
+          binary,
+          dotContours,
+          dotHierarchy,
+          cv.RETR_EXTERNAL,
+          cv.CHAIN_APPROX_SIMPLE,
+        );
+
+        let hasDot = false;
+
+        console.log(
+          `Cell [${row}, ${col}] - found ${dotContours.size()} dot contours`,
+        );
+        for (let k = 0; k < dotContours.size(); k++) {
+          const area = cv.contourArea(dotContours.get(k));
+          // Treat small blobs as dots; tweak 5 if needed
+          if (area > 5) {
+            const rect = cv.boundingRect(dotContours.get(k));
+            const dotColor = new cv.Scalar(0, 0, 255, 255);
+
+            const offsetX = x + centerX + rect.x;
+            const offsetY = y + centerY + rect.y;
+            const rectWidth = rect.width;
+            const rectHeight = rect.height;
+
+            if (inverseTransform && sourceMat) {
+              const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
+                offsetX,
+                offsetY,
+                offsetX + rectWidth,
+                offsetY,
+                offsetX + rectWidth,
+                offsetY + rectHeight,
+                offsetX,
+                offsetY + rectHeight,
+              ]);
+              const projected = new cv.Mat();
+              cv.perspectiveTransform(corners, projected, inverseTransform);
+
+              const pts = [
+                new cv.Point(projected.data32F[0], projected.data32F[1]),
+                new cv.Point(projected.data32F[2], projected.data32F[3]),
+                new cv.Point(projected.data32F[4], projected.data32F[5]),
+                new cv.Point(projected.data32F[6], projected.data32F[7]),
+              ];
+
+              cv.line(sourceMat, pts[0], pts[1], dotColor, 2);
+              cv.line(sourceMat, pts[1], pts[2], dotColor, 2);
+              cv.line(sourceMat, pts[2], pts[3], dotColor, 2);
+              cv.line(sourceMat, pts[3], pts[0], dotColor, 2);
+
+              projected.delete();
+              corners.delete();
+            } else if (overlayTarget) {
+              cv.rectangle(
+                overlayTarget,
+                new cv.Point(offsetX, offsetY),
+                new cv.Point(offsetX + rectWidth, offsetY + rectHeight),
+                dotColor,
+                2,
+              );
+            }
+            hasDot = true;
+            break;
+          }
+        }
+
+        cells[outputRow][col] = hasDot;
 
         // Cleanup
+        dotContours.delete();
+        dotHierarchy.delete();
+        binary.delete();
+        centerRoi.delete();
         gray.delete();
         roi.delete();
       } catch (err) {
