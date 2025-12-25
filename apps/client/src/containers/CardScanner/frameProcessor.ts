@@ -1,3 +1,5 @@
+import { a } from 'vitest/dist/chunks/suite.d.BJWk38HB';
+
 // Threshold for determining if a cell is stamped (lower intensity = darker = stamped)
 export const STAMPED_CELL_THRESHOLD = 128;
 
@@ -7,6 +9,10 @@ export interface GridData {
   cells: boolean[][]; // true = stamped, false = empty
 }
 
+const log = (...args: any[]) => {
+  console.log('[frameProcessor]', ...args);
+};
+
 /**
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
@@ -15,11 +21,13 @@ export interface GridData {
  */
 export function processVideoFrame(
   canvas: HTMLCanvasElement,
-  extractGridCells: (warpedMat: any) => void
+  extractGridCells: (warpedMat: any) => void,
 ): HTMLCanvasElement | null {
   try {
     // Get image data from canvas
     const src = cv.imread(canvas);
+
+    log('src', src);
 
     // Convert to grayscale
     const gray = new cv.Mat();
@@ -41,7 +49,7 @@ export function processVideoFrame(
       contours,
       hierarchy,
       cv.RETR_EXTERNAL,
-      cv.CHAIN_APPROX_SIMPLE
+      cv.CHAIN_APPROX_SIMPLE,
     );
 
     // Find the largest quadrilateral
@@ -52,14 +60,16 @@ export function processVideoFrame(
       const contour = contours.get(i);
       const area = cv.contourArea(contour);
 
-      if (area > maxArea && area > 10000) {
+      if (area > maxArea && area > 70000) {
+        log('contour', i, contour, area);
+
         // Minimum area threshold
         const peri = cv.arcLength(contour, true);
         const approx = new cv.Mat();
         cv.approxPolyDP(contour, approx, 0.02 * peri, true);
 
         // We want exactly 4 points for a quadrilateral (the card outline)
-        if (approx.rows === 4) {
+        if (approx.rows >= 4) {
           maxArea = area;
           if (bestContour) bestContour.delete();
           bestContour = approx;
@@ -70,8 +80,9 @@ export function processVideoFrame(
     }
 
     if (bestContour) {
+      console.log('Best contour found with area:', maxArea);
       // Draw the detected quadrilateral
-      const color = new cv.Scalar(0, 255, 0, 255);
+      const color = new cv.Scalar(0, 255, 0, 125);
       const pts = new cv.MatVector();
       pts.push_back(bestContour);
       cv.drawContours(src, pts, 0, color, 3);
@@ -84,9 +95,12 @@ export function processVideoFrame(
       }
 
       // Define destination points (800x600 rectangle)
-      const dstPoints = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        0, 0, 800, 0, 800, 600, 0, 600,
-      ]);
+      const dstPoints = cv.matFromArray(
+        4,
+        1,
+        cv.CV_32FC2,
+        [0, 0, 800, 0, 800, 600, 0, 600],
+      );
 
       // Get perspective transform matrix
       const M = cv.getPerspectiveTransform(srcPoints, dstPoints);
@@ -133,7 +147,7 @@ export function processVideoFrame(
 export function extractGridCellsFromMat(
   warpedMat: any,
   rows: number = 5,
-  cols: number = 7
+  cols: number = 7,
 ): GridData {
   const width = warpedMat.cols;
   const height = warpedMat.rows;
