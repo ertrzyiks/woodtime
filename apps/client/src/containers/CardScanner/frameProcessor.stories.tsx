@@ -1,5 +1,9 @@
 import * as React from 'react';
-import { processVideoFrame, extractGridCellsFromMat, GridData } from './frameProcessor';
+import {
+  processVideoFrame,
+  extractGridCellsFromMat,
+  GridData,
+} from './frameProcessor';
 
 const FrameProcessorSample = () => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -21,8 +25,6 @@ const FrameProcessorSample = () => {
         if (!canvasRef.current) return;
 
         const canvas = canvasRef.current;
-        canvas.width = img.width;
-        canvas.height = img.height;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
@@ -32,11 +34,11 @@ const FrameProcessorSample = () => {
         }
 
         // Draw the image on the canvas
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, 800, 600);
 
         // Wait for OpenCV to be loaded
         const checkAndProcess = () => {
-          if (typeof (window as any).cv === 'undefined') {
+          if (typeof window.cv === 'undefined') {
             setTimeout(checkAndProcess, 100);
             return;
           }
@@ -44,7 +46,7 @@ const FrameProcessorSample = () => {
           // Process the frame
           try {
             const extractedGridData = (warpedMat: any) => {
-              const data = extractGridCellsFromMat(warpedMat);
+              const data = extractGridCellsFromMat(warpedMat, 4, 5);
               setGridData(data);
             };
 
@@ -82,10 +84,17 @@ const FrameProcessorSample = () => {
     <div style={{ padding: '20px' }}>
       <h2>Frame Processor Test</h2>
       <p>Upload an image of a card to test the frame processing pipeline.</p>
-      
+
       <form>
         <div style={{ marginBottom: '20px' }}>
-          <label htmlFor="file-input" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+          <label
+            htmlFor="file-input"
+            style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: 'bold',
+            }}
+          >
             Select Image:
           </label>
           <input
@@ -106,7 +115,15 @@ const FrameProcessorSample = () => {
       )}
 
       {error && (
-        <div style={{ marginBottom: '20px', padding: '12px', backgroundColor: '#ffebee', color: '#c62828', borderRadius: '4px' }}>
+        <div
+          style={{
+            marginBottom: '20px',
+            padding: '12px',
+            backgroundColor: '#ffebee',
+            color: '#c62828',
+            borderRadius: '4px',
+          }}
+        >
           Error: {error}
         </div>
       )}
@@ -115,24 +132,30 @@ const FrameProcessorSample = () => {
         <h3>Canvas Output:</h3>
         <canvas
           ref={canvasRef}
-          style={{ 
-            border: '2px solid #ccc', 
-            maxWidth: '100%', 
+          width={800}
+          height={600}
+          style={{
+            border: '2px solid #ccc',
+            maxWidth: '100%',
             height: 'auto',
-            display: 'block'
+            display: 'block',
           }}
         />
       </div>
 
       {gridData && (
         <div style={{ marginTop: '20px' }}>
-          <h3>Detected Grid ({gridData.rows} x {gridData.cols}):</h3>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: `repeat(${gridData.cols}, 1fr)`, 
-            gap: '4px',
-            maxWidth: '400px'
-          }}>
+          <h3>
+            Detected Grid ({gridData.rows} x {gridData.cols}):
+          </h3>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${gridData.cols}, 1fr)`,
+              gap: '4px',
+              maxWidth: '400px',
+            }}
+          >
             {gridData.cells.flat().map((stamped, index) => (
               <div
                 key={index}
@@ -166,4 +189,3 @@ export default {
 export const Default = () => {
   return <FrameProcessorSample />;
 };
-
