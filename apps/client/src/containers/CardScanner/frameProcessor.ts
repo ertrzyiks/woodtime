@@ -14,7 +14,7 @@ export interface GridStructure {
 
 /**
  * Detect the grid structure (rows and columns) from a warped card image
- * Uses Hough Line Transform to detect grid lines and count them
+ * Uses edge detection and projection analysis to identify grid lines
  * @param warpedMat - The warped OpenCV Mat containing the rectified card
  * @returns GridStructure with detected rows and cols, or null if detection fails
  */
@@ -30,96 +30,152 @@ export function detectGridStructure(warpedMat: any): GridStructure | null {
       warpedMat.copyTo(gray);
     }
 
-    // Apply adaptive thresholding to enhance grid lines
+    // Apply Gaussian blur to reduce noise
+    const blurred = new cv.Mat();
+    cv.GaussianBlur(gray, blurred, new cv.Size(3, 3), 0);
+
+    // Apply adaptive thresholding to get binary image
     const binary = new cv.Mat();
     cv.adaptiveThreshold(
-      gray,
+      blurred,
       binary,
       255,
       cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-      cv.THRESH_BINARY,
+      cv.THRESH_BINARY_INV,
       11,
       2
     );
 
-    // Invert if needed (we want grid lines to be white)
-    cv.bitwise_not(binary, binary);
-
-    // Detect horizontal and vertical lines using morphological operations
-    const horizontalKernel = cv.getStructuringElement(
-      cv.MORPH_RECT,
-      new cv.Size(Math.floor(warpedMat.cols / 10), 1)
-    );
-    const verticalKernel = cv.getStructuringElement(
-      cv.MORPH_RECT,
-      new cv.Size(1, Math.floor(warpedMat.rows / 10))
-    );
-
-    const horizontal = new cv.Mat();
-    const vertical = new cv.Mat();
-
-    cv.morphologyEx(binary, horizontal, cv.MORPH_OPEN, horizontalKernel);
-    cv.morphologyEx(binary, vertical, cv.MORPH_OPEN, verticalKernel);
-
-    // Find contours for horizontal lines
-    const horizontalContours = new cv.MatVector();
-    const horizontalHierarchy = new cv.Mat();
-    cv.findContours(
-      horizontal,
-      horizontalContours,
-      horizontalHierarchy,
-      cv.RETR_EXTERNAL,
-      cv.CHAIN_APPROX_SIMPLE
+    // Use Hough Line Transform to detect lines
+    const lines = new cv.Mat();
+    cv.HoughLinesP(
+      binary,
+      lines,
+      1, // rho
+      Math.PI / 180, // theta
+      50, // threshold
+      Math.min(warpedMat.cols, warpedMat.rows) * 0.3, // minLineLength
+      20 // maxLineGap
     );
 
-    // Find contours for vertical lines
-    const verticalContours = new cv.MatVector();
-    const verticalHierarchy = new cv.Mat();
-    cv.findContours(
-      vertical,
-      verticalContours,
-      verticalHierarchy,
-      cv.RETR_EXTERNAL,
-      cv.CHAIN_APPROX_SIMPLE
-    );
-
-    // Count significant horizontal lines (rows + 1 for boundaries)
+    // Separate horizontal and vertical lines
     const horizontalLines = new Set<number>();
-    for (let i = 0; i < horizontalContours.size(); i++) {
-      const contour = horizontalContours.get(i);
-      const rect = cv.boundingRect(contour);
-      const y = rect.y + Math.floor(rect.height / 2);
-      
-      // Only consider lines that span a significant portion of the width
-      if (rect.width > warpedMat.cols * 0.5) {
-        horizontalLines.add(y);
+    const verticalLines = new Set<number>();
+    
+    const angleThreshold = 10 * Math.PI / 180; // 10 degrees tolerance
+
+    for (let i = 0; i < lines.rows; i++) {
+      const x1 = lines.data32S[i * 4];
+      const y1 = lines.data32S[i * 4 + 1];
+      const x2 = lines.data32S[i * 4 + 2];
+      const y2 = lines.data32S[i * 4 + 3];
+
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const angle = Math.atan2(dy, dx);
+
+      // Check if line is horizontal (angle close to 0 or PI)
+      if (Math.abs(angle) < angleThreshold || Math.abs(Math.abs(angle) - Math.PI) < angleThreshold) {
+        const y = Math.floor((y1 + y2) / 2);
+        // Only consider lines that span significant width
+        if (Math.abs(dx) > warpedMat.cols * 0.4) {
+          horizontalLines.add(y);
+        }
+      }
+      // Check if line is vertical (angle close to PI/2 or -PI/2)
+      else if (Math.abs(angle - Math.PI / 2) < angleThreshold || Math.abs(angle + Math.PI / 2) < angleThreshold) {
+        const x = Math.floor((x1 + x2) / 2);
+        // Only consider lines that span significant height
+        if (Math.abs(dy) > warpedMat.rows * 0.4) {
+          verticalLines.add(x);
+        }
       }
     }
 
-    // Count significant vertical lines (cols + 1 for boundaries)
-    const verticalLines = new Set<number>();
-    for (let i = 0; i < verticalContours.size(); i++) {
-      const contour = verticalContours.get(i);
-      const rect = cv.boundingRect(contour);
-      const x = rect.x + Math.floor(rect.width / 2);
-      
-      // Only consider lines that span a significant portion of the height
-      if (rect.height > warpedMat.rows * 0.5) {
-        verticalLines.add(x);
+    // If Hough didn't find enough lines, try morphological approach with smaller kernels
+    if (horizontalLines.size < 3 || verticalLines.size < 3) {
+      // Detect horizontal and vertical lines using morphological operations
+      const horizontalKernel = cv.getStructuringElement(
+        cv.MORPH_RECT,
+        new cv.Size(Math.floor(warpedMat.cols / 30), 1)
+      );
+      const verticalKernel = cv.getStructuringElement(
+        cv.MORPH_RECT,
+        new cv.Size(1, Math.floor(warpedMat.rows / 30))
+      );
+
+      const horizontal = new cv.Mat();
+      const vertical = new cv.Mat();
+
+      cv.morphologyEx(binary, horizontal, cv.MORPH_OPEN, horizontalKernel);
+      cv.morphologyEx(binary, vertical, cv.MORPH_OPEN, verticalKernel);
+
+      // Dilate to make detection easier
+      cv.dilate(horizontal, horizontal, horizontalKernel);
+      cv.dilate(vertical, vertical, verticalKernel);
+
+      // Find contours for horizontal lines
+      const horizontalContours = new cv.MatVector();
+      const horizontalHierarchy = new cv.Mat();
+      cv.findContours(
+        horizontal,
+        horizontalContours,
+        horizontalHierarchy,
+        cv.RETR_EXTERNAL,
+        cv.CHAIN_APPROX_SIMPLE
+      );
+
+      // Find contours for vertical lines
+      const verticalContours = new cv.MatVector();
+      const verticalHierarchy = new cv.Mat();
+      cv.findContours(
+        vertical,
+        verticalContours,
+        verticalHierarchy,
+        cv.RETR_EXTERNAL,
+        cv.CHAIN_APPROX_SIMPLE
+      );
+
+      // Count significant horizontal lines
+      for (let i = 0; i < horizontalContours.size(); i++) {
+        const contour = horizontalContours.get(i);
+        const rect = cv.boundingRect(contour);
+        const y = rect.y + Math.floor(rect.height / 2);
+        
+        // Only consider lines that span a significant portion of the width
+        if (rect.width > warpedMat.cols * 0.4) {
+          horizontalLines.add(y);
+        }
       }
+
+      // Count significant vertical lines
+      for (let i = 0; i < verticalContours.size(); i++) {
+        const contour = verticalContours.get(i);
+        const rect = cv.boundingRect(contour);
+        const x = rect.x + Math.floor(rect.width / 2);
+        
+        // Only consider lines that span a significant portion of the height
+        if (rect.height > warpedMat.rows * 0.4) {
+          verticalLines.add(x);
+        }
+      }
+
+      // Cleanup morphological structures
+      horizontal.delete();
+      vertical.delete();
+      horizontalKernel.delete();
+      verticalKernel.delete();
+      horizontalContours.delete();
+      horizontalHierarchy.delete();
+      verticalContours.delete();
+      verticalHierarchy.delete();
     }
 
     // Cleanup
     gray.delete();
+    blurred.delete();
     binary.delete();
-    horizontal.delete();
-    vertical.delete();
-    horizontalKernel.delete();
-    verticalKernel.delete();
-    horizontalContours.delete();
-    horizontalHierarchy.delete();
-    verticalContours.delete();
-    verticalHierarchy.delete();
+    lines.delete();
 
     // Calculate rows and cols
     // Number of rows = number of horizontal lines - 1
