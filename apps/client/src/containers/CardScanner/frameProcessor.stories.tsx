@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   processVideoFrame,
   extractGridCellsFromMat,
+  detectGridStructure,
   GridData,
 } from './frameProcessor';
 
@@ -46,7 +47,8 @@ const FrameProcessorSample = () => {
           // Process the frame
           try {
             const extractedGridData = (warpedMat: any) => {
-              const data = extractGridCellsFromMat(warpedMat, 4, 5);
+              // Auto-detect grid structure (pass undefined to trigger detection)
+              const data = extractGridCellsFromMat(warpedMat);
               setGridData(data);
             };
 

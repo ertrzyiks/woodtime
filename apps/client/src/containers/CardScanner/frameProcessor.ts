@@ -1,5 +1,3 @@
-import { a } from 'vitest/dist/chunks/suite.d.BJWk38HB';
-
 // Threshold for determining if a cell is stamped (lower intensity = darker = stamped)
 export const STAMPED_CELL_THRESHOLD = 128;
 
@@ -7,6 +5,138 @@ export interface GridData {
   rows: number;
   cols: number;
   cells: boolean[][]; // true = stamped, false = empty
+}
+
+export interface GridStructure {
+  rows: number;
+  cols: number;
+}
+
+/**
+ * Detect the grid structure (rows and columns) from a warped card image
+ * Uses Hough Line Transform to detect grid lines and count them
+ * @param warpedMat - The warped OpenCV Mat containing the rectified card
+ * @returns GridStructure with detected rows and cols, or null if detection fails
+ */
+export function detectGridStructure(warpedMat: any): GridStructure | null {
+  try {
+    // Convert to grayscale if needed
+    let gray = new cv.Mat();
+    if (warpedMat.channels() === 4) {
+      cv.cvtColor(warpedMat, gray, cv.COLOR_RGBA2GRAY);
+    } else if (warpedMat.channels() === 3) {
+      cv.cvtColor(warpedMat, gray, cv.COLOR_RGB2GRAY);
+    } else {
+      warpedMat.copyTo(gray);
+    }
+
+    // Apply adaptive thresholding to enhance grid lines
+    const binary = new cv.Mat();
+    cv.adaptiveThreshold(
+      gray,
+      binary,
+      255,
+      cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+      cv.THRESH_BINARY,
+      11,
+      2
+    );
+
+    // Invert if needed (we want grid lines to be white)
+    cv.bitwise_not(binary, binary);
+
+    // Detect horizontal and vertical lines using morphological operations
+    const horizontalKernel = cv.getStructuringElement(
+      cv.MORPH_RECT,
+      new cv.Size(Math.floor(warpedMat.cols / 10), 1)
+    );
+    const verticalKernel = cv.getStructuringElement(
+      cv.MORPH_RECT,
+      new cv.Size(1, Math.floor(warpedMat.rows / 10))
+    );
+
+    const horizontal = new cv.Mat();
+    const vertical = new cv.Mat();
+
+    cv.morphologyEx(binary, horizontal, cv.MORPH_OPEN, horizontalKernel);
+    cv.morphologyEx(binary, vertical, cv.MORPH_OPEN, verticalKernel);
+
+    // Find contours for horizontal lines
+    const horizontalContours = new cv.MatVector();
+    const horizontalHierarchy = new cv.Mat();
+    cv.findContours(
+      horizontal,
+      horizontalContours,
+      horizontalHierarchy,
+      cv.RETR_EXTERNAL,
+      cv.CHAIN_APPROX_SIMPLE
+    );
+
+    // Find contours for vertical lines
+    const verticalContours = new cv.MatVector();
+    const verticalHierarchy = new cv.Mat();
+    cv.findContours(
+      vertical,
+      verticalContours,
+      verticalHierarchy,
+      cv.RETR_EXTERNAL,
+      cv.CHAIN_APPROX_SIMPLE
+    );
+
+    // Count significant horizontal lines (rows + 1 for boundaries)
+    const horizontalLines = new Set<number>();
+    for (let i = 0; i < horizontalContours.size(); i++) {
+      const contour = horizontalContours.get(i);
+      const rect = cv.boundingRect(contour);
+      const y = rect.y + Math.floor(rect.height / 2);
+      
+      // Only consider lines that span a significant portion of the width
+      if (rect.width > warpedMat.cols * 0.5) {
+        horizontalLines.add(y);
+      }
+    }
+
+    // Count significant vertical lines (cols + 1 for boundaries)
+    const verticalLines = new Set<number>();
+    for (let i = 0; i < verticalContours.size(); i++) {
+      const contour = verticalContours.get(i);
+      const rect = cv.boundingRect(contour);
+      const x = rect.x + Math.floor(rect.width / 2);
+      
+      // Only consider lines that span a significant portion of the height
+      if (rect.height > warpedMat.rows * 0.5) {
+        verticalLines.add(x);
+      }
+    }
+
+    // Cleanup
+    gray.delete();
+    binary.delete();
+    horizontal.delete();
+    vertical.delete();
+    horizontalKernel.delete();
+    verticalKernel.delete();
+    horizontalContours.delete();
+    horizontalHierarchy.delete();
+    verticalContours.delete();
+    verticalHierarchy.delete();
+
+    // Calculate rows and cols
+    // Number of rows = number of horizontal lines - 1
+    // Number of cols = number of vertical lines - 1
+    const rows = Math.max(1, horizontalLines.size - 1);
+    const cols = Math.max(1, verticalLines.size - 1);
+
+    // Return null if detection seems unrealistic (too few or too many)
+    if (rows < 2 || rows > 20 || cols < 2 || cols > 20) {
+      return null;
+    }
+
+    return { rows, cols };
+  } catch (err) {
+    console.error('Error detecting grid structure:', err);
+    return null;
+  }
 }
 
 const log = (...args: any[]) => {
@@ -140,25 +270,41 @@ export function processVideoFrame(
 /**
  * Extract grid cells from a warped (rectified) card image
  * @param warpedMat - The warped OpenCV Mat containing the rectified card
- * @param rows - Number of rows in the grid
- * @param cols - Number of columns in the grid
+ * @param rows - Number of rows in the grid (optional - will auto-detect if not provided)
+ * @param cols - Number of columns in the grid (optional - will auto-detect if not provided)
  * @returns Grid data with cell states (stamped/empty)
  */
 export function extractGridCellsFromMat(
   warpedMat: any,
-  rows: number = 5,
-  cols: number = 7,
+  rows?: number,
+  cols?: number,
 ): GridData {
+  // Try to detect grid structure if not provided
+  let finalRows = rows;
+  let finalCols = cols;
+  
+  if (!rows || !cols) {
+    const detected = detectGridStructure(warpedMat);
+    if (detected) {
+      finalRows = rows || detected.rows;
+      finalCols = cols || detected.cols;
+    } else {
+      // Fallback to defaults if detection fails
+      finalRows = rows || 5;
+      finalCols = cols || 7;
+    }
+  }
+
   const width = warpedMat.cols;
   const height = warpedMat.rows;
-  const cellWidth = width / cols;
-  const cellHeight = height / rows;
+  const cellWidth = width / finalCols;
+  const cellHeight = height / finalRows;
 
   const cells: boolean[][] = [];
 
-  for (let row = 0; row < rows; row++) {
+  for (let row = 0; row < finalRows; row++) {
     cells[row] = [];
-    for (let col = 0; col < cols; col++) {
+    for (let col = 0; col < finalCols; col++) {
       const x = Math.floor(col * cellWidth);
       const y = Math.floor(row * cellHeight);
       const w = Math.floor(cellWidth);
@@ -193,5 +339,5 @@ export function extractGridCellsFromMat(
     }
   }
 
-  return { rows, cols, cells };
+  return { rows: finalRows, cols: finalCols, cells };
 }
