@@ -147,8 +147,8 @@ const CardScanner = () => {
     setIsRecording(false);
   };
 
-  const extractGridCells = useCallback((warpedMat: any) => {
-    const gridData = extractGridCellsFromMat(warpedMat);
+  const extractGridCells = useCallback((warpedMat: any, context?: any) => {
+    const gridData = extractGridCellsFromMat(warpedMat, context);
     setGridData(gridData);
   }, []);
 
