@@ -1,5 +1,5 @@
 // Threshold for determining if a cell is stamped (lower intensity = darker = stamped)
-export const STAMPED_CELL_THRESHOLD = 128;
+export const STAMPED_CELL_THRESHOLD = 160;
 
 export interface GridData {
   rows: number;
@@ -353,72 +353,203 @@ export function extractGridCellsFromMat(
           roi.copyTo(gray);
         }
 
-        // Focus on the center area and detect dark blobs via contours
-        const centerWidth = Math.max(1, Math.floor(w * 0.4));
-        const centerHeight = Math.max(1, Math.floor(h * 0.4));
-        const centerX = Math.floor(w * 0.3); // start after a margin from top-left
-        const centerY = Math.floor(h * 0.3);
-        const centerRect = new cv.Rect(
-          centerX,
-          centerY,
-          centerWidth,
-          centerHeight,
+        // Create a mask to exclude the top-left quadrant
+        const quadWidth = Math.max(1, Math.floor(w / 2));
+        const quadHeight = Math.max(1, Math.floor(h / 2));
+
+        // Create a white mask (255 = include)
+        const mask = new cv.Mat(h, w, cv.CV_8UC1, new cv.Scalar(255));
+
+        // Black out top-right quadrant in warped space (appears as top-left in source)
+        cv.rectangle(
+          mask,
+          new cv.Point(quadWidth, 0),
+          new cv.Point(w, quadHeight),
+          new cv.Scalar(0),
+          -1, // filled rectangle
         );
 
-        // Visualize center detection window in purple
-        const centerColor = new cv.Scalar(128, 0, 128, 255);
-        if (inverseTransform && sourceMat) {
-          const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
-            x + centerX,
-            y + centerY,
-            x + centerX + centerWidth,
-            y + centerY,
-            x + centerX + centerWidth,
-            y + centerY + centerHeight,
-            x + centerX,
-            y + centerY + centerHeight,
-          ]);
-          const projected = new cv.Mat();
-          cv.perspectiveTransform(corners, projected, inverseTransform);
+        // Light blur to stabilize noise before thresholding
+        cv.GaussianBlur(gray, gray, new cv.Size(3, 3), 0);
 
-          const pts = [
-            new cv.Point(projected.data32F[0], projected.data32F[1]),
-            new cv.Point(projected.data32F[2], projected.data32F[3]),
-            new cv.Point(projected.data32F[4], projected.data32F[5]),
-            new cv.Point(projected.data32F[6], projected.data32F[7]),
-          ];
-
-          cv.line(sourceMat, pts[0], pts[1], centerColor, 1);
-          cv.line(sourceMat, pts[1], pts[2], centerColor, 1);
-          cv.line(sourceMat, pts[2], pts[3], centerColor, 1);
-          cv.line(sourceMat, pts[3], pts[0], centerColor, 1);
-
-          projected.delete();
-          corners.delete();
-        } else if (overlayTarget) {
-          cv.rectangle(
-            overlayTarget,
-            new cv.Point(x + centerX, y + centerY),
-            new cv.Point(x + centerX + centerWidth, y + centerY + centerHeight),
-            centerColor,
-            1,
-          );
-        }
-        const centerRoi = gray.roi(centerRect);
-
+        // Apply threshold to grayscale
         const binary = new cv.Mat();
         cv.threshold(
-          centerRoi,
+          gray,
           binary,
           STAMPED_CELL_THRESHOLD,
           255,
           cv.THRESH_BINARY_INV,
         );
 
+        // Morphological close to fill small gaps in hole rims
+        const closeKernel = cv.Mat.ones(3, 3, cv.CV_8U);
+        cv.morphologyEx(binary, binary, cv.MORPH_CLOSE, closeKernel);
+        closeKernel.delete();
+
+        // Apply mask to binary image
+        const maskedBinary = new cv.Mat();
+        cv.bitwise_and(binary, mask, maskedBinary);
+
+        // Visualize detection area in purple (everywhere except top-left)
+        const quadColor = new cv.Scalar(128, 0, 128, 255);
+        const excludedColor = new cv.Scalar(255, 128, 0, 255); // Orange for excluded area
+
+        // Visualize EXCLUDED top-left quadrant in orange (top-right in warped space)
+        if (inverseTransform && sourceMat) {
+          const topLeft = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x + quadWidth,
+            y,
+            x + w,
+            y,
+            x + w,
+            y + quadHeight,
+            x + quadWidth,
+            y + quadHeight,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(topLeft, projected, inverseTransform);
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+          cv.line(sourceMat, pts[0], pts[1], excludedColor, 1);
+          cv.line(sourceMat, pts[1], pts[2], excludedColor, 1);
+          cv.line(sourceMat, pts[2], pts[3], excludedColor, 1);
+          cv.line(sourceMat, pts[3], pts[0], excludedColor, 1);
+          projected.delete();
+          topLeft.delete();
+        } else if (overlayTarget) {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x + quadWidth, y),
+            new cv.Point(x + w, y + quadHeight),
+            excludedColor,
+            1,
+          );
+        }
+
+        // Visualize top-right quadrant (now included)
+        if (inverseTransform && sourceMat) {
+          const topRight = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x,
+            y,
+            x + quadWidth,
+            y,
+            x + quadWidth,
+            y + quadHeight,
+            x,
+            y + quadHeight,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(topRight, projected, inverseTransform);
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+          cv.line(sourceMat, pts[0], pts[1], quadColor, 1);
+          cv.line(sourceMat, pts[1], pts[2], quadColor, 1);
+          cv.line(sourceMat, pts[2], pts[3], quadColor, 1);
+          cv.line(sourceMat, pts[3], pts[0], quadColor, 1);
+          projected.delete();
+          topRight.delete();
+        } else if (overlayTarget) {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x, y),
+            new cv.Point(x + quadWidth, y + quadHeight),
+            quadColor,
+            1,
+          );
+        }
+
+        // Visualize bottom-left quadrant
+        if (inverseTransform && sourceMat) {
+          const bottomLeft = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x,
+            y + quadHeight,
+            x + quadWidth,
+            y + quadHeight,
+            x + quadWidth,
+            y + h,
+            x,
+            y + h,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(bottomLeft, projected, inverseTransform);
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+          cv.line(sourceMat, pts[0], pts[1], quadColor, 1);
+          cv.line(sourceMat, pts[1], pts[2], quadColor, 1);
+          cv.line(sourceMat, pts[2], pts[3], quadColor, 1);
+          cv.line(sourceMat, pts[3], pts[0], quadColor, 1);
+          projected.delete();
+          bottomLeft.delete();
+        } else if (overlayTarget) {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x, y + quadHeight),
+            new cv.Point(x + quadWidth, y + h),
+            quadColor,
+            1,
+          );
+        }
+
+        // Visualize bottom-right quadrant
+        if (inverseTransform && sourceMat) {
+          const bottomRight = cv.matFromArray(4, 1, cv.CV_32FC2, [
+            x + quadWidth,
+            y + quadHeight,
+            x + w,
+            y + quadHeight,
+            x + w,
+            y + h,
+            x + quadWidth,
+            y + h,
+          ]);
+          const projected = new cv.Mat();
+          cv.perspectiveTransform(bottomRight, projected, inverseTransform);
+          const pts = [
+            new cv.Point(projected.data32F[0], projected.data32F[1]),
+            new cv.Point(projected.data32F[2], projected.data32F[3]),
+            new cv.Point(projected.data32F[4], projected.data32F[5]),
+            new cv.Point(projected.data32F[6], projected.data32F[7]),
+          ];
+          cv.line(sourceMat, pts[0], pts[1], quadColor, 1);
+          cv.line(sourceMat, pts[1], pts[2], quadColor, 1);
+          cv.line(sourceMat, pts[2], pts[3], quadColor, 1);
+          cv.line(sourceMat, pts[3], pts[0], quadColor, 1);
+          projected.delete();
+          bottomRight.delete();
+        } else if (overlayTarget) {
+          cv.rectangle(
+            overlayTarget,
+            new cv.Point(x + quadWidth, y + quadHeight),
+            new cv.Point(x + w, y + h),
+            quadColor,
+            1,
+          );
+        }
+
+        // DEBUG: Check if maskedBinary has any white pixels
+        const whitePixelCount = cv.countNonZero(maskedBinary);
+        console.log(
+          `Cell [${row}, ${col}] - white pixels in maskedBinary: ${whitePixelCount}`,
+        );
+
+        // Use findContours to detect holes (irregular, jagged shapes from spiking)
         const dotContours = new cv.MatVector();
         const dotHierarchy = new cv.Mat();
         cv.findContours(
-          binary,
+          maskedBinary,
           dotContours,
           dotHierarchy,
           cv.RETR_EXTERNAL,
@@ -428,60 +559,81 @@ export function extractGridCellsFromMat(
         let hasDot = false;
 
         console.log(
-          `Cell [${row}, ${col}] - found ${dotContours.size()} dot contours`,
+          `Cell [${row}, ${col}] - found ${dotContours.size()} contours`,
         );
+
         for (let k = 0; k < dotContours.size(); k++) {
-          const area = cv.contourArea(dotContours.get(k));
-          // Treat small blobs as dots; tweak 5 if needed
-          if (area > 5) {
-            const rect = cv.boundingRect(dotContours.get(k));
-            const dotColor = new cv.Scalar(0, 0, 255, 255);
+          const contour = dotContours.get(k);
+          const area = cv.contourArea(contour);
+          const rect = cv.boundingRect(contour);
 
-            const offsetX = x + centerX + rect.x;
-            const offsetY = y + centerY + rect.y;
-            const rectWidth = rect.width;
-            const rectHeight = rect.height;
-
-            if (inverseTransform && sourceMat) {
-              const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
-                offsetX,
-                offsetY,
-                offsetX + rectWidth,
-                offsetY,
-                offsetX + rectWidth,
-                offsetY + rectHeight,
-                offsetX,
-                offsetY + rectHeight,
-              ]);
-              const projected = new cv.Mat();
-              cv.perspectiveTransform(corners, projected, inverseTransform);
-
-              const pts = [
-                new cv.Point(projected.data32F[0], projected.data32F[1]),
-                new cv.Point(projected.data32F[2], projected.data32F[3]),
-                new cv.Point(projected.data32F[4], projected.data32F[5]),
-                new cv.Point(projected.data32F[6], projected.data32F[7]),
-              ];
-
-              cv.line(sourceMat, pts[0], pts[1], dotColor, 2);
-              cv.line(sourceMat, pts[1], pts[2], dotColor, 2);
-              cv.line(sourceMat, pts[2], pts[3], dotColor, 2);
-              cv.line(sourceMat, pts[3], pts[0], dotColor, 2);
-
-              projected.delete();
-              corners.delete();
-            } else if (overlayTarget) {
-              cv.rectangle(
-                overlayTarget,
-                new cv.Point(offsetX, offsetY),
-                new cv.Point(offsetX + rectWidth, offsetY + rectHeight),
-                dotColor,
-                2,
-              );
-            }
-            hasDot = true;
-            break;
+          // Filter by area to reject noise and large grid lines
+          if (area < 1 || area > 100) {
+            console.log(
+              `Cell [${row}, ${col}] contour ${k} REJECTED - area: ${area}`,
+            );
+            continue;
           }
+
+          // Filter by aspect ratio to reject elongated shapes (lines)
+          const aspectRatio = rect.width / rect.height;
+          if (aspectRatio > 2.5 || aspectRatio < 0.33) {
+            console.log(
+              `Cell [${row}, ${col}] contour ${k} REJECTED - aspect ratio: ${aspectRatio.toFixed(2)}`,
+            );
+            continue; // Too elongated - likely a line segment
+          }
+
+          console.log(
+            `Cell [${row}, ${col}] contour ${k} ACCEPTED - area: ${area}, width: ${rect.width}, height: ${rect.height}, aspect: ${aspectRatio.toFixed(2)}`,
+          );
+
+          const dotColor = new cv.Scalar(0, 0, 255, 255);
+
+          const offsetX = x + rect.x;
+          const offsetY = y + rect.y;
+          const rectWidth = rect.width;
+          const rectHeight = rect.height;
+
+          if (inverseTransform && sourceMat) {
+            const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
+              offsetX,
+              offsetY,
+              offsetX + rectWidth,
+              offsetY,
+              offsetX + rectWidth,
+              offsetY + rectHeight,
+              offsetX,
+              offsetY + rectHeight,
+            ]);
+            const projected = new cv.Mat();
+            cv.perspectiveTransform(corners, projected, inverseTransform);
+
+            const pts = [
+              new cv.Point(projected.data32F[0], projected.data32F[1]),
+              new cv.Point(projected.data32F[2], projected.data32F[3]),
+              new cv.Point(projected.data32F[4], projected.data32F[5]),
+              new cv.Point(projected.data32F[6], projected.data32F[7]),
+            ];
+
+            cv.line(sourceMat, pts[0], pts[1], dotColor, 2);
+            cv.line(sourceMat, pts[1], pts[2], dotColor, 2);
+            cv.line(sourceMat, pts[2], pts[3], dotColor, 2);
+            cv.line(sourceMat, pts[3], pts[0], dotColor, 2);
+
+            projected.delete();
+            corners.delete();
+          } else if (overlayTarget) {
+            cv.rectangle(
+              overlayTarget,
+              new cv.Point(offsetX, offsetY),
+              new cv.Point(offsetX + rectWidth, offsetY + rectHeight),
+              dotColor,
+              2,
+            );
+          }
+          hasDot = true;
+          // No break - visualize ALL contours for debugging
         }
 
         cells[outputRow][col] = hasDot;
@@ -489,8 +641,11 @@ export function extractGridCellsFromMat(
         // Cleanup
         dotContours.delete();
         dotHierarchy.delete();
+        maskedBinary.delete();
         binary.delete();
-        centerRoi.delete();
+        mask.delete();
+
+        // Cleanup
         gray.delete();
         roi.delete();
       } catch (err) {
