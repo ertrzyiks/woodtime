@@ -14,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import EventIcon from '@mui/icons-material/Event';
 import ListIcon from '@mui/icons-material/List';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import { useRxQuery } from '../../database/hooks/useRxQuery';
@@ -58,6 +59,11 @@ const useStyles = makeStyles((theme: Theme) =>
       position: 'fixed',
       right: '1em',
       bottom: '5em',
+    },
+    scannerButton: {
+      position: 'fixed',
+      right: '1em',
+      bottom: '10em',
     },
   }),
 );
@@ -154,6 +160,15 @@ const EventList = () => {
       </List>
 
       {showChecklist && <SimpleChecklist handleClose={handleChecklistClose} />}
+      <Fab
+        className={classes.scannerButton}
+        color="secondary"
+        aria-label="scan"
+        component={Link}
+        to="/card-scanner"
+      >
+        <CameraAltIcon />
+      </Fab>
       <Fab
         className={classes.addEventButton}
         color="primary"

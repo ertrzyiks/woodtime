@@ -8,6 +8,7 @@ import AddCheckpointPage from './containers/AddCheckpointPage/AddCheckpointPage'
 import AddVirtualChallenge from './containers/AddVirtualChallenge/AddVirtualChallenge';
 import VirtualChallengeList from './containers/VirtualChallengeList/VirtualChallengeList';
 import VirtualChallenge from './containers/VirtualChallenge/VirtualChallenge';
+import CardScanner from './containers/CardScanner/CardScanner';
 import AppShell from './AppShell';
 import Layout from './Layout';
 import SignIn from './containers/SignIn/SignIn';
@@ -49,6 +50,9 @@ function App() {
             </Route>
             <Route path="/sign-in" exact>
               <SignIn />
+            </Route>
+            <Route path="/card-scanner" exact>
+              <CardScanner />
             </Route>
           </Switch>
         </Layout>
