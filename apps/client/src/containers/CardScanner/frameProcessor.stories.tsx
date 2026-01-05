@@ -6,10 +6,10 @@ import {
 } from './frameProcessor';
 
 interface FrameProcessorSampleProps {
-  image?: string;
+  imageData?: string;
 }
 
-const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
+const FrameProcessorSample = ({ imageData }: FrameProcessorSampleProps) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [gridData, setGridData] = React.useState<GridData | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -17,13 +17,12 @@ const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
 
   // Process image if provided via props
   React.useEffect(() => {
-    if (!image || !canvasRef.current) return;
+    if (!imageData || !canvasRef.current) return;
 
     setError(null);
     setIsProcessing(true);
 
     const img = new Image();
-    img.crossOrigin = 'anonymous'; // Enable CORS for external images
     img.onload = () => {
       if (!canvasRef.current) return;
 
@@ -71,8 +70,8 @@ const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
       setIsProcessing(false);
     };
 
-    img.src = image;
-  }, [image]);
+    img.src = imageData;
+  }, [imageData]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -147,12 +146,12 @@ const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
     <div style={{ padding: '20px' }}>
       <h2>Frame Processor Test</h2>
       <p>
-        {image
+        {imageData
           ? 'Processing provided card image.'
           : 'Upload an image of a card to test the frame processing pipeline.'}
       </p>
 
-      {!image && (
+      {!imageData && (
         <form>
           <div style={{ marginBottom: '20px' }}>
             <label
@@ -248,55 +247,51 @@ const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
   );
 };
 
+// Helper function to load image and convert to data URL
+const loadImage = async (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+    img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+    img.src = url;
+  });
+};
+
 export default {
   title: 'Pages/CardScanner/frameProcessor',
   component: FrameProcessorSample,
   decorators: [],
-  loaders: [],
 };
 
 export const Default = () => {
   return <FrameProcessorSample />;
 };
 
-// Remote image URLs for card samples
-// These should be replaced with actual URLs from the Google Photos album:
-// https://photos.app.goo.gl/KbV4LGwMREEHz2J49
+// Remote image URLs for card samples from Google Photos album
 const CARD_IMAGES = {
-  empty: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Empty+Card+(5x7+Grid)',
-  corner: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Corner+Stamps',
-  diagonal: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Diagonal+Pattern',
-  cross: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Cross+Pattern',
-  fullRow: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Full+Row',
-  checkerboard: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Checkerboard+Pattern',
+  first: 'https://lh3.googleusercontent.com/rd-pw/AP1GczMgotKOF9lHBjNDFQ1tB8nVQu3-pkHm5MXNllmb-GILgdi3X2P7P9PG5IelMHyQ4JAm0_w3IAGz9Hv6onN5SBu3FzVQ9YiXm2NrwGNoSncVapkTm6Z6ji0nXoJMpq3NsQMIA5j-LsUk3Jt7pEkmtZ9swRwfh36em3j0w0kaYObu7SCM8d8IeKV2qKIPydIempKamPaAXmKfK80oIv9gb_GD1oKjkV72Fw0aj0jNT-lKJhqDGsv5x-ldBIHWL7zhnspB9AwBVJFxaYgnTqulsCFV-q9zBY2EKhtpW91gMXVfF08MurHhyPwC1dbinqfQBMyRwZEEKU5615kmIHtl-iEWG5JHkhTIxiWCDTAbtfWNrG-UwNnpUCidMfKbXAzwSUGpuS_fI1FUHMRvTCrs7_vEC6x91KHSZGVFZa5bP9cWh_DJ9k804K_TmIB5ysP3x_oWMAamu6WFjYo0FdEWnPtPDntFqj7U4RKfZSunm2iL5Qw2AClBbxT0iJr-BnG56hxYQPsbT8qd-uRt2opPffCjyHl-FUy_RBNOyXajLonTJVFZJVrbI33_WbZee6lYjR_K4K-E9M4SLLBHHyRU5b0yiR-4ejBhVkCt-5BXAO33LWwMsorUtye-7eNRvXAnPW88PDxH8vZNYKgZJuHzUvYSx8hoMf2WRM_ePtVHEsew6R3dKZT2CSGTpZnNvNREOBP75xM5lRSdHkPgfPFVMQTaSOybG1HVeKPQSx4rsO1SYLotK4JS1jFA1NSvTEqZzKnc3Dl0dFKKlSgfcWvV-AwBXlBeAYFlkqOxRHF-k8PZQkTvlTiYjk5Qy2bplAnEqBb2EUIAEjF-Mcf4TZY5pv-0xzoKJe1PXrpfWbAwg-XRCrMPbnry6MguicJNJmt7Cs36cqhdOPoTHW6w6ohzo_S_ix8w-kenrtG0ripFqmGgDbUCfcrHu98ut3LCUDN1nqTVnQW-spMi-O5B8GXgF2dYpURFHF7AhecoT33QWfx58LAb98W5xrpXNTd8Kpsefn9MjiwQmDdYZv5zunCKCbo4l-VyLnVZaerY1WZFmuNnfRxA0zw4K119gKjXvtnLAzxgPX-jDdQQcXNiwMdsyG3KzwshRf18Ypgw8NamKKISqGLTPnPdkq5uGZ2KDrZqQTBsA9ugh7iz_YFmbtzN0AiW4g_tt0VMg8ssM7Is7SV0Lx4=s2522-w2522-h1892-s-no-gm?authuser=0',
 };
 
-// Story with empty card (no stamped cells)
-export const EmptyCard = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.empty} />;
-};
-
-// Story with corner cells stamped
-export const CornerStamps = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.corner} />;
-};
-
-// Story with diagonal pattern
-export const DiagonalPattern = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.diagonal} />;
-};
-
-// Story with cross pattern
-export const CrossPattern = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.cross} />;
-};
-
-// Story with full row stamped
-export const FullRow = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.fullRow} />;
-};
-
-// Story with checkerboard pattern
-export const CheckerboardPattern = () => {
-  return <FrameProcessorSample image={CARD_IMAGES.checkerboard} />;
+// Story with first card from Google Photos album
+export const FirstCard = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES.first),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
 };
