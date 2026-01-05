@@ -22,15 +22,3 @@ export const Default = () => {
     </AppShell>
   );
 };
-
-export const WithoutCamera = () => {
-  return (
-    <AppShell>
-      <CardScanner />
-    </AppShell>
-  );
-};
-
-WithoutCamera.parameters = {
-  chromatic: { disableSnapshot: true },
-};
