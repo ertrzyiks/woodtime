@@ -23,6 +23,7 @@ const FrameProcessorSample = ({ image }: FrameProcessorSampleProps) => {
     setIsProcessing(true);
 
     const img = new Image();
+    img.crossOrigin = 'anonymous'; // Enable CORS for external images
     img.onload = () => {
       if (!canvasRef.current) return;
 
@@ -258,32 +259,44 @@ export const Default = () => {
   return <FrameProcessorSample />;
 };
 
+// Remote image URLs for card samples
+// These should be replaced with actual URLs from the Google Photos album:
+// https://photos.app.goo.gl/KbV4LGwMREEHz2J49
+const CARD_IMAGES = {
+  empty: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Empty+Card+(5x7+Grid)',
+  corner: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Corner+Stamps',
+  diagonal: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Diagonal+Pattern',
+  cross: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Cross+Pattern',
+  fullRow: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Full+Row',
+  checkerboard: 'https://via.placeholder.com/800x600/FFFFFF/000000?text=Checkerboard+Pattern',
+};
+
 // Story with empty card (no stamped cells)
 export const EmptyCard = () => {
-  return <FrameProcessorSample image="/card-samples/card1_empty.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.empty} />;
 };
 
 // Story with corner cells stamped
 export const CornerStamps = () => {
-  return <FrameProcessorSample image="/card-samples/card2_corner.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.corner} />;
 };
 
 // Story with diagonal pattern
 export const DiagonalPattern = () => {
-  return <FrameProcessorSample image="/card-samples/card3_diagonal.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.diagonal} />;
 };
 
 // Story with cross pattern
 export const CrossPattern = () => {
-  return <FrameProcessorSample image="/card-samples/card4_cross.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.cross} />;
 };
 
 // Story with full row stamped
 export const FullRow = () => {
-  return <FrameProcessorSample image="/card-samples/card5_full_row.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.fullRow} />;
 };
 
 // Story with checkerboard pattern
 export const CheckerboardPattern = () => {
-  return <FrameProcessorSample image="/card-samples/card6_checkerboard.png" />;
+  return <FrameProcessorSample image={CARD_IMAGES.checkerboard} />;
 };
