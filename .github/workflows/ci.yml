@@ -130,6 +130,7 @@ jobs:
       - run: |
           git config --global user.email "deploy-bot@ertrzyiks.me"
           git config --global user.name "Deploy Bot"
+          git config --global lfs.locksverify false
           git remote add dokku dokku@167.71.190.115:woodtime-api
           git push dokku HEAD:master --force
 
