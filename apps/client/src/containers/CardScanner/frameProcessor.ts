@@ -129,6 +129,9 @@ const log = (...args: any[]) => {
   console.log('[frameProcessor]', ...args);
 };
 
+// Set to true to visualize edges detection
+const DEBUG_VISUALIZE_EDGES = true;
+
 /**
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
@@ -145,9 +148,14 @@ export function processVideoFrame(
 
     log('src', src);
 
+    // Resize image for faster processing and better edge detection
+    const resized = new cv.Mat();
+    cv.resize(src, resized, new cv.Size(640, 480));
+    log('resized to 640x480');
+
     // Convert to grayscale
     const gray = new cv.Mat();
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.cvtColor(resized, gray, cv.COLOR_RGBA2GRAY);
 
     // Apply Gaussian blur
     const blurred = new cv.Mat();
@@ -155,7 +163,36 @@ export function processVideoFrame(
 
     // Edge detection with Canny
     const edges = new cv.Mat();
-    cv.Canny(blurred, edges, 50, 150);
+    cv.Canny(blurred, edges, 100, 220);
+
+    // Visualize edges for debugging
+    if (DEBUG_VISUALIZE_EDGES) {
+      // Convert edges to RGBA for display (white edges on black background)
+      const edgesViz = new cv.Mat();
+      cv.cvtColor(edges, edgesViz, cv.COLOR_GRAY2RGBA);
+
+      // Get or create debug canvas
+      let debugCanvas = document.getElementById(
+        'debug-canvas',
+      ) as HTMLCanvasElement;
+      if (!debugCanvas) {
+        debugCanvas = document.createElement('canvas');
+        debugCanvas.id = 'debug-canvas';
+        debugCanvas.style.display = 'block';
+        debugCanvas.style.marginTop = '10px';
+        debugCanvas.style.border = '2px solid red';
+        canvas.parentElement?.appendChild(debugCanvas);
+      }
+
+      // Set canvas size to match the image
+      debugCanvas.width = edgesViz.cols;
+      debugCanvas.height = edgesViz.rows;
+
+      // Display edges on debug canvas
+      cv.imshow(debugCanvas, edgesViz);
+      edgesViz.delete();
+      console.log('Displaying Canny edges visualization on debug canvas');
+    }
 
     // Find contours
     const contours = new cv.MatVector();
@@ -176,7 +213,7 @@ export function processVideoFrame(
       const contour = contours.get(i);
       const area = cv.contourArea(contour);
 
-      if (area > maxArea && area > 70000) {
+      if (area > maxArea && area > 700) {
         log('contour', i, contour, area);
 
         // Minimum area threshold
@@ -197,6 +234,20 @@ export function processVideoFrame(
 
     if (bestContour) {
       console.log('Best contour found with area:', maxArea);
+
+      // Scale contour coordinates back to original image size
+      const scaleX = src.cols / resized.cols;
+      const scaleY = src.rows / resized.rows;
+
+      for (let i = 0; i < bestContour.rows; i++) {
+        bestContour.data32S[i * 2] = Math.round(
+          bestContour.data32S[i * 2] * scaleX,
+        );
+        bestContour.data32S[i * 2 + 1] = Math.round(
+          bestContour.data32S[i * 2 + 1] * scaleY,
+        );
+      }
+
       // Draw the detected quadrilateral
       const color = new cv.Scalar(0, 255, 0, 125);
       const pts = new cv.MatVector();
@@ -242,6 +293,7 @@ export function processVideoFrame(
 
     // Cleanup
     src.delete();
+    resized.delete();
     gray.delete();
     blurred.delete();
     edges.delete();
