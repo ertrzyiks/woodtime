@@ -4,6 +4,13 @@ import {
   extractGridCellsFromMat,
   GridData,
 } from './frameProcessor';
+import example1 from './fixtures/example1.jpg';
+import example2 from './fixtures/example2.jpg';
+import example3 from './fixtures/example3.jpg';
+import example4 from './fixtures/example4.jpg';
+import example5 from './fixtures/example5.jpg';
+import example6 from './fixtures/example6.jpg';
+import example7 from './fixtures/example7.jpg';
 
 interface FrameProcessorSampleProps {
   imageData?: string;
@@ -279,16 +286,88 @@ export const Default = () => {
   return <FrameProcessorSample />;
 };
 
-// Remote image URLs for card samples from Google Photos album
-const CARD_IMAGES = {
-  first: 'https://lh3.googleusercontent.com/rd-pw/AP1GczMgotKOF9lHBjNDFQ1tB8nVQu3-pkHm5MXNllmb-GILgdi3X2P7P9PG5IelMHyQ4JAm0_w3IAGz9Hv6onN5SBu3FzVQ9YiXm2NrwGNoSncVapkTm6Z6ji0nXoJMpq3NsQMIA5j-LsUk3Jt7pEkmtZ9swRwfh36em3j0w0kaYObu7SCM8d8IeKV2qKIPydIempKamPaAXmKfK80oIv9gb_GD1oKjkV72Fw0aj0jNT-lKJhqDGsv5x-ldBIHWL7zhnspB9AwBVJFxaYgnTqulsCFV-q9zBY2EKhtpW91gMXVfF08MurHhyPwC1dbinqfQBMyRwZEEKU5615kmIHtl-iEWG5JHkhTIxiWCDTAbtfWNrG-UwNnpUCidMfKbXAzwSUGpuS_fI1FUHMRvTCrs7_vEC6x91KHSZGVFZa5bP9cWh_DJ9k804K_TmIB5ysP3x_oWMAamu6WFjYo0FdEWnPtPDntFqj7U4RKfZSunm2iL5Qw2AClBbxT0iJr-BnG56hxYQPsbT8qd-uRt2opPffCjyHl-FUy_RBNOyXajLonTJVFZJVrbI33_WbZee6lYjR_K4K-E9M4SLLBHHyRU5b0yiR-4ejBhVkCt-5BXAO33LWwMsorUtye-7eNRvXAnPW88PDxH8vZNYKgZJuHzUvYSx8hoMf2WRM_ePtVHEsew6R3dKZT2CSGTpZnNvNREOBP75xM5lRSdHkPgfPFVMQTaSOybG1HVeKPQSx4rsO1SYLotK4JS1jFA1NSvTEqZzKnc3Dl0dFKKlSgfcWvV-AwBXlBeAYFlkqOxRHF-k8PZQkTvlTiYjk5Qy2bplAnEqBb2EUIAEjF-Mcf4TZY5pv-0xzoKJe1PXrpfWbAwg-XRCrMPbnry6MguicJNJmt7Cs36cqhdOPoTHW6w6ohzo_S_ix8w-kenrtG0ripFqmGgDbUCfcrHu98ut3LCUDN1nqTVnQW-spMi-O5B8GXgF2dYpURFHF7AhecoT33QWfx58LAb98W5xrpXNTd8Kpsefn9MjiwQmDdYZv5zunCKCbo4l-VyLnVZaerY1WZFmuNnfRxA0zw4K119gKjXvtnLAzxgPX-jDdQQcXNiwMdsyG3KzwshRf18Ypgw8NamKKISqGLTPnPdkq5uGZ2KDrZqQTBsA9ugh7iz_YFmbtzN0AiW4g_tt0VMg8ssM7Is7SV0Lx4=s2522-w2522-h1892-s-no-gm?authuser=0',
-};
+// Local fixture images
+const CARD_IMAGES = [
+  example1,
+  example2,
+  example3,
+  example4,
+  example5,
+  example6,
+  example7,
+];
 
-// Story with first card from Google Photos album
-export const FirstCard = {
+// Stories for each fixture image
+export const Example1 = {
   loaders: [
     async () => ({
-      imageData: await loadImage(CARD_IMAGES.first),
+      imageData: await loadImage(CARD_IMAGES[0]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example2 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[1]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example3 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[2]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example4 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[3]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example5 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[4]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example6 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[5]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example7 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[6]),
     }),
   ],
   render: (args: any, { loaded }: any) => {
