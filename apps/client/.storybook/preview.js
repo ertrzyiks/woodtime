@@ -50,9 +50,11 @@ export const parameters = {
       mockGraphQLQuery('PullEvents'),
       mockGraphQLQuery('PullCheckpoints'),
       mockGraphQLQuery('PullVirtualChallenges'),
+      mockGraphQLQuery('PullParticipants'),
       mockGraphQLMutation('PushEvents'),
       mockGraphQLMutation('PushCheckpoints'),
       mockGraphQLMutation('PushVirtualChallenges'),
+      mockGraphQLMutation('PushParticipants'),
     ],
   },
 };
