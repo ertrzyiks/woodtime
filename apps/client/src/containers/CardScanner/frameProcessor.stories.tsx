@@ -4,12 +4,81 @@ import {
   extractGridCellsFromMat,
   GridData,
 } from './frameProcessor';
+import example1 from './fixtures/example1.jpg';
+import example2 from './fixtures/example2.jpg';
+import example3 from './fixtures/example3.jpg';
+import example4 from './fixtures/example4.jpg';
+import example5 from './fixtures/example5.jpg';
+import example6 from './fixtures/example6.jpg';
+import example7 from './fixtures/example7.jpg';
 
-const FrameProcessorSample = () => {
+interface FrameProcessorSampleProps {
+  imageData?: string;
+}
+
+const FrameProcessorSample = ({ imageData }: FrameProcessorSampleProps) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const [gridData, setGridData] = React.useState<GridData | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
+
+  // Process image if provided via props
+  React.useEffect(() => {
+    if (!imageData || !canvasRef.current) return;
+
+    setError(null);
+    setIsProcessing(true);
+
+    const img = new Image();
+    img.onload = () => {
+      if (!canvasRef.current) return;
+
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        setError('Could not get canvas context');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Draw the image on the canvas
+      ctx.drawImage(img, 0, 0, 800, 600);
+
+      // Wait for OpenCV to be loaded
+      const checkAndProcess = () => {
+        if (typeof window.cv === 'undefined') {
+          setTimeout(checkAndProcess, 100);
+          return;
+        }
+
+        // Process the frame
+        try {
+          const extractedGridData = (warpedMat: any, context?: any) => {
+            const data = extractGridCellsFromMat(warpedMat, context);
+            setGridData(data);
+          };
+
+          const result = processVideoFrame(canvas, extractedGridData);
+          if (!result) {
+            setError('Failed to process frame');
+          }
+        } catch (err: any) {
+          setError(err.message || 'Error processing frame');
+        } finally {
+          setIsProcessing(false);
+        }
+      };
+
+      checkAndProcess();
+    };
+
+    img.onerror = () => {
+      setError('Failed to load image');
+      setIsProcessing(false);
+    };
+
+    img.src = imageData;
+  }, [imageData]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -83,30 +152,36 @@ const FrameProcessorSample = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h2>Frame Processor Test</h2>
-      <p>Upload an image of a card to test the frame processing pipeline.</p>
+      <p>
+        {imageData
+          ? 'Processing provided card image.'
+          : 'Upload an image of a card to test the frame processing pipeline.'}
+      </p>
 
-      <form>
-        <div style={{ marginBottom: '20px' }}>
-          <label
-            htmlFor="file-input"
-            style={{
-              display: 'block',
-              marginBottom: '8px',
-              fontWeight: 'bold',
-            }}
-          >
-            Select Image:
-          </label>
-          <input
-            id="file-input"
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            disabled={isProcessing}
-            style={{ padding: '8px' }}
-          />
-        </div>
-      </form>
+      {!imageData && (
+        <form>
+          <div style={{ marginBottom: '20px' }}>
+            <label
+              htmlFor="file-input"
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: 'bold',
+              }}
+            >
+              Select Image:
+            </label>
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={isProcessing}
+              style={{ padding: '8px' }}
+            />
+          </div>
+        </form>
+      )}
 
       {isProcessing && (
         <div style={{ marginBottom: '20px', color: '#666' }}>
@@ -179,13 +254,123 @@ const FrameProcessorSample = () => {
   );
 };
 
+// Helper function to load image and convert to data URL
+const loadImage = async (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL());
+    };
+    img.onerror = () => reject(new Error(`Failed to load image from ${url}`));
+    img.src = url;
+  });
+};
+
 export default {
   title: 'Pages/CardScanner/frameProcessor',
   component: FrameProcessorSample,
   decorators: [],
-  loaders: [],
 };
 
 export const Default = () => {
   return <FrameProcessorSample />;
+};
+
+// Local fixture images
+const CARD_IMAGES = [
+  example1,
+  example2,
+  example3,
+  example4,
+  example5,
+  example6,
+  example7,
+];
+
+// Stories for each fixture image
+export const Example1 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[0]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example2 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[1]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example3 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[2]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example4 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[3]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example5 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[4]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example6 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[5]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
+};
+
+export const Example7 = {
+  loaders: [
+    async () => ({
+      imageData: await loadImage(CARD_IMAGES[6]),
+    }),
+  ],
+  render: (args: any, { loaded }: any) => {
+    return <FrameProcessorSample imageData={loaded.imageData} />;
+  },
 };
