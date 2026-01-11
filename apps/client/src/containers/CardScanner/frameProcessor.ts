@@ -133,6 +133,67 @@ const log = (...args: any[]) => {
 const DEBUG_VISUALIZE_EDGES = true;
 
 /**
+ * Order points in clockwise order starting from top-left
+ * @param points - Array of 4 or more points
+ * @returns Array of exactly 4 points in order: [top-left, top-right, bottom-right, bottom-left]
+ */
+function orderPoints(points: number[][]): number[][] {
+  // If we have exactly 4 points, order them
+  // If we have more than 4 points, find the 4 extreme corners
+  
+  if (points.length === 4) {
+    // Sort by sum (x+y) to find top-left and bottom-right
+    const sortedBySum = [...points].sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+    const topLeft = sortedBySum[0];
+    const bottomRight = sortedBySum[3];
+    
+    // Sort by difference (y-x) to find top-right and bottom-left
+    const sortedByDiff = [...points].sort((a, b) => (a[1] - a[0]) - (b[1] - b[0]));
+    const topRight = sortedByDiff[0];
+    const bottomLeft = sortedByDiff[3];
+    
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  } else {
+    // For more than 4 points, find the 4 extreme corners
+    // Top-left: minimum x+y
+    // Top-right: minimum y-x
+    // Bottom-right: maximum x+y
+    // Bottom-left: maximum y-x
+    
+    let topLeft = points[0];
+    let topRight = points[0];
+    let bottomRight = points[0];
+    let bottomLeft = points[0];
+    
+    for (const point of points) {
+      const [x, y] = point;
+      
+      // Top-left: minimize x + y
+      if (x + y < topLeft[0] + topLeft[1]) {
+        topLeft = point;
+      }
+      
+      // Top-right: minimize y - x (or maximize x - y)
+      if (y - x < topRight[1] - topRight[0]) {
+        topRight = point;
+      }
+      
+      // Bottom-right: maximize x + y
+      if (x + y > bottomRight[0] + bottomRight[1]) {
+        bottomRight = point;
+      }
+      
+      // Bottom-left: maximize y - x (or minimize x - y)
+      if (y - x > bottomLeft[1] - bottomLeft[0]) {
+        bottomLeft = point;
+      }
+    }
+    
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  }
+}
+
+/**
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
  * @param extractGridCells - Callback to handle extracted grid cells
@@ -233,32 +294,38 @@ export function processVideoFrame(
     }
 
     if (bestContour) {
-      console.log('Best contour found with area:', maxArea);
+      console.log('Best contour found with area:', maxArea, 'points:', bestContour.rows);
 
       // Scale contour coordinates back to original image size
       const scaleX = src.cols / resized.cols;
       const scaleY = src.rows / resized.rows;
 
+      // Extract all points from the contour
+      const points: number[][] = [];
       for (let i = 0; i < bestContour.rows; i++) {
-        bestContour.data32S[i * 2] = Math.round(
-          bestContour.data32S[i * 2] * scaleX,
-        );
-        bestContour.data32S[i * 2 + 1] = Math.round(
-          bestContour.data32S[i * 2 + 1] * scaleY,
-        );
+        const x = Math.round(bestContour.data32S[i * 2] * scaleX);
+        const y = Math.round(bestContour.data32S[i * 2 + 1] * scaleY);
+        points.push([x, y]);
       }
+
+      // Order the points to get the 4 corners
+      const orderedPoints = orderPoints(points);
+      console.log('Ordered corner points:', orderedPoints);
+
+      // Create a new contour with exactly 4 ordered points for visualization
+      const orderedContour = cv.matFromArray(4, 1, cv.CV_32SC2, orderedPoints.flat());
 
       // Draw the detected quadrilateral
       const color = new cv.Scalar(0, 255, 0, 125);
       const pts = new cv.MatVector();
-      pts.push_back(bestContour);
+      pts.push_back(orderedContour);
       cv.drawContours(src, pts, 0, color, 3);
 
-      // Perform perspective transform
+      // Perform perspective transform using ordered points
       const srcPoints = cv.Mat.zeros(4, 1, cv.CV_32FC2);
       for (let i = 0; i < 4; i++) {
-        srcPoints.data32F[i * 2] = bestContour.data32S[i * 2];
-        srcPoints.data32F[i * 2 + 1] = bestContour.data32S[i * 2 + 1];
+        srcPoints.data32F[i * 2] = orderedPoints[i][0];
+        srcPoints.data32F[i * 2 + 1] = orderedPoints[i][1];
       }
 
       // Define destination points (800x600 rectangle)
@@ -285,6 +352,7 @@ export function processVideoFrame(
       dstPoints.delete();
       srcPoints.delete();
       pts.delete();
+      orderedContour.delete();
       bestContour.delete();
     }
 
