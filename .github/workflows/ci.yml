@@ -135,7 +135,6 @@ jobs:
           git config --global filter.lfs.required false
           git config --global filter.lfs.smudge "cat"
           git config --global filter.lfs.clean "cat"
-          git lfs uninstall --local || true
           git remote add dokku dokku@167.71.190.115:woodtime-api
           git push dokku HEAD:master --force
 
