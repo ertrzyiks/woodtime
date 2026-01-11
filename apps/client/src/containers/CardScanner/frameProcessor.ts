@@ -129,6 +129,75 @@ const log = (...args: any[]) => {
   console.log('[frameProcessor]', ...args);
 };
 
+// Set to true to visualize edges detection
+const DEBUG_VISUALIZE_EDGES = true;
+
+/**
+ * Order points in clockwise order starting from top-left
+ * @param points - Array of 4 or more points
+ * @returns Array of exactly 4 points in order: [top-left, top-right, bottom-right, bottom-left]
+ */
+function orderPoints(points: number[][]): number[][] {
+  // If we have exactly 4 points, order them
+  // If we have more than 4 points, find the 4 extreme corners
+  
+  // Guard against empty array
+  if (!points || points.length === 0) {
+    throw new Error('Cannot order points: empty array');
+  }
+  
+  if (points.length === 4) {
+    // Sort by sum (x+y) to find top-left and bottom-right
+    const sortedBySum = [...points].sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+    const topLeft = sortedBySum[0];
+    const bottomRight = sortedBySum[3];
+    
+    // Sort by difference (y-x) to find top-right and bottom-left
+    const sortedByDiff = [...points].sort((a, b) => (a[1] - a[0]) - (b[1] - b[0]));
+    const topRight = sortedByDiff[0];
+    const bottomLeft = sortedByDiff[3];
+    
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  } else {
+    // For more than 4 points, find the 4 extreme corners
+    // Top-left: minimum x+y
+    // Top-right: minimum y-x
+    // Bottom-right: maximum x+y
+    // Bottom-left: maximum y-x
+    
+    let topLeft = points[0];
+    let topRight = points[0];
+    let bottomRight = points[0];
+    let bottomLeft = points[0];
+    
+    for (const point of points) {
+      const [x, y] = point;
+      
+      // Top-left: minimize x + y
+      if (x + y < topLeft[0] + topLeft[1]) {
+        topLeft = point;
+      }
+      
+      // Top-right: minimize y - x (or maximize x - y)
+      if (y - x < topRight[1] - topRight[0]) {
+        topRight = point;
+      }
+      
+      // Bottom-right: maximize x + y
+      if (x + y > bottomRight[0] + bottomRight[1]) {
+        bottomRight = point;
+      }
+      
+      // Bottom-left: maximize y - x (or minimize x - y)
+      if (y - x > bottomLeft[1] - bottomLeft[0]) {
+        bottomLeft = point;
+      }
+    }
+    
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  }
+}
+
 /**
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
@@ -145,9 +214,14 @@ export function processVideoFrame(
 
     log('src', src);
 
+    // Resize image for faster processing and better edge detection
+    const resized = new cv.Mat();
+    cv.resize(src, resized, new cv.Size(640, 480));
+    log('resized to 640x480');
+
     // Convert to grayscale
     const gray = new cv.Mat();
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.cvtColor(resized, gray, cv.COLOR_RGBA2GRAY);
 
     // Apply Gaussian blur
     const blurred = new cv.Mat();
@@ -155,7 +229,36 @@ export function processVideoFrame(
 
     // Edge detection with Canny
     const edges = new cv.Mat();
-    cv.Canny(blurred, edges, 50, 150);
+    cv.Canny(blurred, edges, 100, 220);
+
+    // Visualize edges for debugging
+    if (DEBUG_VISUALIZE_EDGES) {
+      // Convert edges to RGBA for display (white edges on black background)
+      const edgesViz = new cv.Mat();
+      cv.cvtColor(edges, edgesViz, cv.COLOR_GRAY2RGBA);
+
+      // Get or create debug canvas
+      let debugCanvas = document.getElementById(
+        'debug-canvas',
+      ) as HTMLCanvasElement;
+      if (!debugCanvas) {
+        debugCanvas = document.createElement('canvas');
+        debugCanvas.id = 'debug-canvas';
+        debugCanvas.style.display = 'block';
+        debugCanvas.style.marginTop = '10px';
+        debugCanvas.style.border = '2px solid red';
+        canvas.parentElement?.appendChild(debugCanvas);
+      }
+
+      // Set canvas size to match the image
+      debugCanvas.width = edgesViz.cols;
+      debugCanvas.height = edgesViz.rows;
+
+      // Display edges on debug canvas
+      cv.imshow(debugCanvas, edgesViz);
+      edgesViz.delete();
+      console.log('Displaying Canny edges visualization on debug canvas');
+    }
 
     // Find contours
     const contours = new cv.MatVector();
@@ -176,38 +279,80 @@ export function processVideoFrame(
       const contour = contours.get(i);
       const area = cv.contourArea(contour);
 
-      if (area > maxArea && area > 70000) {
+      if (area > maxArea && area > 700) {
         log('contour', i, contour, area);
 
         // Minimum area threshold
         const peri = cv.arcLength(contour, true);
-        const approx = new cv.Mat();
-        cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+        
+        // Try different epsilon values to get a good approximation
+        // Start with more aggressive simplification and reduce if needed
+        // Epsilon values represent the maximum distance between the original contour and approximation
+        // Higher values = more aggressive simplification = fewer points
+        // Values chosen through experimentation: 0.04 (very aggressive) down to 0.015 (precise)
+        const epsilonValues = [0.04, 0.03, 0.02, 0.015];
+        let bestApprox = null;
+        
+        for (const epsilon of epsilonValues) {
+          const approx = new cv.Mat();
+          cv.approxPolyDP(contour, approx, epsilon * peri, true);
+          
+          // Prefer approximations with exactly 4 points
+          if (approx.rows === 4) {
+            bestApprox = approx;
+            break;
+          } else if (approx.rows >= 4 && !bestApprox) {
+            // Fall back to this if we can't get exactly 4 points
+            bestApprox = approx;
+          } else {
+            approx.delete();
+          }
+        }
 
-        // We want exactly 4 points for a quadrilateral (the card outline)
-        if (approx.rows >= 4) {
+        // We want at least 4 points for a quadrilateral (the card outline)
+        if (bestApprox && bestApprox.rows >= 4) {
           maxArea = area;
           if (bestContour) bestContour.delete();
-          bestContour = approx;
-        } else {
-          approx.delete();
+          bestContour = bestApprox;
+        } else if (bestApprox) {
+          bestApprox.delete();
         }
       }
     }
 
     if (bestContour) {
-      console.log('Best contour found with area:', maxArea);
+      console.log('Best contour found with area:', maxArea, 'points:', bestContour.rows);
+
+      // Scale contour coordinates back to original image size
+      const scaleX = src.cols / resized.cols;
+      const scaleY = src.rows / resized.rows;
+
+      // Extract all points from the contour
+      const points: number[][] = [];
+      for (let i = 0; i < bestContour.rows; i++) {
+        const x = Math.round(bestContour.data32S[i * 2] * scaleX);
+        const y = Math.round(bestContour.data32S[i * 2 + 1] * scaleY);
+        points.push([x, y]);
+      }
+
+      // Order the points to get the 4 corners
+      const orderedPoints = orderPoints(points);
+      console.log('Ordered corner points:', orderedPoints);
+
+      // Create a new contour with exactly 4 ordered points for visualization
+      const orderedContour = cv.matFromArray(4, 1, cv.CV_32SC2, orderedPoints.flat());
+
       // Draw the detected quadrilateral
       const color = new cv.Scalar(0, 255, 0, 125);
       const pts = new cv.MatVector();
-      pts.push_back(bestContour);
+      pts.push_back(orderedContour);
       cv.drawContours(src, pts, 0, color, 3);
 
-      // Perform perspective transform
+      // Perform perspective transform using ordered points
       const srcPoints = cv.Mat.zeros(4, 1, cv.CV_32FC2);
       for (let i = 0; i < 4; i++) {
-        srcPoints.data32F[i * 2] = bestContour.data32S[i * 2];
-        srcPoints.data32F[i * 2 + 1] = bestContour.data32S[i * 2 + 1];
+        srcPoints.data32F[i * 2] = orderedPoints[i][0];
+        srcPoints.data32F[i * 2 + 1] = orderedPoints[i][1];
       }
 
       // Define destination points (800x600 rectangle)
@@ -234,6 +379,7 @@ export function processVideoFrame(
       dstPoints.delete();
       srcPoints.delete();
       pts.delete();
+      orderedContour.delete();
       bestContour.delete();
     }
 
@@ -242,6 +388,7 @@ export function processVideoFrame(
 
     // Cleanup
     src.delete();
+    resized.delete();
     gray.delete();
     blurred.delete();
     edges.delete();
