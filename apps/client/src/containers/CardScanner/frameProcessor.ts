@@ -141,6 +141,11 @@ function orderPoints(points: number[][]): number[][] {
   // If we have exactly 4 points, order them
   // If we have more than 4 points, find the 4 extreme corners
   
+  // Guard against empty array
+  if (!points || points.length === 0) {
+    throw new Error('Cannot order points: empty array');
+  }
+  
   if (points.length === 4) {
     // Sort by sum (x+y) to find top-left and bottom-right
     const sortedBySum = [...points].sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
@@ -282,6 +287,9 @@ export function processVideoFrame(
         
         // Try different epsilon values to get a good approximation
         // Start with more aggressive simplification and reduce if needed
+        // Epsilon values represent the maximum distance between the original contour and approximation
+        // Higher values = more aggressive simplification = fewer points
+        // Values chosen through experimentation: 0.04 (very aggressive) down to 0.015 (precise)
         const epsilonValues = [0.04, 0.03, 0.02, 0.015];
         let bestApprox = null;
         
