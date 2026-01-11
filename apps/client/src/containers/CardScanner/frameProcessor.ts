@@ -279,16 +279,35 @@ export function processVideoFrame(
 
         // Minimum area threshold
         const peri = cv.arcLength(contour, true);
-        const approx = new cv.Mat();
-        cv.approxPolyDP(contour, approx, 0.02 * peri, true);
+        
+        // Try different epsilon values to get a good approximation
+        // Start with more aggressive simplification and reduce if needed
+        const epsilonValues = [0.04, 0.03, 0.02, 0.015];
+        let bestApprox = null;
+        
+        for (const epsilon of epsilonValues) {
+          const approx = new cv.Mat();
+          cv.approxPolyDP(contour, approx, epsilon * peri, true);
+          
+          // Prefer approximations with exactly 4 points
+          if (approx.rows === 4) {
+            bestApprox = approx;
+            break;
+          } else if (approx.rows >= 4 && !bestApprox) {
+            // Fall back to this if we can't get exactly 4 points
+            bestApprox = approx;
+          } else {
+            approx.delete();
+          }
+        }
 
-        // We want exactly 4 points for a quadrilateral (the card outline)
-        if (approx.rows >= 4) {
+        // We want at least 4 points for a quadrilateral (the card outline)
+        if (bestApprox && bestApprox.rows >= 4) {
           maxArea = area;
           if (bestContour) bestContour.delete();
-          bestContour = approx;
-        } else {
-          approx.delete();
+          bestContour = bestApprox;
+        } else if (bestApprox) {
+          bestApprox.delete();
         }
       }
     }
