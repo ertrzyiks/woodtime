@@ -42,7 +42,7 @@
     "rxdb": "16.21.1",
     "rxjs": "7.8.2",
     "typescript": "5.9.3",
-    "vitest": "4.0.16",
+    "vitest": "4.0.17",
     "web-vitals": "5.1.0",
     "workbox-background-sync": "7.4.0",
     "workbox-broadcast-update": "7.4.0",
