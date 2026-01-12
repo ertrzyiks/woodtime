@@ -28,6 +28,6 @@
   },
   "devDependencies": {
     "selfsigned": "5.4.0",
-    "vitest": "4.0.16"
+    "vitest": "4.0.17"
   }
 }
