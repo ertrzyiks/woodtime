@@ -22,7 +22,7 @@
     "graphql-middleware": "6.1.35",
     "graphql-shield": "7.6.5",
     "knex": "3.1.0",
-    "prettier": "3.7.4",
+    "prettier": "3.8.0",
     "sqlite3": "5.1.7",
     "uuid": "13.0.0"
   },
