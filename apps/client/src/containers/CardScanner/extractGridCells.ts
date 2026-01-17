@@ -13,32 +13,12 @@ export interface ExtractionContext {
 }
 
 /**
- * Draw a quadrilateral outline on a source image
- * @param sourceMat - The image to draw on
- * @param pts - Array of 4 points forming the quadrilateral
- * @param color - Scalar color for the lines
- * @param thickness - Line thickness (default 1)
- */
-function drawQuadrilateral(
-  sourceMat: any,
-  pts: any[],
-  color: any,
-  thickness: number = 1,
-): void {
-  cv.line(sourceMat, pts[0], pts[1], color, thickness);
-  cv.line(sourceMat, pts[1], pts[2], color, thickness);
-  cv.line(sourceMat, pts[2], pts[3], color, thickness);
-  cv.line(sourceMat, pts[3], pts[0], color, thickness);
-}
-
-/**
  * Extract and analyze a single cell for holes
  * @param warpedMat - The warped card image
  * @param x, y, w, h - Cell position and dimensions
  * @param row, col - Cell row and column indices
  * @param sourceMat - Original source image for visualization
  * @param inverseTransform - Perspective transform for visualization
- * @param overlayTarget - Canvas to draw visualizations on
  * @returns true if a hole (dot) was detected in the cell
  */
 function extractSingleCell(
@@ -51,12 +31,7 @@ function extractSingleCell(
   col: number,
   sourceMat: any,
   inverseTransform: any,
-  overlayTarget: any,
 ): boolean {
-  const quadColor = new cv.Scalar(128, 0, 128, 255);
-  const excludedColor = new cv.Scalar(255, 128, 0, 255);
-  const dotColor = new cv.Scalar(0, 0, 255, 255);
-
   try {
     // Extract cell region
     const roi = warpedMat.roi(new cv.Rect(x, y, w, h));
@@ -106,138 +81,6 @@ function extractSingleCell(
     // Apply mask to binary image
     const maskedBinary = new cv.Mat();
     cv.bitwise_and(binary, mask, maskedBinary);
-
-    // Visualize EXCLUDED top-left quadrant in orange (top-right in warped space)
-    if (inverseTransform && sourceMat) {
-      const topLeft = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        x + quadWidth,
-        y,
-        x + w,
-        y,
-        x + w,
-        y + quadHeight,
-        x + quadWidth,
-        y + quadHeight,
-      ]);
-      const projected = new cv.Mat();
-      cv.perspectiveTransform(topLeft, projected, inverseTransform);
-      const pts = [
-        new cv.Point(projected.data32F[0], projected.data32F[1]),
-        new cv.Point(projected.data32F[2], projected.data32F[3]),
-        new cv.Point(projected.data32F[4], projected.data32F[5]),
-        new cv.Point(projected.data32F[6], projected.data32F[7]),
-      ];
-      drawQuadrilateral(sourceMat, pts, excludedColor, 1);
-      projected.delete();
-      topLeft.delete();
-    } else if (overlayTarget) {
-      cv.rectangle(
-        overlayTarget,
-        new cv.Point(x + quadWidth, y),
-        new cv.Point(x + w, y + quadHeight),
-        excludedColor,
-        1,
-      );
-    }
-
-    // Visualize top-right quadrant (now included)
-    if (inverseTransform && sourceMat) {
-      const topRight = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        x,
-        y,
-        x + quadWidth,
-        y,
-        x + quadWidth,
-        y + quadHeight,
-        x,
-        y + quadHeight,
-      ]);
-      const projected = new cv.Mat();
-      cv.perspectiveTransform(topRight, projected, inverseTransform);
-      const pts = [
-        new cv.Point(projected.data32F[0], projected.data32F[1]),
-        new cv.Point(projected.data32F[2], projected.data32F[3]),
-        new cv.Point(projected.data32F[4], projected.data32F[5]),
-        new cv.Point(projected.data32F[6], projected.data32F[7]),
-      ];
-      drawQuadrilateral(sourceMat, pts, quadColor, 1);
-      projected.delete();
-      topRight.delete();
-    } else if (overlayTarget) {
-      cv.rectangle(
-        overlayTarget,
-        new cv.Point(x, y),
-        new cv.Point(x + quadWidth, y + quadHeight),
-        quadColor,
-        1,
-      );
-    }
-
-    // Visualize bottom-left quadrant
-    if (inverseTransform && sourceMat) {
-      const bottomLeft = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        x,
-        y + quadHeight,
-        x + quadWidth,
-        y + quadHeight,
-        x + quadWidth,
-        y + h,
-        x,
-        y + h,
-      ]);
-      const projected = new cv.Mat();
-      cv.perspectiveTransform(bottomLeft, projected, inverseTransform);
-      const pts = [
-        new cv.Point(projected.data32F[0], projected.data32F[1]),
-        new cv.Point(projected.data32F[2], projected.data32F[3]),
-        new cv.Point(projected.data32F[4], projected.data32F[5]),
-        new cv.Point(projected.data32F[6], projected.data32F[7]),
-      ];
-      drawQuadrilateral(sourceMat, pts, quadColor, 1);
-      projected.delete();
-      bottomLeft.delete();
-    } else if (overlayTarget) {
-      cv.rectangle(
-        overlayTarget,
-        new cv.Point(x, y + quadHeight),
-        new cv.Point(x + quadWidth, y + h),
-        quadColor,
-        1,
-      );
-    }
-
-    // Visualize bottom-right quadrant
-    if (inverseTransform && sourceMat) {
-      const bottomRight = cv.matFromArray(4, 1, cv.CV_32FC2, [
-        x + quadWidth,
-        y + quadHeight,
-        x + w,
-        y + quadHeight,
-        x + w,
-        y + h,
-        x + quadWidth,
-        y + h,
-      ]);
-      const projected = new cv.Mat();
-      cv.perspectiveTransform(bottomRight, projected, inverseTransform);
-      const pts = [
-        new cv.Point(projected.data32F[0], projected.data32F[1]),
-        new cv.Point(projected.data32F[2], projected.data32F[3]),
-        new cv.Point(projected.data32F[4], projected.data32F[5]),
-        new cv.Point(projected.data32F[6], projected.data32F[7]),
-      ];
-      drawQuadrilateral(sourceMat, pts, quadColor, 1);
-      projected.delete();
-      bottomRight.delete();
-    } else if (overlayTarget) {
-      cv.rectangle(
-        overlayTarget,
-        new cv.Point(x + quadWidth, y + quadHeight),
-        new cv.Point(x + w, y + h),
-        quadColor,
-        1,
-      );
-    }
 
     // DEBUG: Check if maskedBinary has any white pixels
     const whitePixelCount = cv.countNonZero(maskedBinary);
@@ -291,40 +134,6 @@ function extractSingleCell(
       const rectWidth = rect.width;
       const rectHeight = rect.height;
 
-      if (inverseTransform && sourceMat) {
-        const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
-          offsetX,
-          offsetY,
-          offsetX + rectWidth,
-          offsetY,
-          offsetX + rectWidth,
-          offsetY + rectHeight,
-          offsetX,
-          offsetY + rectHeight,
-        ]);
-        const projected = new cv.Mat();
-        cv.perspectiveTransform(corners, projected, inverseTransform);
-
-        const pts = [
-          new cv.Point(projected.data32F[0], projected.data32F[1]),
-          new cv.Point(projected.data32F[2], projected.data32F[3]),
-          new cv.Point(projected.data32F[4], projected.data32F[5]),
-          new cv.Point(projected.data32F[6], projected.data32F[7]),
-        ];
-
-        drawQuadrilateral(sourceMat, pts, dotColor, 2);
-
-        projected.delete();
-        corners.delete();
-      } else if (overlayTarget) {
-        cv.rectangle(
-          overlayTarget,
-          new cv.Point(offsetX, offsetY),
-          new cv.Point(offsetX + rectWidth, offsetY + rectHeight),
-          dotColor,
-          2,
-        );
-      }
       hasDot = true;
       // No break - visualize ALL contours for debugging
     }
@@ -366,8 +175,6 @@ export function extractGridCellsFromMat(
 
   const sourceMat = context?.sourceMat;
   const inverseTransform = context?.inverseTransform;
-  const overlayTarget = sourceMat || warpedMat;
-  const rectColor = new cv.Scalar(255, 0, 0, 255);
 
   const width = warpedMat.cols;
   const height = warpedMat.rows;
@@ -385,44 +192,6 @@ export function extractGridCellsFromMat(
       const w = Math.floor(cellWidth);
       const h = Math.floor(cellHeight);
 
-      // Draw the assumed grid cell on the original canvas for visualization
-      if (overlayTarget) {
-        if (inverseTransform && sourceMat) {
-          const corners = cv.matFromArray(4, 1, cv.CV_32FC2, [
-            x,
-            y,
-            x + w,
-            y,
-            x + w,
-            y + h,
-            x,
-            y + h,
-          ]);
-          const projected = new cv.Mat();
-          cv.perspectiveTransform(corners, projected, inverseTransform);
-
-          const pts = [
-            new cv.Point(projected.data32F[0], projected.data32F[1]),
-            new cv.Point(projected.data32F[2], projected.data32F[3]),
-            new cv.Point(projected.data32F[4], projected.data32F[5]),
-            new cv.Point(projected.data32F[6], projected.data32F[7]),
-          ];
-
-          drawQuadrilateral(sourceMat, pts, rectColor, 2);
-
-          projected.delete();
-          corners.delete();
-        } else {
-          cv.rectangle(
-            overlayTarget,
-            new cv.Point(x, y),
-            new cv.Point(x + w, y + h),
-            rectColor,
-            2,
-          );
-        }
-      }
-
       cells[outputRow][col] = extractSingleCell(
         warpedMat,
         x,
@@ -433,7 +202,6 @@ export function extractGridCellsFromMat(
         col,
         sourceMat,
         inverseTransform,
-        overlayTarget,
       );
     }
   }

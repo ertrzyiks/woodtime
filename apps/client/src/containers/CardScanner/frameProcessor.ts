@@ -130,6 +130,74 @@ const log = (...args: any[]) => {
 };
 
 /**
+ * Order points in clockwise order starting from top-left
+ * @param points - Array of 4 or more points
+ * @returns Array of exactly 4 points in order: [top-left, top-right, bottom-right, bottom-left]
+ */
+function orderPoints(points: number[][]): number[][] {
+  // If we have exactly 4 points, order them
+  // If we have more than 4 points, find the 4 extreme corners
+
+  // Guard against empty array
+  if (!points || points.length === 0) {
+    throw new Error('Cannot order points: empty array');
+  }
+
+  if (points.length === 4) {
+    // Sort by sum (x+y) to find top-left and bottom-right
+    const sortedBySum = [...points].sort((a, b) => a[0] + a[1] - (b[0] + b[1]));
+    const topLeft = sortedBySum[0];
+    const bottomRight = sortedBySum[3];
+
+    // Sort by difference (y-x) to find top-right and bottom-left
+    const sortedByDiff = [...points].sort(
+      (a, b) => a[1] - a[0] - (b[1] - b[0]),
+    );
+    const topRight = sortedByDiff[0];
+    const bottomLeft = sortedByDiff[3];
+
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  } else {
+    // For more than 4 points, find the 4 extreme corners
+    // Top-left: minimum x+y
+    // Top-right: minimum y-x
+    // Bottom-right: maximum x+y
+    // Bottom-left: maximum y-x
+
+    let topLeft = points[0];
+    let topRight = points[0];
+    let bottomRight = points[0];
+    let bottomLeft = points[0];
+
+    for (const point of points) {
+      const [x, y] = point;
+
+      // Top-left: minimize x + y
+      if (x + y < topLeft[0] + topLeft[1]) {
+        topLeft = point;
+      }
+
+      // Top-right: minimize y - x (or maximize x - y)
+      if (y - x < topRight[1] - topRight[0]) {
+        topRight = point;
+      }
+
+      // Bottom-right: maximize x + y
+      if (x + y > bottomRight[0] + bottomRight[1]) {
+        bottomRight = point;
+      }
+
+      // Bottom-left: maximize y - x (or minimize x - y)
+      if (y - x > bottomLeft[1] - bottomLeft[0]) {
+        bottomLeft = point;
+      }
+    }
+
+    return [topLeft, topRight, bottomRight, bottomLeft];
+  }
+}
+
+/**
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
  * @param extractGridCells - Callback to handle extracted grid cells
@@ -145,69 +213,182 @@ export function processVideoFrame(
 
     log('src', src);
 
+    // Resize image for faster processing and better edge detection
+    const resized = new cv.Mat();
+    cv.resize(src, resized, new cv.Size(800, 600));
+    log('resized to 800x600');
+    const scaleX = src.cols / resized.cols;
+    const scaleY = src.rows / resized.rows;
+
     // Convert to grayscale
     const gray = new cv.Mat();
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.cvtColor(resized, gray, cv.COLOR_RGBA2GRAY);
 
     // Apply Gaussian blur
     const blurred = new cv.Mat();
-    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+    cv.GaussianBlur(gray, blurred, new cv.Size(3, 3), 0);
 
     // Edge detection with Canny
     const edges = new cv.Mat();
-    cv.Canny(blurred, edges, 50, 150);
+    cv.Canny(blurred, edges, 50, 180, 3);
+
+    // Merge nearby parallel edges using morphological closing
+    // This connects the top and bottom edges of wide grid lines into single contours
+    const kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(5, 5));
+    const closedEdges = new cv.Mat();
+    cv.morphologyEx(edges, closedEdges, cv.MORPH_CLOSE, kernel);
+    kernel.delete();
+    edges.delete();
+
+    // Visualize the contour input (edges) on a separate canvas beneath the main one
+    const contourCanvasId = 'contour-debug-canvas';
+    const contourCanvas =
+      (document.getElementById(contourCanvasId) as HTMLCanvasElement) ||
+      (() => {
+        const c = document.createElement('canvas');
+        c.id = contourCanvasId;
+        c.style.display = 'block';
+        c.style.marginTop = '10px';
+        canvas.parentElement?.appendChild(c);
+        return c;
+      })();
+    contourCanvas.width = closedEdges.cols;
+    contourCanvas.height = closedEdges.rows;
+    const edgesViz = new cv.Mat();
+    cv.cvtColor(closedEdges, edgesViz, cv.COLOR_GRAY2RGBA);
+    cv.imshow(contourCanvas, edgesViz);
+    edgesViz.delete();
 
     // Find contours
     const contours = new cv.MatVector();
     const hierarchy = new cv.Mat();
     cv.findContours(
-      edges,
+      closedEdges,
       contours,
       hierarchy,
-      cv.RETR_EXTERNAL,
+      cv.RETR_TREE,
       cv.CHAIN_APPROX_SIMPLE,
     );
 
     // Find the largest quadrilateral
     let maxArea = 0;
     let bestContour = null;
+    const scaledContours = new cv.MatVector();
+    const contoursToDelete: cv.Mat[] = [];
 
     for (let i = 0; i < contours.size(); i++) {
       const contour = contours.get(i);
       const area = cv.contourArea(contour);
 
-      if (area > maxArea && area > 70000) {
+      // Reject contours that are too elongated; expect roughly rectangular cards (4:3 tolerance window)
+      const rect = cv.boundingRect(contour);
+      if (rect.height === 0) {
+        continue;
+      }
+      const aspectRatio = rect.width / rect.height;
+      if (aspectRatio < 0.5 || aspectRatio > 3.0) {
+        continue;
+      }
+
+      if (area > maxArea && area > 700) {
         log('contour', i, contour, area);
 
         // Minimum area threshold
         const peri = cv.arcLength(contour, true);
-        const approx = new cv.Mat();
-        cv.approxPolyDP(contour, approx, 0.02 * peri, true);
 
-        // We want exactly 4 points for a quadrilateral (the card outline)
-        if (approx.rows >= 4) {
+        // Try different epsilon values to get a good approximation
+        // Start with more aggressive simplification and reduce if needed
+        // Epsilon values represent the maximum distance between the original contour and approximation
+        // Higher values = more aggressive simplification = fewer points
+        // Values chosen through experimentation: 0.04 (very aggressive) down to 0.015 (precise)
+        const epsilonValues = [0.04, 0.03, 0.02, 0.015];
+        let bestApprox = null;
+
+        for (const epsilon of epsilonValues) {
+          const approx = new cv.Mat();
+          cv.approxPolyDP(contour, approx, epsilon * peri, true);
+
+          // Prefer approximations with exactly 4 points
+          if (approx.rows === 4) {
+            bestApprox = approx;
+            break;
+          } else if (approx.rows >= 4 && !bestApprox) {
+            // Fall back to this if we can't get exactly 4 points
+            bestApprox = approx;
+          } else {
+            approx.delete();
+          }
+        }
+
+        // We want at least 4 points for a quadrilateral (the card outline)
+        if (bestApprox && bestApprox.rows >= 4) {
           maxArea = area;
           if (bestContour) bestContour.delete();
-          bestContour = approx;
-        } else {
-          approx.delete();
+          bestContour = bestApprox;
+        } else if (bestApprox) {
+          bestApprox.delete();
         }
       }
+
+      // Scale current contour to original image size for visualization
+      const scaled = new cv.Mat(contour.rows, 1, cv.CV_32SC2);
+      for (let j = 0; j < contour.rows; j++) {
+        scaled.data32S[j * 2] = Math.round(contour.data32S[j * 2] * scaleX);
+        scaled.data32S[j * 2 + 1] = Math.round(
+          contour.data32S[j * 2 + 1] * scaleY,
+        );
+      }
+      scaledContours.push_back(scaled);
+      contoursToDelete.push(scaled);
+    }
+
+    // Draw all detected contours in green on the original-sized source
+    if (scaledContours.size() > 0) {
+      cv.drawContours(
+        src,
+        scaledContours,
+        -1,
+        new cv.Scalar(0, 255, 0, 255),
+        2,
+      );
     }
 
     if (bestContour) {
-      console.log('Best contour found with area:', maxArea);
-      // Draw the detected quadrilateral
-      const color = new cv.Scalar(0, 255, 0, 125);
-      const pts = new cv.MatVector();
-      pts.push_back(bestContour);
-      cv.drawContours(src, pts, 0, color, 3);
+      console.log(
+        'Best contour found with area:',
+        maxArea,
+        'points:',
+        bestContour.rows,
+      );
 
-      // Perform perspective transform
+      // Extract all points from the contour
+      const points: number[][] = [];
+      for (let i = 0; i < bestContour.rows; i++) {
+        const x = Math.round(bestContour.data32S[i * 2] * scaleX);
+        const y = Math.round(bestContour.data32S[i * 2 + 1] * scaleY);
+        points.push([x, y]);
+      }
+
+      // Order the points to get the 4 corners
+      const orderedPoints = orderPoints(points);
+      console.log('Ordered corner points:', orderedPoints);
+
+      // Draw the best contour as a clean rectangle using ordered points in red
+      const redColor = new cv.Scalar(0, 0, 255, 255);
+      for (let i = 0; i < 4; i++) {
+        const p1 = new cv.Point(orderedPoints[i][0], orderedPoints[i][1]);
+        const p2 = new cv.Point(
+          orderedPoints[(i + 1) % 4][0],
+          orderedPoints[(i + 1) % 4][1],
+        );
+        cv.line(src, p1, p2, redColor, 3);
+      }
+
+      // Perform perspective transform using ordered points
       const srcPoints = cv.Mat.zeros(4, 1, cv.CV_32FC2);
       for (let i = 0; i < 4; i++) {
-        srcPoints.data32F[i * 2] = bestContour.data32S[i * 2];
-        srcPoints.data32F[i * 2 + 1] = bestContour.data32S[i * 2 + 1];
+        srcPoints.data32F[i * 2] = orderedPoints[i][0];
+        srcPoints.data32F[i * 2 + 1] = orderedPoints[i][1];
       }
 
       // Define destination points (800x600 rectangle)
@@ -233,7 +414,6 @@ export function processVideoFrame(
       warped.delete();
       dstPoints.delete();
       srcPoints.delete();
-      pts.delete();
       bestContour.delete();
     }
 
@@ -242,11 +422,14 @@ export function processVideoFrame(
 
     // Cleanup
     src.delete();
+    resized.delete();
     gray.delete();
     blurred.delete();
-    edges.delete();
+    closedEdges.delete();
     contours.delete();
     hierarchy.delete();
+    contoursToDelete.forEach((mat) => mat.delete());
+    scaledContours.delete();
 
     return canvas;
   } catch (err) {
