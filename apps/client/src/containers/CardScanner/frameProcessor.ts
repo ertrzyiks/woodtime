@@ -4,6 +4,11 @@ import {
   GridData,
   ExtractionContext,
 } from './extractGridCells';
+import {
+  generateGridTemplate,
+  detectGridMultiScale,
+  extractCellPositions,
+} from './gridTemplateMatching';
 
 export type { GridData, ExtractionContext };
 
@@ -129,6 +134,22 @@ const log = (...args: any[]) => {
   console.log('[frameProcessor]', ...args);
 };
 
+type PipelineStep = (input: any, ctx: PipelineContext) => any;
+
+interface PipelineContext {
+  canvas: HTMLCanvasElement;
+  contourCanvas: HTMLCanvasElement;
+  templateCanvas?: HTMLCanvasElement;
+  src: any;
+  resizedColor?: any;
+  originalScaleX?: number;
+  originalScaleY?: number;
+}
+
+function runPipeline(input: any, steps: PipelineStep[], ctx: PipelineContext) {
+  return steps.reduce((current, step) => step(current, ctx), input);
+}
+
 /**
  * Order points in clockwise order starting from top-left
  * @param points - Array of 4 or more points
@@ -213,34 +234,6 @@ export function processVideoFrame(
 
     log('src', src);
 
-    // Resize image for faster processing and better edge detection
-    const resized = new cv.Mat();
-    cv.resize(src, resized, new cv.Size(800, 600));
-    log('resized to 800x600');
-    const scaleX = src.cols / resized.cols;
-    const scaleY = src.rows / resized.rows;
-
-    // Convert to grayscale
-    const gray = new cv.Mat();
-    cv.cvtColor(resized, gray, cv.COLOR_RGBA2GRAY);
-
-    // Apply Gaussian blur
-    const blurred = new cv.Mat();
-    cv.GaussianBlur(gray, blurred, new cv.Size(3, 3), 0);
-
-    // Edge detection with Canny
-    const edges = new cv.Mat();
-    cv.Canny(blurred, edges, 50, 180, 3);
-
-    // Merge nearby parallel edges using morphological closing
-    // This connects the top and bottom edges of wide grid lines into single contours
-    const kernel = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(5, 5));
-    const closedEdges = new cv.Mat();
-    cv.morphologyEx(edges, closedEdges, cv.MORPH_CLOSE, kernel);
-    kernel.delete();
-    edges.delete();
-
-    // Visualize the contour input (edges) on a separate canvas beneath the main one
     const contourCanvasId = 'contour-debug-canvas';
     const contourCanvas =
       (document.getElementById(contourCanvasId) as HTMLCanvasElement) ||
@@ -252,143 +245,168 @@ export function processVideoFrame(
         canvas.parentElement?.appendChild(c);
         return c;
       })();
-    contourCanvas.width = closedEdges.cols;
-    contourCanvas.height = closedEdges.rows;
-    const edgesViz = new cv.Mat();
-    cv.cvtColor(closedEdges, edgesViz, cv.COLOR_GRAY2RGBA);
-    cv.imshow(contourCanvas, edgesViz);
-    edgesViz.delete();
 
-    // Find contours
-    const contours = new cv.MatVector();
-    const hierarchy = new cv.Mat();
-    cv.findContours(
-      closedEdges,
-      contours,
-      hierarchy,
-      cv.RETR_TREE,
-      cv.CHAIN_APPROX_SIMPLE,
+    const ctx: PipelineContext = {
+      canvas,
+      contourCanvas,
+      src,
+    };
+
+    // Build a processing pipeline so each transformation is explicit and ordered
+    const thickLinesSmall = runPipeline(
+      src,
+      [
+        // Resize image for faster processing and better edge detection
+        (input) => {
+          const resized = new cv.Mat();
+          cv.resize(input, resized, new cv.Size(800, 600));
+          log('resized to 800x600');
+          return resized;
+        },
+        // Convert to grayscale
+        (input) => {
+          const gray = new cv.Mat();
+          cv.cvtColor(input, gray, cv.COLOR_RGBA2GRAY);
+          return gray;
+        },
+        // Apply Gaussian blur to smooth noise
+        (input) => {
+          const blurred = new cv.Mat();
+          cv.GaussianBlur(input, blurred, new cv.Size(3, 3), 0);
+          input.delete();
+          return blurred;
+        },
+        // Edge detection with Canny
+        (input) => {
+          const edges = new cv.Mat();
+          cv.Canny(input, edges, 50, 180, 3);
+          input.delete();
+          return edges;
+        },
+        // Merge nearby parallel edges using morphological closing
+        (input) => {
+          const kernel = cv.getStructuringElement(
+            cv.MORPH_RECT,
+            new cv.Size(5, 5),
+          );
+          const closedEdges = new cv.Mat();
+          cv.morphologyEx(input, closedEdges, cv.MORPH_CLOSE, kernel);
+          kernel.delete();
+          input.delete();
+          return closedEdges;
+        },
+        // Downscale further for processing
+        (input, ctx) => {
+          const PROCESS_SCALE = 0.5;
+          const smallWidth = Math.round(input.cols * PROCESS_SCALE);
+          const smallHeight = Math.round(input.rows * PROCESS_SCALE);
+          const resizedSmall = new cv.Mat();
+          cv.resize(input, resizedSmall, new cv.Size(smallWidth, smallHeight));
+          ctx.originalScaleX = ctx.src.cols / resizedSmall.cols;
+          ctx.originalScaleY = ctx.src.rows / resizedSmall.rows;
+          return resizedSmall;
+        },
+        // Suppress thin lines with opening
+        (input) => {
+          const thickKernel = cv.getStructuringElement(
+            cv.MORPH_RECT,
+            new cv.Size(5, 5),
+          );
+          const thickLines = new cv.Mat();
+          cv.morphologyEx(input, thickLines, cv.MORPH_OPEN, thickKernel);
+          thickKernel.delete();
+
+          return thickLines;
+        },
+        // Visualize thick lines on contour canvas
+        (thickLines) => {
+          const thickViz = new cv.Mat();
+          cv.cvtColor(thickLines, thickViz, cv.COLOR_GRAY2RGBA);
+          // thickViz.delete();
+          return thickLines;
+        },
+        (input) => {
+          ctx.contourCanvas.width = input.cols;
+          ctx.contourCanvas.height = input.rows;
+          cv.imshow(ctx.contourCanvas, input);
+          return input;
+        },
+      ],
+      ctx,
     );
 
-    // Find the largest quadrilateral
-    let maxArea = 0;
-    let bestContour = null;
-    const scaledContours = new cv.MatVector();
-    const contoursToDelete: cv.Mat[] = [];
+    // Use template matching to detect grid instead of contours
+    // Generate a template grid (3 rows x 10 columns, with cell size 80px)
+    const GRID_ROWS = 3;
+    const GRID_COLS = 10;
+    const CELL_SIZE = 80;
 
-    for (let i = 0; i < contours.size(); i++) {
-      const contour = contours.get(i);
-      const area = cv.contourArea(contour);
+    const gridTemplate = generateGridTemplate(GRID_ROWS, GRID_COLS, CELL_SIZE);
 
-      // Reject contours that are too elongated; expect roughly rectangular cards (4:3 tolerance window)
-      const rect = cv.boundingRect(contour);
-      if (rect.height === 0) {
-        continue;
-      }
-      const aspectRatio = rect.width / rect.height;
-      if (aspectRatio < 0.5 || aspectRatio > 3.0) {
-        continue;
-      }
+    // Visualize the template on a debug canvas
+    const templateCanvasId = 'template-debug-canvas';
+    const templateCanvas =
+      (document.getElementById(templateCanvasId) as HTMLCanvasElement) ||
+      (() => {
+        const c = document.createElement('canvas');
+        c.id = templateCanvasId;
+        c.style.display = 'block';
+        c.style.marginTop = '10px';
+        canvas.parentElement?.appendChild(c);
+        return c;
+      })();
+    templateCanvas.width = gridTemplate.cols;
+    templateCanvas.height = gridTemplate.rows;
+    const templateViz = new cv.Mat();
+    cv.cvtColor(gridTemplate, templateViz, cv.COLOR_GRAY2RGBA);
+    cv.imshow(templateCanvas, templateViz);
+    templateViz.delete();
 
-      if (area > maxArea && area > 700) {
-        log('contour', i, contour, area);
+    // Try to find the grid in the warped card using multi-scale template matching
+    const gridMatch = detectGridMultiScale(
+      thickLinesSmall,
+      gridTemplate,
+      [0.8, 0.9, 1.0, 1.1, 1.2],
+    );
 
-        // Minimum area threshold
-        const peri = cv.arcLength(contour, true);
+    gridTemplate.delete();
+    thickLinesSmall.delete();
 
-        // Try different epsilon values to get a good approximation
-        // Start with more aggressive simplification and reduce if needed
-        // Epsilon values represent the maximum distance between the original contour and approximation
-        // Higher values = more aggressive simplification = fewer points
-        // Values chosen through experimentation: 0.04 (very aggressive) down to 0.015 (precise)
-        const epsilonValues = [0.04, 0.03, 0.02, 0.015];
-        let bestApprox = null;
+    console.log('gridMatch', gridMatch);
+    let canvasImage: any = src; // default display image
 
-        for (const epsilon of epsilonValues) {
-          const approx = new cv.Mat();
-          cv.approxPolyDP(contour, approx, epsilon * peri, true);
+    if (gridMatch && gridMatch.confidence > 0.5) {
+      log('Grid detected with confidence:', gridMatch.confidence);
+      log('Grid position:', gridMatch.x, gridMatch.y);
+      log('Grid size:', gridMatch.width, 'x', gridMatch.height);
 
-          // Prefer approximations with exactly 4 points
-          if (approx.rows === 4) {
-            bestApprox = approx;
-            break;
-          } else if (approx.rows >= 4 && !bestApprox) {
-            // Fall back to this if we can't get exactly 4 points
-            bestApprox = approx;
-          } else {
-            approx.delete();
-          }
-        }
-
-        // We want at least 4 points for a quadrilateral (the card outline)
-        if (bestApprox && bestApprox.rows >= 4) {
-          maxArea = area;
-          if (bestContour) bestContour.delete();
-          bestContour = bestApprox;
-        } else if (bestApprox) {
-          bestApprox.delete();
-        }
-      }
-
-      // Scale current contour to original image size for visualization
-      const scaled = new cv.Mat(contour.rows, 1, cv.CV_32SC2);
-      for (let j = 0; j < contour.rows; j++) {
-        scaled.data32S[j * 2] = Math.round(contour.data32S[j * 2] * scaleX);
-        scaled.data32S[j * 2 + 1] = Math.round(
-          contour.data32S[j * 2 + 1] * scaleY,
-        );
-      }
-      scaledContours.push_back(scaled);
-      contoursToDelete.push(scaled);
-    }
-
-    // Draw all detected contours in green on the original-sized source
-    if (scaledContours.size() > 0) {
-      cv.drawContours(
-        src,
-        scaledContours,
-        -1,
-        new cv.Scalar(0, 255, 0, 255),
-        2,
-      );
-    }
-
-    if (bestContour) {
-      console.log(
-        'Best contour found with area:',
-        maxArea,
-        'points:',
-        bestContour.rows,
-      );
-
-      // Extract all points from the contour
-      const points: number[][] = [];
-      for (let i = 0; i < bestContour.rows; i++) {
-        const x = Math.round(bestContour.data32S[i * 2] * scaleX);
-        const y = Math.round(bestContour.data32S[i * 2 + 1] * scaleY);
-        points.push([x, y]);
-      }
-
-      // Order the points to get the 4 corners
-      const orderedPoints = orderPoints(points);
-      console.log('Ordered corner points:', orderedPoints);
-
-      // Draw the best contour as a clean rectangle using ordered points in red
+      // Scale grid position and size back to original image size
+      const scaledGridX = Math.round(gridMatch.x * ctx.originalScaleX!);
+      const scaledGridY = Math.round(gridMatch.y * ctx.originalScaleY!);
+      const gridWidth = Math.round(gridMatch.width * ctx.originalScaleX!);
+      const gridHeight = Math.round(gridMatch.height * ctx.originalScaleY!);
       const redColor = new cv.Scalar(0, 0, 255, 255);
-      for (let i = 0; i < 4; i++) {
-        const p1 = new cv.Point(orderedPoints[i][0], orderedPoints[i][1]);
-        const p2 = new cv.Point(
-          orderedPoints[(i + 1) % 4][0],
-          orderedPoints[(i + 1) % 4][1],
-        );
-        cv.line(src, p1, p2, redColor, 3);
-      }
+      cv.rectangle(
+        src,
+        new cv.Point(scaledGridX, scaledGridY),
+        new cv.Point(scaledGridX + gridWidth, scaledGridY + gridHeight),
+        redColor,
+        3,
+      );
 
-      // Perform perspective transform using ordered points
+      // Create a perspective transform to straighten the card
+      // For now, assume the card is already relatively straight from the resizing
       const srcPoints = cv.Mat.zeros(4, 1, cv.CV_32FC2);
+      const corners = [
+        [scaledGridX, scaledGridY],
+        [scaledGridX + gridWidth, scaledGridY],
+        [scaledGridX + gridWidth, scaledGridY + gridHeight],
+        [scaledGridX, scaledGridY + gridHeight],
+      ];
+
       for (let i = 0; i < 4; i++) {
-        srcPoints.data32F[i * 2] = orderedPoints[i][0];
-        srcPoints.data32F[i * 2 + 1] = orderedPoints[i][1];
+        srcPoints.data32F[i * 2] = corners[i][0];
+        srcPoints.data32F[i * 2 + 1] = corners[i][1];
       }
 
       // Define destination points (800x600 rectangle)
@@ -405,7 +423,7 @@ export function processVideoFrame(
       const warped = new cv.Mat();
       cv.warpPerspective(src, warped, M, new cv.Size(800, 600));
 
-      // Extract grid cells (assuming 5 rows x 7 cols)
+      // Extract grid cells using the detected grid structure
       extractGridCells(warped, { sourceMat: src, inverseTransform: inverseM });
 
       // Cleanup
@@ -414,22 +432,21 @@ export function processVideoFrame(
       warped.delete();
       dstPoints.delete();
       srcPoints.delete();
-      bestContour.delete();
+    } else {
+      log('Grid not detected with sufficient confidence');
     }
 
-    // Display result
-    cv.imshow(canvas, src);
+    // Display result (masked to grid region if available)
+    cv.imshow(canvas, canvasImage);
 
     // Cleanup
+    if (canvasImage !== src) {
+      canvasImage.delete();
+    }
+    if (ctx.resizedColor) {
+      ctx.resizedColor.delete();
+    }
     src.delete();
-    resized.delete();
-    gray.delete();
-    blurred.delete();
-    closedEdges.delete();
-    contours.delete();
-    hierarchy.delete();
-    contoursToDelete.forEach((mat) => mat.delete());
-    scaledContours.delete();
 
     return canvas;
   } catch (err) {
