@@ -10,6 +10,7 @@ import {
   extractCellPositions,
 } from './gridTemplateMatching';
 import { resize, grayscale, scale, blur, closeLines, canny } from './steps';
+import { PipelineDebugger } from './pipelineDebugger';
 
 export type { GridData, ExtractionContext };
 export type { PipelineContext };
@@ -140,7 +141,9 @@ type PipelineStep = (input: any, ctx: PipelineContext) => any;
 
 interface PipelineContext {
   canvas: HTMLCanvasElement;
-  contourCanvas: HTMLCanvasElement;
+  contourCanvas?: HTMLCanvasElement;
+  debugContainer?: HTMLDivElement;
+  debugger?: PipelineDebugger;
   templateCanvas?: HTMLCanvasElement;
   src: any;
   resizedColor?: any;
@@ -149,7 +152,26 @@ interface PipelineContext {
 }
 
 function runPipeline(input: any, steps: PipelineStep[], ctx: PipelineContext) {
-  return steps.reduce((current, step) => step(current, ctx), input);
+  return steps.reduce((current, step, index) => {
+    const result = step(current, ctx);
+    // Automatically collect debug frames if debugger is available
+    if (ctx.debugger && index < steps.length - 1) {
+      // Don't collect the final display step
+      const stepNames = [
+        'resize(800, 600)',
+        'grayscale()',
+        'blur(3)',
+        'canny(50, 180, 3)',
+        'closeLines(5)',
+        'scale(0.5)',
+      ];
+      // Clone the mat for debugging to avoid deletion issues
+      const debugMat = new cv.Mat();
+      result.copyTo(debugMat);
+      ctx.debugger.addFrame(stepNames[index] || `Step ${index + 1}`, debugMat);
+    }
+    return result;
+  }, input);
 }
 
 /**
@@ -224,11 +246,13 @@ function orderPoints(points: number[][]): number[][] {
  * Process a video frame to detect and extract grid cells from a card
  * @param canvas - Canvas element containing the video frame
  * @param extractGridCells - Callback to handle extracted grid cells
+ * @param debugContainer - Optional div element for pipeline debugging visualization
  * @returns The modified canvas or null if processing failed
  */
 export function processVideoFrame(
   canvas: HTMLCanvasElement,
   extractGridCells: (warpedMat: any, context?: ExtractionContext) => void,
+  debugContainer?: HTMLDivElement,
 ): HTMLCanvasElement | null {
   try {
     // Get image data from canvas
@@ -236,21 +260,17 @@ export function processVideoFrame(
 
     log('src', src);
 
-    const contourCanvasId = 'contour-debug-canvas';
-    const contourCanvas =
-      (document.getElementById(contourCanvasId) as HTMLCanvasElement) ||
-      (() => {
-        const c = document.createElement('canvas');
-        c.id = contourCanvasId;
-        c.style.display = 'block';
-        c.style.marginTop = '10px';
-        canvas.parentElement?.appendChild(c);
-        return c;
-      })();
+    // Setup debugging if a debug container is provided
+    let pipelineDebugger: PipelineDebugger | undefined;
+    if (debugContainer) {
+      debugContainer.innerHTML = ''; // Clear previous debug content
+      pipelineDebugger = new PipelineDebugger(debugContainer);
+    }
 
     const ctx: PipelineContext = {
       canvas,
-      contourCanvas,
+      debugContainer,
+      debugger: pipelineDebugger,
       src,
     };
 
@@ -275,12 +295,6 @@ export function processVideoFrame(
         //   thickKernel.delete();
         //   return thickLines;
         // },
-        (input) => {
-          ctx.contourCanvas.width = input.cols;
-          ctx.contourCanvas.height = input.rows;
-          cv.imshow(ctx.contourCanvas, input);
-          return input;
-        },
       ],
       ctx,
     );
@@ -388,6 +402,11 @@ export function processVideoFrame(
 
     // Display result (masked to grid region if available)
     cv.imshow(canvas, canvasImage);
+
+    // Render debug visualization if debugger is available
+    if (ctx.debugger) {
+      ctx.debugger.render();
+    }
 
     // Cleanup
     if (canvasImage !== src) {

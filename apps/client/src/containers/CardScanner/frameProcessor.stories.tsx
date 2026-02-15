@@ -58,7 +58,11 @@ const FrameProcessorSample = ({ imageData }: FrameProcessorSampleProps) => {
             setGridData(data);
           };
 
-          const result = processVideoFrame(canvas, extractedGridData);
+          const result = processVideoFrame(
+            canvas,
+            extractedGridData,
+            document.getElementById('debug-container') as HTMLDivElement,
+          );
           if (!result) {
             setError('Failed to process frame');
           }
@@ -119,7 +123,11 @@ const FrameProcessorSample = ({ imageData }: FrameProcessorSampleProps) => {
               setGridData(data);
             };
 
-            const result = processVideoFrame(canvas, extractedGridData);
+            const result = processVideoFrame(
+              canvas,
+              extractedGridData,
+              document.getElementById('debug-container') as HTMLDivElement,
+            );
             if (!result) {
               setError('Failed to process frame');
             }
@@ -188,6 +196,8 @@ const FrameProcessorSample = ({ imageData }: FrameProcessorSampleProps) => {
           Processing image...
         </div>
       )}
+
+      <div id="debug-container"></div>
 
       {error && (
         <div
