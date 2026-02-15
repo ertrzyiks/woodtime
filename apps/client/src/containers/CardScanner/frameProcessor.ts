@@ -9,8 +9,10 @@ import {
   detectGridMultiScale,
   extractCellPositions,
 } from './gridTemplateMatching';
+import { resize, grayscale, scale, blur, closeLines, canny } from './steps';
 
 export type { GridData, ExtractionContext };
+export type { PipelineContext };
 
 interface GridStructure {
   rows: number;
@@ -256,75 +258,23 @@ export function processVideoFrame(
     const thickLinesSmall = runPipeline(
       src,
       [
-        // Resize image for faster processing and better edge detection
-        (input) => {
-          const resized = new cv.Mat();
-          cv.resize(input, resized, new cv.Size(800, 600));
-          log('resized to 800x600');
-          return resized;
-        },
-        // Convert to grayscale
-        (input) => {
-          const gray = new cv.Mat();
-          cv.cvtColor(input, gray, cv.COLOR_RGBA2GRAY);
-          return gray;
-        },
-        // Apply Gaussian blur to smooth noise
-        (input) => {
-          const blurred = new cv.Mat();
-          cv.GaussianBlur(input, blurred, new cv.Size(3, 3), 0);
-          input.delete();
-          return blurred;
-        },
-        // Edge detection with Canny
-        (input) => {
-          const edges = new cv.Mat();
-          cv.Canny(input, edges, 50, 180, 3);
-          input.delete();
-          return edges;
-        },
-        // Merge nearby parallel edges using morphological closing
-        (input) => {
-          const kernel = cv.getStructuringElement(
-            cv.MORPH_RECT,
-            new cv.Size(5, 5),
-          );
-          const closedEdges = new cv.Mat();
-          cv.morphologyEx(input, closedEdges, cv.MORPH_CLOSE, kernel);
-          kernel.delete();
-          input.delete();
-          return closedEdges;
-        },
-        // Downscale further for processing
-        (input, ctx) => {
-          const PROCESS_SCALE = 0.5;
-          const smallWidth = Math.round(input.cols * PROCESS_SCALE);
-          const smallHeight = Math.round(input.rows * PROCESS_SCALE);
-          const resizedSmall = new cv.Mat();
-          cv.resize(input, resizedSmall, new cv.Size(smallWidth, smallHeight));
-          ctx.originalScaleX = ctx.src.cols / resizedSmall.cols;
-          ctx.originalScaleY = ctx.src.rows / resizedSmall.rows;
-          return resizedSmall;
-        },
-        // Suppress thin lines with opening
-        (input) => {
-          const thickKernel = cv.getStructuringElement(
-            cv.MORPH_RECT,
-            new cv.Size(5, 5),
-          );
-          const thickLines = new cv.Mat();
-          cv.morphologyEx(input, thickLines, cv.MORPH_OPEN, thickKernel);
-          thickKernel.delete();
-
-          return thickLines;
-        },
-        // Visualize thick lines on contour canvas
-        (thickLines) => {
-          const thickViz = new cv.Mat();
-          cv.cvtColor(thickLines, thickViz, cv.COLOR_GRAY2RGBA);
-          // thickViz.delete();
-          return thickLines;
-        },
+        resize(800, 600),
+        grayscale(),
+        blur(3),
+        canny(50, 180, 3),
+        closeLines(5),
+        scale(0.5),
+        // // Suppress thin lines with opening
+        // (input) => {
+        //   const thickKernel = cv.getStructuringElement(
+        //     cv.MORPH_RECT,
+        //     new cv.Size(2, 2),
+        //   );
+        //   const thickLines = new cv.Mat();
+        //   cv.morphologyEx(input, thickLines, cv.MORPH_OPEN, thickKernel);
+        //   thickKernel.delete();
+        //   return thickLines;
+        // },
         (input) => {
           ctx.contourCanvas.width = input.cols;
           ctx.contourCanvas.height = input.rows;
