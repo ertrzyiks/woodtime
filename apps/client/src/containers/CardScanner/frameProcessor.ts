@@ -20,6 +20,7 @@ import {
   detectContours,
 } from './steps';
 import { PipelineDebugger } from './pipelineDebugger';
+import { filterLinesByWidth } from './steps/filterLinesByWidth';
 
 export type { GridData, ExtractionContext };
 export type { PipelineContext };
@@ -322,7 +323,7 @@ export function processVideoFrame(
         blur(7),
         canny(50, 180, 3),
         closeLines(5),
-        scale(0.5),
+        scale(0.3),
         detectCorners(),
         detectContours(),
       ],
