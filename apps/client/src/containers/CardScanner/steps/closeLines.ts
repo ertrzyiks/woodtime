@@ -3,8 +3,8 @@ import { PipelineContext } from '../frameProcessor';
 /**
  * Close lines using morphological closing operation
  */
-export const closeLines =
-  (kernelSize: number) => (input: any, ctx?: PipelineContext) => {
+export const closeLines = (kernelSize: number) => {
+  const step = (input: any, ctx?: PipelineContext) => {
     const kernel = cv.getStructuringElement(
       cv.MORPH_RECT,
       new cv.Size(kernelSize, kernelSize),
@@ -15,3 +15,6 @@ export const closeLines =
     input.delete();
     return closedEdges;
   };
+  step.__stepName = `closeLines(${kernelSize})`;
+  return step;
+};
