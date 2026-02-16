@@ -264,6 +264,20 @@ export const detectCorners = () => {
           straightenedCard.rows,
         );
 
+        // Record perspective transform in context
+        if (ctx && ctx.transformations) {
+          ctx.transformations.push({
+            stepName: 'detectCorners',
+            inputWidth: input.cols,
+            inputHeight: input.rows,
+            outputWidth: dstWidth,
+            outputHeight: dstHeight,
+            type: 'perspective',
+            matrix: inverseM, // Store inverse matrix for reverse transformation
+            metadata: { corners: scaledCorners },
+          });
+        }
+
         // Cleanup
         M.delete();
         srcPoints.delete();

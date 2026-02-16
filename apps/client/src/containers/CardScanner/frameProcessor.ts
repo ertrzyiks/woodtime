@@ -24,6 +24,26 @@ import { PipelineDebugger } from './pipelineDebugger';
 export type { GridData, ExtractionContext };
 export type { PipelineContext };
 
+/**
+ * Tracks information about a transformation applied to the image
+ * Allows later steps to understand what operations preceded them
+ */
+export interface PipelineTransformation {
+  // The step that performed this transformation
+  stepName: string;
+  // Input and output dimensions
+  inputWidth: number;
+  inputHeight: number;
+  outputWidth: number;
+  outputHeight: number;
+  // Type of transformation (for easier identification)
+  type: 'resize' | 'scale' | 'perspective' | 'other';
+  // Optional: transformation matrix (e.g., perspective transform)
+  matrix?: any;
+  // Optional: metadata about the transformation
+  metadata?: Record<string, any>;
+}
+
 interface GridStructure {
   rows: number;
   cols: number;
@@ -233,6 +253,11 @@ interface PipelineContext {
   detectedCorners?: number[][] | null;
   inverseTransform?: any; // Inverse perspective transform matrix
   detectedContours?: any; // Contours detected in straightened card
+  transformedContourPoints?: number[][]; // Contour points transformed back to scaled space
+  originalImageWidth?: number;
+  originalImageHeight?: number;
+  // Transformation history - each step records what it did
+  transformations?: PipelineTransformation[];
 }
 
 function runPipeline(input: any, steps: PipelineStep[], ctx: PipelineContext) {
@@ -281,7 +306,12 @@ export function processVideoFrame(
       debugContainer,
       debugger: pipelineDebugger,
       src,
+      originalImageWidth: src.cols,
+      originalImageHeight: src.rows,
+      transformations: [], // Initialize transformation history
     };
+
+    log('Original image dimensions from canvas:', src.cols, 'x', src.rows);
 
     // Build a processing pipeline so each transformation is explicit and ordered
     const thickLinesSmall = runPipeline(
@@ -338,8 +368,62 @@ export function processVideoFrame(
     // Cleanup
     straightenedCard.delete();
 
-    // Display result
-    cv.imshow(canvas, src);
+    // Draw the transformed contour on the original image if available
+    if (
+      ctx.transformedContourPoints &&
+      ctx.transformedContourPoints.length > 0
+    ) {
+      // Create a copy to draw on
+      const outputWithContour = new cv.Mat();
+      src.copyTo(outputWithContour);
+
+      // Convert to RGB if needed for colored drawing
+      let drawMat = outputWithContour;
+      if (outputWithContour.channels() === 4) {
+        const rgbMat = new cv.Mat();
+        cv.cvtColor(outputWithContour, rgbMat, cv.COLOR_RGBA2RGB);
+        outputWithContour.delete();
+        drawMat = rgbMat;
+      } else if (outputWithContour.channels() === 1) {
+        const rgbMat = new cv.Mat();
+        cv.cvtColor(outputWithContour, rgbMat, cv.COLOR_GRAY2RGB);
+        outputWithContour.delete();
+        drawMat = rgbMat;
+      }
+
+      // Draw the contour points as a polyline in red
+      const contourPoints = ctx.transformedContourPoints;
+      if (contourPoints.length >= 2) {
+        const color = new cv.Scalar(0, 0, 255, 255); // Red in BGR
+
+        // Draw lines connecting the points
+        for (let i = 0; i < contourPoints.length; i++) {
+          const p1 = contourPoints[i];
+          const p2 = contourPoints[(i + 1) % contourPoints.length];
+
+          cv.line(
+            drawMat,
+            new cv.Point(Math.round(p1[0]), Math.round(p1[1])),
+            new cv.Point(Math.round(p2[0]), Math.round(p2[1])),
+            color,
+            3,
+            cv.LINE_AA,
+          );
+        }
+
+        console.log(
+          '[frameProcessor] Drew transformed contour on original image',
+        );
+
+        // Display the result
+        cv.imshow(canvas, drawMat);
+      }
+
+      drawMat.delete();
+    } else {
+      // Display result without contour
+      cv.imshow(canvas, src);
+    }
 
     // Render debug visualization if debugger is available
     if (ctx.debugger) {

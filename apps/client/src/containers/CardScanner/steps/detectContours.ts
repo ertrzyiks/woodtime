@@ -1,8 +1,45 @@
 import { PipelineContext } from '../frameProcessor';
 
 /**
+ * Reverse transform a point through the transformation pipeline history
+ * Applies all transformations in reverse order to map from current space back to original space
+ */
+function reverseTransformPoint(
+  point: [number, number],
+  transformations: any[],
+): [number, number] {
+  let [x, y] = point;
+
+  // Apply transformations in reverse order
+  for (let i = transformations.length - 1; i >= 0; i--) {
+    const t = transformations[i];
+
+    if (t.type === 'perspective' && t.matrix) {
+      // Apply inverse perspective transform
+      const pt = cv.matFromArray(1, 1, cv.CV_32FC2, [x, y]);
+      const transformedPt = cv.matFromArray(1, 1, cv.CV_32FC2, [0, 0]);
+      cv.perspectiveTransform(pt, transformedPt, t.matrix);
+      x = transformedPt.data32F[0];
+      y = transformedPt.data32F[1];
+      pt.delete();
+      transformedPt.delete();
+    } else if (t.type === 'resize' || t.type === 'scale') {
+      // For resize/scale, we need to map from output space back to input space
+      // This means multiplying by the ratio: inputSize / outputSize
+      const scaleX = t.inputWidth / t.outputWidth;
+      const scaleY = t.inputHeight / t.outputHeight;
+      x *= scaleX;
+      y *= scaleY;
+    }
+  }
+
+  return [x, y];
+}
+
+/**
  * Detect contours in the straightened card image
  * Finds all contours and stores information about them
+ * Transforms contours back to original image space using transformation history
  */
 export const detectContours = () => {
   const step = (input: any, ctx: PipelineContext) => {
@@ -89,6 +126,54 @@ export const detectContours = () => {
       console.log(
         `[detectContours] Drew largest contour (index ${largestIndex}) on output image`,
       );
+
+      // Transform the largest contour back to original image space
+      // Uses the transformation history to apply inverse transformations
+      if (ctx.transformations && ctx.transformations.length > 0) {
+        try {
+          const largestContour = contours.get(largestIndex);
+          const contourPoints: number[][] = [];
+
+          // Extract contour points
+          const contourMat = largestContour;
+          for (let i = 0; i < contourMat.rows; i++) {
+            const x = contourMat.data32S[i * 2];
+            const y = contourMat.data32S[i * 2 + 1];
+            contourPoints.push([x, y]);
+          }
+
+          console.log(
+            `[detectContours] Largest contour has ${contourPoints.length} points`,
+          );
+
+          // Transform points back through the entire pipeline
+          const transformedPoints: number[][] = contourPoints.map((point) =>
+            reverseTransformPoint(
+              point as [number, number],
+              ctx.transformations!,
+            ),
+          );
+
+          console.log(
+            `[detectContours] Transformed ${transformedPoints.length} points back to original image space using transformation history`,
+          );
+          console.log(
+            `[detectContours] Used ${ctx.transformations.length} transformations in reverse`,
+          );
+
+          // Store transformed contour in context for use in frameProcessor
+          ctx.transformedContourPoints = transformedPoints;
+        } catch (err) {
+          console.error(
+            '[detectContours] Error transforming contour back:',
+            err,
+          );
+        }
+      } else {
+        console.warn(
+          '[detectContours] No transformation history available - contour transformation skipped',
+        );
+      }
 
       // Cleanup (note: contours and hierarchy are stored in context, so don't delete them yet)
       return output;

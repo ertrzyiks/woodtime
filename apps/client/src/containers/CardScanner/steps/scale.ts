@@ -11,6 +11,20 @@ export const scale = (scaleFactor: number) => {
     cv.resize(input, resizedSmall, new cv.Size(smallWidth, smallHeight));
     ctx.originalScaleX = ctx.src.cols / resizedSmall.cols;
     ctx.originalScaleY = ctx.src.rows / resizedSmall.rows;
+
+    // Record transformation in context
+    if (ctx && ctx.transformations) {
+      ctx.transformations.push({
+        stepName: `scale(${scaleFactor})`,
+        inputWidth: input.cols,
+        inputHeight: input.rows,
+        outputWidth: smallWidth,
+        outputHeight: smallHeight,
+        type: 'scale',
+        metadata: { scaleFactor },
+      });
+    }
+
     return resizedSmall;
   };
   step.__stepName = `scale(${scaleFactor})`;
