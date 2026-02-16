@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "global": "4.4.0",
-    "prettier": "3.8.0"
+    "prettier": "3.8.1"
   },
   "sideEffects": false
 }
