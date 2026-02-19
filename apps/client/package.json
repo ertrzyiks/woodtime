@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "3.14.0",
+    "@apollo/client": "4.1.5",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@graphql-tools/mock": "9.1.5",
