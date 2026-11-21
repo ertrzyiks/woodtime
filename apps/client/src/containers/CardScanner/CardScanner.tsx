@@ -6,11 +6,15 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import StopIcon from '@mui/icons-material/Stop';
 import { useHistory } from 'react-router-dom';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import {
-  processVideoFrame,
-  extractGridCellsFromMat,
-  GridData,
-} from './frameProcessor';
+import { readCardGrayscale, toGrayscale } from './cardReader';
+import referenceCardUrl from './reference/reference-card.jpg?url';
+
+/** Stamped state of the 3 x 10 cell grid, row 0 is the top row of the card. */
+interface GridData {
+  rows: number;
+  cols: number;
+  cells: boolean[][];
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -54,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cellGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(7, 1fr)',
+      gridTemplateColumns: 'repeat(10, 1fr)',
       gap: 4,
       maxWidth: 400,
       margin: '0 auto',
@@ -89,17 +93,29 @@ const CardScanner = () => {
   const [gridData, setGridData] = useState<GridData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isOpenCVLoaded, setIsOpenCVLoaded] = useState(false);
+  const referenceGrayRef = useRef<any>(null);
+  // The OpenCV.js global is a thenable that resolves to the initialised module.
+  const cvRef = useRef<any>(null);
 
-  // Check if OpenCV is loaded
+  // Wait until OpenCV.js is initialised
   useEffect(() => {
+    let cancelled = false;
     const checkOpenCV = () => {
+      if (cancelled) return;
       if (typeof cv !== 'undefined') {
-        setIsOpenCVLoaded(true);
+        Promise.resolve(cv).then((module: any) => {
+          if (cancelled) return;
+          cvRef.current = module;
+          setIsOpenCVLoaded(true);
+        });
       } else {
         setTimeout(checkOpenCV, 100);
       }
     };
     checkOpenCV();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Cleanup on unmount
@@ -147,10 +163,21 @@ const CardScanner = () => {
     setIsRecording(false);
   };
 
-  const extractGridCells = useCallback((warpedMat: any, context?: any) => {
-    const gridData = extractGridCellsFromMat(warpedMat, context);
-    setGridData(gridData);
-  }, []);
+  // Load the reference card once OpenCV is ready; it is the alignment template.
+  useEffect(() => {
+    if (!isOpenCVLoaded || referenceGrayRef.current) return;
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      canvas.getContext('2d')?.drawImage(image, 0, 0);
+      const rgba = cvRef.current.imread(canvas);
+      referenceGrayRef.current = toGrayscale(cvRef.current, rgba);
+      rgba.delete();
+    };
+    image.src = referenceCardUrl;
+  }, [isOpenCVLoaded]);
 
   const processFrame = useCallback(() => {
     if (!videoRef.current || !canvasRef.current || !isRecording) return;
@@ -180,14 +207,41 @@ const CardScanner = () => {
       return;
     }
 
-    // Process the frame
-    processVideoFrame(canvas, extractGridCells);
+    // Wait until the reference card has been loaded
+    if (!referenceGrayRef.current) {
+      animationFrameRef.current = requestAnimationFrame(processFrame);
+      return;
+    }
+
+    // Read the stamped cells of the card in this frame
+    // A frame that cannot be read (e.g. blank camera frame) is skipped, not fatal.
+    try {
+      const rgba = cvRef.current.imread(canvas);
+      const gray = toGrayscale(cvRef.current, rgba);
+      rgba.delete();
+      try {
+        const reading = readCardGrayscale(
+          cvRef.current,
+          gray,
+          referenceGrayRef.current,
+        );
+        setGridData({
+          rows: reading.rows,
+          cols: reading.cols,
+          cells: reading.cells,
+        });
+      } finally {
+        gray.delete();
+      }
+    } catch (err) {
+      console.warn('Skipping camera frame:', err);
+    }
 
     // Continue processing
     if (isRecording) {
       animationFrameRef.current = requestAnimationFrame(processFrame);
     }
-  }, [isRecording, isOpenCVLoaded, extractGridCells]);
+  }, [isRecording, isOpenCVLoaded]);
 
   useEffect(() => {
     if (isRecording && isOpenCVLoaded) {
