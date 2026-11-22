@@ -6,7 +6,11 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import StopIcon from '@mui/icons-material/Stop';
 import { useHistory } from 'react-router-dom';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import { readCardGrayscale, toGrayscale } from './cardReader';
+import {
+  drawReadingOverlay,
+  readCardGrayscale,
+  toGrayscale,
+} from './cardReader';
 import referenceCardUrl from './reference/reference-card.jpg?url';
 
 /** Stamped state of the 3 x 10 cell grid, row 0 is the top row of the card. */
@@ -87,6 +91,11 @@ const CardScanner = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
+  // Mirrors showOverlay for the frame loop, which does not re-create on change.
+  const showOverlayRef = useRef(false);
+  showOverlayRef.current = showOverlay;
   const animationFrameRef = useRef<number | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -218,7 +227,6 @@ const CardScanner = () => {
     try {
       const rgba = cvRef.current.imread(canvas);
       const gray = toGrayscale(cvRef.current, rgba);
-      rgba.delete();
       try {
         const reading = readCardGrayscale(
           cvRef.current,
@@ -230,8 +238,16 @@ const CardScanner = () => {
           cols: reading.cols,
           cells: reading.cells,
         });
+        if (showOverlayRef.current && overlayCanvasRef.current) {
+          const overlay = drawReadingOverlay(cvRef.current, rgba, reading, {
+            matches: true,
+          });
+          cvRef.current.imshow(overlayCanvasRef.current, overlay);
+          overlay.delete();
+        }
       } finally {
         gray.delete();
+        rgba.delete();
       }
     } catch (err) {
       console.warn('Skipping camera frame:', err);
@@ -318,10 +334,32 @@ const CardScanner = () => {
             Stop Camera
           </Button>
         )}
+        <Button
+          variant={showOverlay ? 'contained' : 'outlined'}
+          onClick={() => setShowOverlay((v) => !v)}
+        >
+          {showOverlay ? 'Hide overlay' : 'Show overlay'}
+        </Button>
         <Button variant="outlined" onClick={handleBack}>
           Back
         </Button>
       </div>
+
+      {showOverlay && (
+        <Paper style={{ padding: 8, marginTop: 8 }}>
+          <Typography variant="h6" gutterBottom>
+            Debug overlay
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            Green frame: stamped. Orange frame: empty. Red circle: detected
+            hole. Yellow dots: alignment matches.
+          </Typography>
+          <canvas
+            ref={overlayCanvasRef}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          />
+        </Paper>
+      )}
 
       {gridData && (
         <Paper className={classes.gridPreview}>

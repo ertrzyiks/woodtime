@@ -309,3 +309,46 @@ export function matToArray(mat: any, rows: number, cols: number): number[] {
 }
 
 export { CARD_HEIGHT, CARD_WIDTH };
+
+/**
+ * Outline of one cell (its margin-trimmed rectangle) in photo coordinates,
+ * as four points: top-left, top-right, bottom-right, bottom-left.
+ * `transform` maps reference coordinates to the photo, scaled by `scale`
+ * (so the points are in full-resolution photo pixels).
+ */
+export function cellOutline(
+  cv: any,
+  transform: Transform,
+  scale: number,
+  row: number,
+  col: number,
+): Array<[number, number]> {
+  const d = createDisposer();
+  try {
+    const x0 = COLUMN_EDGES[col] + CELL_MARGIN;
+    const x1 = COLUMN_EDGES[col + 1] - CELL_MARGIN;
+    const y0 = ROW_EDGES[row] + CELL_MARGIN;
+    const y1 = ROW_EDGES[row + 1] - CELL_MARGIN;
+    const corners = d.track(
+      matPoints(cv, [
+        [x0, y0],
+        [x1, y0],
+        [x1, y1],
+        [x0, y1],
+      ]),
+    );
+    const mapped = d.track(new cv.Mat());
+    const M = d.track(
+      matFromArray(cv, toSmallCoordinates(transform, scale), 3, 3),
+    );
+    cv.perspectiveTransform(corners, mapped, M);
+    const out: Array<[number, number]> = [];
+    const data = mapped.data32F as Float32Array;
+    // Points are in the downscaled photo; convert back to full resolution.
+    for (let i = 0; i < 4; i++)
+      out.push([data[2 * i] / scale, data[2 * i + 1] / scale]);
+    return out;
+  } finally {
+    d.dispose();
+  }
+}

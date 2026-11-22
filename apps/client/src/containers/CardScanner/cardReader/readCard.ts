@@ -7,6 +7,7 @@
  */
 import { cardNumber, COLS, ROWS } from './layout';
 import {
+  cellOutline,
   cellPatch,
   cellTransforms,
   createDisposer,
@@ -24,6 +25,8 @@ export interface CellReading {
   col: number;
   stamped: boolean;
   holes: HoleBlob[];
+  /** Cell outline in full-resolution photo pixels: TL, TR, BR, BL. */
+  outline: Array<[number, number]>;
 }
 
 export interface CardReading {
@@ -37,6 +40,8 @@ export interface CardReading {
   matchCount: number;
   /** False when the card could not be aligned at all. */
   aligned: boolean;
+  /** ORB match points in full-resolution photo pixels (for debugging). */
+  matchPoints: Array<[number, number]>;
 }
 
 /**
@@ -63,6 +68,7 @@ export function readCardGrayscale(
       return emptyReading(matches.reference.length, false);
     }
     const transforms = cellTransforms(cv, matches, global);
+    const matchPoints = matches.photo;
     const { small, scale } = downscaleForPatches(cv, photoGray);
     disposer.track(small);
 
@@ -74,8 +80,15 @@ export function readCardGrayscale(
           const holes = findHolesInPatch(cv, patch);
           const card = cardNumber(row, col);
           const stamped = holes.length > 0;
+          const outline = cellOutline(
+            cv,
+            transforms[row][col],
+            scale,
+            row,
+            col,
+          );
           cells[row][col] = stamped;
-          details[card] = { card, row, col, stamped, holes };
+          details[card] = { card, row, col, stamped, holes, outline };
         } finally {
           patch.delete();
         }
@@ -88,6 +101,7 @@ export function readCardGrayscale(
       details,
       matchCount: matches.reference.length,
       aligned: true,
+      matchPoints,
     };
   } finally {
     disposer.dispose();
@@ -102,6 +116,7 @@ function emptyReading(matchCount: number, aligned: boolean): CardReading {
     details: {},
     matchCount,
     aligned,
+    matchPoints: [],
   };
 }
 
