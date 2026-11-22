@@ -1,2 +1,4 @@
 #!/usr/bin/env bash
-git push dokku-api main:master
+# Pushes main to the Dokku API app. Git LFS objects are not uploaded: Dokku
+# has no LFS endpoint, and the API does not use the LFS-tracked images.
+GIT_LFS_SKIP_PUSH=1 git push dokku-api main:master

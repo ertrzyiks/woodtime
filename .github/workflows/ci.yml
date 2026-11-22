@@ -136,7 +136,7 @@ jobs:
           git config --global filter.lfs.smudge "cat"
           git config --global filter.lfs.clean "cat"
           git remote add dokku dokku@167.71.190.115:woodtime-api
-          git push dokku HEAD:master --force
+          GIT_LFS_SKIP_PUSH=1 git push dokku HEAD:master --force
 
   deploy_web:
     name: "Deploy Web"
@@ -146,6 +146,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          lfs: false
       - name: Download build folder
         uses: actions/download-artifact@v7
         with:
@@ -153,6 +155,8 @@ jobs:
           path: dist
 
       - name: Deploy 🚀
+        env:
+          GIT_LFS_SKIP_PUSH: 1
         uses: JamesIves/github-pages-deploy-action@v4.8.0
         with:
           branch: gh-pages
