@@ -6,11 +6,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import StopIcon from '@mui/icons-material/Stop';
 import { useHistory } from 'react-router-dom';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import {
-  drawReadingOverlay,
-  readCardGrayscale,
-  toGrayscale,
-} from './cardReader';
+import { CardReaderClient, OPENCV_INTEGRITY, OPENCV_URL } from './cardReader';
 import referenceCardUrl from './reference/reference-card.jpg?url';
 
 /** Stamped state of the 3 x 10 cell grid, row 0 is the top row of the card. */
@@ -37,14 +33,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 'auto',
       border: '2px solid #ccc',
       borderRadius: 8,
-    },
-    canvas: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      pointerEvents: 'none',
-      maxWidth: '100%',
-      height: 'auto',
     },
     controls: {
       display: 'flex',
@@ -90,7 +78,6 @@ const CardScanner = () => {
   const history = useHistory();
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   // Mirrors showOverlay for the frame loop, which does not re-create on change.
@@ -101,29 +88,27 @@ const CardScanner = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [gridData, setGridData] = useState<GridData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isOpenCVLoaded, setIsOpenCVLoaded] = useState(false);
-  const referenceGrayRef = useRef<any>(null);
-  // The OpenCV.js global is a thenable that resolves to the initialised module.
-  const cvRef = useRef<any>(null);
+  const [isReaderReady, setIsReaderReady] = useState(false);
+  // The card reader runs in a Web Worker; it is created once per page.
+  const readerRef = useRef<CardReaderClient | null>(null);
 
-  // Wait until OpenCV.js is initialised
   useEffect(() => {
-    let cancelled = false;
-    const checkOpenCV = () => {
-      if (cancelled) return;
-      if (typeof cv !== 'undefined') {
-        Promise.resolve(cv).then((module: any) => {
-          if (cancelled) return;
-          cvRef.current = module;
-          setIsOpenCVLoaded(true);
-        });
-      } else {
-        setTimeout(checkOpenCV, 100);
-      }
-    };
-    checkOpenCV();
+    const reader = new CardReaderClient({
+      opencvUrl: OPENCV_URL,
+      opencvIntegrity: OPENCV_INTEGRITY,
+      referenceUrl: referenceCardUrl,
+    });
+    readerRef.current = reader;
+    reader
+      .whenReady()
+      .then(() => setIsReaderReady(true))
+      .catch((err) => {
+        console.error('Card reader failed to load:', err);
+        setError('The card reader could not be loaded.');
+      });
     return () => {
-      cancelled = true;
+      reader.terminate();
+      readerRef.current = null;
     };
   }, []);
 
@@ -172,98 +157,47 @@ const CardScanner = () => {
     setIsRecording(false);
   };
 
-  // Load the reference card once OpenCV is ready; it is the alignment template.
-  useEffect(() => {
-    if (!isOpenCVLoaded || referenceGrayRef.current) return;
-    const image = new Image();
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-      canvas.getContext('2d')?.drawImage(image, 0, 0);
-      const rgba = cvRef.current.imread(canvas);
-      referenceGrayRef.current = toGrayscale(cvRef.current, rgba);
-      rgba.delete();
-    };
-    image.src = referenceCardUrl;
-  }, [isOpenCVLoaded]);
-
   const processFrame = useCallback(() => {
-    if (!videoRef.current || !canvasRef.current || !isRecording) return;
-
     const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const reader = readerRef.current;
+    if (!video || !reader || !isRecording) return;
 
-    if (!ctx) return;
-
-    // Wait for video to have valid dimensions
-    if (video.videoWidth === 0 || video.videoHeight === 0) {
+    const scheduleNext = () => {
       animationFrameRef.current = requestAnimationFrame(processFrame);
+    };
+
+    // Skip this frame if the video has no picture yet or the worker is still busy.
+    if (video.videoWidth === 0 || !reader.isReady || reader.isBusy) {
+      scheduleNext();
       return;
     }
 
-    // Set canvas dimensions to match video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    // Draw video frame to canvas
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Check if OpenCV is loaded
-    if (!isOpenCVLoaded) {
-      animationFrameRef.current = requestAnimationFrame(processFrame);
-      return;
-    }
-
-    // Wait until the reference card has been loaded
-    if (!referenceGrayRef.current) {
-      animationFrameRef.current = requestAnimationFrame(processFrame);
-      return;
-    }
-
-    // Read the stamped cells of the card in this frame
-    // A frame that cannot be read (e.g. blank camera frame) is skipped, not fatal.
-    try {
-      const rgba = cvRef.current.imread(canvas);
-      const gray = toGrayscale(cvRef.current, rgba);
-      try {
-        const reading = readCardGrayscale(
-          cvRef.current,
-          gray,
-          referenceGrayRef.current,
-        );
-        setGridData({
-          rows: reading.rows,
-          cols: reading.cols,
-          cells: reading.cells,
-        });
-        if (showOverlayRef.current && overlayCanvasRef.current) {
-          const overlay = drawReadingOverlay(cvRef.current, rgba, reading, {
-            matches: true,
-          });
-          cvRef.current.imshow(overlayCanvasRef.current, overlay);
-          overlay.delete();
+    createImageBitmap(video)
+      .then((bitmap) => reader.read(bitmap, showOverlayRef.current))
+      .then((result) => {
+        if (!result.aligned) return;
+        setGridData({ rows: 3, cols: 10, cells: result.grid });
+        const overlayCanvas = overlayCanvasRef.current;
+        if (result.overlay && overlayCanvas) {
+          overlayCanvas.width = result.overlay.width;
+          overlayCanvas.height = result.overlay.height;
+          overlayCanvas.getContext('2d')?.drawImage(result.overlay, 0, 0);
+          result.overlay.close();
         }
-      } finally {
-        gray.delete();
-        rgba.delete();
-      }
-    } catch (err) {
-      console.warn('Skipping camera frame:', err);
-    }
+      })
+      .catch((err) => {
+        if (err instanceof Error && err.message === 'Reader is busy') return;
+        console.warn('Skipping camera frame:', err);
+      });
 
-    // Continue processing
-    if (isRecording) {
-      animationFrameRef.current = requestAnimationFrame(processFrame);
-    }
-  }, [isRecording, isOpenCVLoaded]);
+    scheduleNext();
+  }, [isRecording]);
 
   useEffect(() => {
-    if (isRecording && isOpenCVLoaded) {
+    if (isRecording && isReaderReady) {
       processFrame();
     }
-  }, [isRecording, isOpenCVLoaded, processFrame]);
+  }, [isRecording, isReaderReady, processFrame]);
 
   const handleBack = () => {
     history.push('/');
@@ -306,11 +240,6 @@ const CardScanner = () => {
           autoPlay
           playsInline
           muted
-        />
-        <canvas
-          ref={canvasRef}
-          className={classes.canvas}
-          style={{ display: isRecording ? 'block' : 'none' }}
         />
       </div>
 

@@ -5,3 +5,6 @@ export type { HoleBlob } from './holes';
 export * from './layout';
 export { drawReadingOverlay, patchToPhoto } from './overlay';
 export type { OverlayOptions } from './overlay';
+export { CardReaderClient } from './readerClient';
+export type { FrameResult } from './readerClient';
+export { OPENCV_INTEGRITY, OPENCV_URL } from './opencvSource';
