@@ -10,6 +10,7 @@ export interface FrameResult {
   grid: boolean[][];
   matchCount: number;
   aligned: boolean;
+  cardSizeFraction: number | null;
   overlay?: ImageBitmap;
 }
 
@@ -104,6 +105,7 @@ export class CardReaderClient {
         grid: message.grid,
         matchCount: message.matchCount,
         aligned: message.aligned,
+        cardSizeFraction: message.cardSizeFraction,
         overlay: message.overlay,
       });
     }

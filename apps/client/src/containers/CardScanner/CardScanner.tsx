@@ -6,7 +6,12 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import StopIcon from '@mui/icons-material/Stop';
 import { useHistory } from 'react-router-dom';
 import { useBreadcrumbStyles } from '../../hooks/useBreadcrumbStyles';
-import { CardReaderClient, OPENCV_INTEGRITY, OPENCV_URL } from './cardReader';
+import {
+  CardReaderClient,
+  MIN_CARD_SIZE,
+  OPENCV_INTEGRITY,
+  OPENCV_URL,
+} from './cardReader';
 import referenceCardUrl from './reference/reference-card.jpg?url';
 
 /** Stamped state of the 3 x 10 cell grid, row 0 is the top row of the card. */
@@ -65,6 +70,20 @@ const useStyles = makeStyles((theme: Theme) =>
     cellStamped: {
       backgroundColor: '#4caf50',
     },
+    hint: {
+      position: 'absolute',
+      top: theme.spacing(2),
+      left: '50%',
+      transform: 'translateX(-50%)',
+      maxWidth: '90%',
+      padding: theme.spacing(1, 2),
+      borderRadius: 8,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      color: '#fff',
+      textAlign: 'center',
+      pointerEvents: 'none',
+      zIndex: 1,
+    },
   }),
 );
 
@@ -87,6 +106,8 @@ const CardScanner = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [gridData, setGridData] = useState<GridData | null>(null);
+  // Card size as a fraction of the frame's shorter side; null when no card is found.
+  const [cardSize, setCardSize] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isReaderReady, setIsReaderReady] = useState(false);
   // The card reader runs in a Web Worker; it is created once per page.
@@ -128,7 +149,12 @@ const CardScanner = () => {
     try {
       setError(null);
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: 1280, height: 720 },
+        // Ask for a high resolution: the card needs many pixels for holes to be visible.
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 3840 },
+          height: { ideal: 2160 },
+        },
       });
 
       if (videoRef.current) {
@@ -155,6 +181,7 @@ const CardScanner = () => {
       videoRef.current.srcObject = null;
     }
     setIsRecording(false);
+    setCardSize(null);
   };
 
   const processFrame = useCallback(() => {
@@ -175,6 +202,7 @@ const CardScanner = () => {
     createImageBitmap(video)
       .then((bitmap) => reader.read(bitmap, showOverlayRef.current))
       .then((result) => {
+        setCardSize(result.cardSizeFraction);
         if (!result.aligned) return;
         setGridData({ rows: 3, cols: 10, cells: result.grid });
         const overlayCanvas = overlayCanvasRef.current;
@@ -241,6 +269,13 @@ const CardScanner = () => {
           playsInline
           muted
         />
+        {isRecording && (cardSize === null || cardSize < MIN_CARD_SIZE) && (
+          <div className={classes.hint}>
+            {cardSize === null
+              ? 'Point the camera at the card'
+              : 'Move closer: the card should fill the frame'}
+          </div>
+        )}
       </div>
 
       <div className={classes.controls}>

@@ -6,7 +6,7 @@
  */
 /// <reference lib="webworker" />
 import { drawReadingOverlay } from './overlay';
-import { readCardGrayscale, toGrayscale } from './readCard';
+import { readCardInFrame, toGrayscale } from './readCard';
 import type { ReaderRequest, ReaderResponse } from './readerProtocol';
 
 const scope = self as unknown as DedicatedWorkerGlobalScope & { cv?: any };
@@ -65,7 +65,7 @@ async function readFrame(request: Extract<ReaderRequest, { type: 'frame' }>) {
   let overlay: any = null;
   try {
     gray = toGrayscale(cv, rgba);
-    const reading = readCardGrayscale(cv, gray, referenceGray);
+    const reading = readCardInFrame(cv, gray, referenceGray);
     let overlayBitmap: ImageBitmap | undefined;
     if (request.overlay) {
       overlay = drawReadingOverlay(cv, rgba, reading, { matches: true });
@@ -82,6 +82,7 @@ async function readFrame(request: Extract<ReaderRequest, { type: 'frame' }>) {
       grid: reading.cells,
       matchCount: reading.matchCount,
       aligned: reading.aligned,
+      cardSizeFraction: reading.cardSizeFraction,
       overlay: overlayBitmap,
     };
     post(response, overlayBitmap ? [overlayBitmap] : []);

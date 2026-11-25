@@ -32,6 +32,8 @@ export type ReaderResponse =
       grid: boolean[][];
       matchCount: number;
       aligned: boolean;
+      /** Card size as a fraction of the frame's shorter side; null if no card. */
+      cardSizeFraction: number | null;
       overlay?: ImageBitmap;
     }
   | { type: 'error'; id?: number; message: string };

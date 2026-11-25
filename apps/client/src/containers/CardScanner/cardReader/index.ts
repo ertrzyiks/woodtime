@@ -1,4 +1,9 @@
-export { readCardGrayscale, toGrayscale } from './readCard';
+export {
+  MIN_CARD_SIZE,
+  readCardGrayscale,
+  readCardInFrame,
+  toGrayscale,
+} from './readCard';
 export type { CardReading, CellReading } from './readCard';
 export { findHolesInPatch } from './holes';
 export type { HoleBlob } from './holes';
